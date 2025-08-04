@@ -1,0 +1,148 @@
+/* Import Google Fonts */
+/* font-family: 'Bangers', cursive; */
+/* font-family: 'Open Sans', sans-serif; */
+
+body {
+    font-family: 'Open Sans', sans-serif;
+    background-color: #e0f7fa;
+    background-image: linear-gradient(to bottom, #81d4fa, #e0f7fa);
+    color: #333;
+    margin: 0;
+    padding: 40px 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center; /* Re-centered vertically */
+    min-height: 100vh;
+}
+
+.container {
+    width: 100%;
+    max-width: 800px;
+    background: #ffffff;
+    border-radius: 20px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+    padding: 30px 40px;
+    text-align: center;
+    border: 8px solid #00509d;
+    border-image: linear-gradient(45deg, #e63946, #ffd166) 1;
+}
+
+header .title {
+    font-family: 'Bangers', cursive;
+    font-size: 4.5rem;
+    color: #e63946;
+    margin: 0;
+    letter-spacing: 3px;
+    text-shadow: 4px 4px 0 #ffd166;
+}
+
+header .subtitle {
+    font-size: 1.2rem;
+    color: #00509d;
+    font-weight: bold;
+    margin-top: -10px;
+    margin-bottom: 30px;
+}
+
+.ticket-booth {
+    background: #fffbe8;
+    border: 3px dashed #e63946;
+    padding: 20px;
+    border-radius: 10px;
+}
+
+.ticket-booth h2 {
+    font-family: 'Bangers', cursive;
+    font-size: 2rem;
+    color: #00509d;
+    margin-top: 0;
+}
+
+#urlInput {
+    width: 80%;
+    padding: 12px;
+    border: 2px solid #ccc;
+    border-radius: 5px;
+    font-size: 1rem;
+    margin-bottom: 20px;
+}
+
+#analyzeButton {
+    display: block;
+    width: 100%;
+    padding: 15px;
+    font-family: 'Bangers', cursive;
+    font-size: 1.8rem;
+    color: #fff;
+    background-image: linear-gradient(to right, #e63946, #f77f00);
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s;
+    letter-spacing: 1px;
+    box-shadow: 0 5px 0 #c1121f;
+}
+
+#analyzeButton:hover {
+    transform: scale(1.02) translateY(-2px);
+    box-shadow: 0 7px 0 #c1121f;
+}
+
+#analyzeButton:active {
+    transform: translateY(2px);
+    box-shadow: 0 3px 0 #c1121f;
+}
+
+#analyzeButton:disabled {
+    background-image: none;
+    background-color: #999;
+    box-shadow: 0 5px 0 #666;
+    cursor: not-allowed;
+}
+
+/* Progress Bar Styles */
+#progress-container { margin-top: 20px; }
+#progress-status { font-size: 1.2rem; color: #00509d; }
+.progress-bar-outline { width: 100%; height: 30px; background-color: #e0e0e0; border-radius: 15px; border: 2px solid #00509d; padding: 3px; }
+#progress-bar { width: 0%; height: 100%; background-image: linear-gradient(to right, #ffd166, #fca311); border-radius: 10px; transition: width 0.3s ease-in-out; }
+
+#results {
+    margin-top: 40px;
+    text-align: left;
+}
+#results h2, #results h3 {
+    font-family: 'Bangers', cursive;
+    text-align: center;
+    color: #00509d;
+}
+#results h2 { font-size: 2.5rem; }
+#results h3 { font-size: 2rem; margin-top: 30px; }
+
+.score-card { margin: 20px auto; text-align: center; }
+.score-circle { width: 150px; height: 150px; margin: auto; background: #ffd166; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-family: 'Bangers', cursive; font-size: 3rem; color: #00509d; border: 8px solid #00509d; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+
+#checklist-container { margin-top: 20px; }
+
+.check-item {
+    display: flex; 
+    align-items: center; 
+    margin-bottom: 12px; 
+    font-size: 1.1rem;
+    background-color: #f8f9fa;
+    padding: 10px;
+    border-radius: 5px;
+    border-left: 5px solid #ccc;
+}
+.check-item.passed {
+    border-left-color: #2a9d8f;
+}
+.check-item.failed {
+    border-left-color: #e76f51;
+}
+
+.check-item-icon { margin-right: 15px; font-size: 1.5rem; }
+.check-item-text strong { color: #00509d; }
+.check-item-text span { font-size: 0.9rem; color: #666; display: block; }
+
+footer { margin-top: 30px; text-align: center; font-size: 0.9rem; color: #777; }
+.hidden { display: none; }

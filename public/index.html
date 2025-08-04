@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The GEO Thrill-O-Meter</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Open+Sans:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1 class="title">Generative Engine Optimization<BR>(GEO)<BR>Thrill-O-Meter</h1>
+<br>
+            <p class="subtitle">Is your website a headline attraction or a sideshow? Let's find out!</p>
+        </header>
+
+        <main>
+            <div class="ticket-booth">
+                <h2>Enter Your Website's Homepage URL</h2>
+                <input type="text" id="urlInput" placeholder="https://your-attraction-website.com">
+                <button id="analyzeButton">Start Full Site Inspection!</button>
+            </div>
+
+            <div id="progress-container" class="hidden">
+                <h3 id="progress-status">Preparing the inspection...</h3>
+                <div class="progress-bar-outline">
+                    <div id="progress-bar" style="width: 0%;"></div>
+                </div>
+            </div>
+
+            <div id="results" class="hidden">
+                <h2>Full Site Inspection Report</h2>
+                <div class="score-card">
+                    <h3>Overall Thrill Score</h3>
+                    <div id="score" class="score-circle">0/100</div>
+                </div>
+                <div id="checklist-container">
+                    <h3>Site-Wide Compliance Checklist</h3>
+                    </div>
+            </div>
+        </main>
+
+        <footer>
+            <p>A GEO Compliance Tool for the Themed Attractions Industry</p>
+        </footer>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
