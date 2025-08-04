@@ -8,7 +8,9 @@ const progressContainer = document.getElementById('progress-container');
 const progressStatus = document.getElementById('progress-status');
 const progressBar = document.getElementById('progress-bar');
 const resultsSection = document.getElementById('results');
-const scoreElement = document.getElementById('score');
+const scoreCircle = document.getElementById('score-circle');
+const scoreLegend = document.getElementById('score-legend');
+const ctaButton = document.getElementById('cta-button');
 const checklistContainer = document.getElementById('checklist-container');
 
 
@@ -26,9 +28,9 @@ analyzeButton.addEventListener('click', async () => {
     } catch (error) {
         console.error("A critical error occurred:", error);
         alert(`An unexpected error occurred: ${error.message}. Please check the URL and try again.`);
-        progressContainer.classList.add('hidden');
+        uiReset(); // Reset UI on critical failure
         resultsSection.classList.remove('hidden');
-        scoreElement.textContent = "N/A";
+        scoreCircle.textContent = "N/A";
         checklistContainer.innerHTML = '<h3>Site-Wide Compliance Checklist</h3><p>The analysis could not be completed.</p>';
     } finally {
         analyzeButton.textContent = 'Start Full Site Inspection!';
@@ -38,7 +40,7 @@ analyzeButton.addEventListener('click', async () => {
 
 
 /**
- * The main CRAWLER function. It orchestrates the entire site analysis.
+ * The main CRAWLER function.
  * @param {string} startUrl The URL where the crawl begins.
  */
 async function crawlSite(startUrl) {
@@ -68,16 +70,6 @@ async function crawlSite(startUrl) {
             const checks = runAllChecks(doc, currentUrl);
             allPageResults.push({ url: currentUrl, checks });
 
-            doc.querySelectorAll('a[href]').forEach(link => {
-                try {
-                    const absoluteUrl = new URL(link.getAttribute('href'), startUrl).href;
-                    if (absoluteUrl.startsWith(siteOrigin) && !crawledUrls.has(absoluteUrl) && !urlsToCrawl.includes(absoluteUrl)) {
-                       if (urlsToCrawl.length + crawledUrls.size < MAX_PAGES_TO_CRAWL) {
-                            urlsToCrawl.push(absoluteUrl);
-                       }
-                    }
-                } catch (e) { /* Ignore invalid URLs */ }
-            });
         } catch (error) {
             console.error(`Failed to crawl ${currentUrl}:`, error);
         }
@@ -93,6 +85,12 @@ function uiReset() {
     resultsSection.classList.add('hidden');
     progressContainer.classList.remove('hidden');
     checklistContainer.innerHTML = '<h3>Site-Wide Compliance Checklist</h3>';
+    
+    // Hide CTA and reset score colors/text on new run
+    ctaButton.classList.add('hidden');
+    scoreCircle.className = 'score-circle';
+    scoreLegend.className = 'score-legend';
+    scoreLegend.textContent = '';
 }
 
 function uiUpdateProgress(crawledCount, currentUrl) {
@@ -101,12 +99,25 @@ function uiUpdateProgress(crawledCount, currentUrl) {
     progressStatus.textContent = `Analyzing page ${crawledCount}/${MAX_PAGES_TO_CRAWL}: ${currentUrl.substring(0, 70)}...`;
 }
 
+/**
+ * Gets the category object (label and class name) based on the score.
+ * @param {number} score - The final calculated score.
+ * @returns {Object} An object with label and className.
+ */
+function getScoreCategory(score) {
+    if (score >= 90) return { label: 'Excellent', className: 'score-excellent' };
+    if (score >= 80) return { label: 'Good', className: 'score-good' };
+    if (score >= 70) return { label: 'Room to Improve', className: 'score-improve' };
+    if (score >= 60) return { label: 'Needs Help', className: 'score-needs-help' };
+    return { label: 'Needs Urgent Help', className: 'score-urgent' };
+}
+
 function displayFinalReport(allPageResults) {
     progressContainer.classList.add('hidden');
     resultsSection.classList.remove('hidden');
 
     if (allPageResults.length === 0) {
-        scoreElement.textContent = "N/A";
+        scoreCircle.textContent = "N/A";
         checklistContainer.innerHTML += '<p>Could not retrieve any pages to analyze.</p>';
         return;
     }
@@ -130,7 +141,21 @@ function displayFinalReport(allPageResults) {
     });
 
     const averageScore = Math.round((totalPasses / totalChecks) * 100) || 0;
-    scoreElement.textContent = `${averageScore}/100`;
+    
+    // --- NEW LOGIC FOR SCORE AND CTA ---
+    const scoreCategory = getScoreCategory(averageScore);
+
+    scoreCircle.textContent = `${averageScore}`;
+    scoreCircle.classList.add(scoreCategory.className);
+    
+    scoreLegend.textContent = scoreCategory.label;
+    scoreLegend.classList.add(scoreCategory.className);
+
+    if (averageScore <= 73) {
+        ctaButton.classList.remove('hidden');
+    }
+    // --- END OF NEW LOGIC ---
+
 
     for (const name in checkStats) {
         const stats = checkStats[name];
@@ -152,7 +177,7 @@ function displayFinalReport(allPageResults) {
 }
 
 
-// --- Analysis Functions ---
+// --- Analysis Functions (Unchanged) ---
 function runAllChecks(doc, url) {
     const textContent = doc.body.textContent || "";
     const schemaTypes = getSchemaTypes(doc);
