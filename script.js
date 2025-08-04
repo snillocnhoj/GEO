@@ -25,7 +25,6 @@ analyzeButton.addEventListener('click', async () => {
 
     try {
         const startUrl = rawUrl.startsWith('http') ? rawUrl : `https://${rawUrl}`;
-        // Set button to disabled state immediately
         analyzeButton.textContent = 'Inspection in Progress...';
         analyzeButton.disabled = true;
         await crawlSite(startUrl);
@@ -33,12 +32,11 @@ analyzeButton.addEventListener('click', async () => {
     } catch (error) {
         console.error("A critical error occurred:", error);
         alert(`An unexpected error occurred: ${error.message}. Please check the URL and try again.`);
-        uiReset(); // Reset UI on critical failure
+        uiReset(); 
         resultsSection.classList.remove('hidden');
         checklistContainer.innerHTML = '<h3>Site-Wide Compliance Checklist</h3><p>The analysis could not be completed.</p>';
 
     } finally {
-        // This block will always run, re-enabling the button
         analyzeButton.textContent = 'Start Full Site Inspection!';
         analyzeButton.disabled = false;
     }
@@ -59,9 +57,7 @@ async function crawlSite(startUrl) {
 
     while (urlsToCrawl.length > 0 && crawledUrls.size < MAX_PAGES_TO_CRAWL) {
         const currentUrl = urlsToCrawl.shift();
-        if (crawledUrls.has(currentUrl)) {
-            continue;
-        }
+        if (crawledUrls.has(currentUrl)) continue;
 
         try {
             crawledUrls.add(currentUrl);
@@ -87,9 +83,7 @@ async function crawlSite(startUrl) {
                             urlsToCrawl.push(absoluteUrl);
                        }
                     }
-                } catch (e) { 
-                    // Ignore invalid URLs
-                }
+                } catch (e) { /* Ignore invalid URLs */ }
             });
         } catch (error) {
             console.error(`Failed to crawl ${currentUrl}:`, error);
@@ -101,16 +95,11 @@ async function crawlSite(startUrl) {
 
 // --- UI Update Functions ---
 function uiReset() {
-    // Hide results, show progress
     resultsSection.classList.add('hidden');
     progressContainer.classList.remove('hidden');
     
-    // Clear out previous results completely
-    checklistContainer.innerHTML = '<h3>Site-Wide Compliance Checklist</h3>';
-    
-    // Hide the entire score wrapper initially
+    checklistContainer.innerHTML = '';
     scoreWrapper.classList.add('hidden');
-    ctaButton.classList.add('hidden');
 }
 
 function uiUpdateProgress(crawledCount, currentUrl) {
@@ -119,11 +108,6 @@ function uiUpdateProgress(crawledCount, currentUrl) {
     progressStatus.textContent = `Analyzing page ${crawledCount}/${MAX_PAGES_TO_CRAWL}: ${currentUrl.substring(0, 70)}...`;
 }
 
-/**
- * Gets the category object (label and class name) based on the score.
- * @param {number} score - The final calculated score.
- * @returns {Object} An object with label and className.
- */
 function getScoreCategory(score) {
     if (score >= 90) return { label: 'Excellent', className: 'score-excellent' };
     if (score >= 80) return { label: 'Good', className: 'score-good' };
@@ -135,8 +119,8 @@ function getScoreCategory(score) {
 function displayFinalReport(allPageResults) {
     progressContainer.classList.add('hidden');
     resultsSection.classList.remove('hidden');
+    checklistContainer.innerHTML = '<h3>Site-Wide Compliance Checklist</h3>';
 
-    // Handle case where no pages could be analyzed
     if (allPageResults.length === 0) {
         checklistContainer.innerHTML += '<p>Could not retrieve any pages to analyze.</p>';
         return;
@@ -166,16 +150,18 @@ function displayFinalReport(allPageResults) {
 
     // Update score elements
     scoreCircle.textContent = `${averageScore}`;
-    scoreCircle.className = 'score-circle'; // Reset classes
+    scoreCircle.className = 'score-circle'; 
     scoreCircle.classList.add(scoreCategory.className);
     
     scoreLegend.textContent = scoreCategory.label;
-    scoreLegend.className = 'score-legend'; // Reset classes
+    scoreLegend.className = 'score-legend'; 
     scoreLegend.classList.add(scoreCategory.className);
 
     // Update and show CTA button if needed
     if (averageScore <= 73) {
         ctaButton.classList.remove('hidden');
+    } else {
+        ctaButton.classList.add('hidden');
     }
     
     // Unhide the entire score wrapper now that it's populated
@@ -228,13 +214,11 @@ function runAllChecks(doc, url) {
         { name: 'FAQ or How-To Schema', passed: schemaTypes.includes('FAQPage') || schemaTypes.includes('HowTo') },
     ];
 }
-
 function checkAltText(doc) {
     const images = Array.from(doc.querySelectorAll('img'));
     if (images.length === 0) return true;
     return images.every(img => img.alt && img.alt.trim() !== '');
 }
-
 function checkConversationalTone(doc) {
     const headings = doc.querySelectorAll('h2, h3');
     const questionWords = ['what', 'how', 'why', 'when', 'where', 'is', 'can', 'do'];
@@ -243,7 +227,6 @@ function checkConversationalTone(doc) {
         return questionWords.some(word => headingText.startsWith(word));
     });
 }
-
 function checkOutboundLinks(doc, url) {
     try {
         const pageHost = new URL(url).hostname;
@@ -255,7 +238,6 @@ function checkOutboundLinks(doc, url) {
         });
     } catch (e) { return false; }
 }
-
 function countInternalLinks(doc, url) {
     try {
         const pageHost = new URL(url).hostname;
@@ -267,7 +249,6 @@ function countInternalLinks(doc, url) {
         }).length;
     } catch (e) { return 0; }
 }
-
 function checkReadability(text) {
     const sentences = text.match(/[^.!?]+[.!?]+/g) || [];
     const words = text.match(/\b\w+\b/g) || [];
@@ -275,7 +256,6 @@ function checkReadability(text) {
     const average = words.length / sentences.length;
     return average < 25;
 }
-
 function getSchemaTypes(doc) {
     const schemas = [];
     const schemaScripts = doc.querySelectorAll('script[type="application/ld+json"]');

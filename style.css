@@ -140,10 +140,11 @@ header .subtitle {
     align-items: center;
     font-family: 'Bangers', cursive;
     font-size: 3rem;
-    color: #fff; /* Text color is always white */
-    border: 8px solid;
+    color: #fff; /* Text color is ALWAYS white */
+    border: 8px solid #ccc; /* Default border color */
     box-shadow: 0 4px 10px rgba(0,0,0,0.1);
     transition: background-color 0.5s, border-color 0.5s;
+    background-color: #ccc; /* Default background color */
 }
 
 .score-legend {
@@ -154,14 +155,14 @@ header .subtitle {
 }
 
 /* --- CSS FIX IS HERE --- */
-/* The 'color' property was removed from these shared classes */
+/* These classes ONLY control background and border color now. */
 .score-excellent { background-color: #2a9d8f; border-color: #264653; }
 .score-good { background-color: #8ab17d; border-color: #264653; }
 .score-improve { background-color: #e9c46a; border-color: #264653; }
 .score-needs-help { background-color: #f4a261; border-color: #264653; }
 .score-urgent { background-color: #e76f51; border-color: #264653; }
 
-/* The legend's text color is set separately */
+/* The legend's text color is set separately and explicitly. */
 .score-legend.score-excellent { color: #2a9d8f; }
 .score-legend.score-good { color: #8ab17d; }
 .score-legend.score-improve { color: #e9c46a; }
