@@ -24,15 +24,22 @@ analyzeButton.addEventListener('click', async () => {
 
     try {
         const startUrl = rawUrl.startsWith('http') ? rawUrl : `https://${rawUrl}`;
+        // Set button to disabled state immediately
+        analyzeButton.textContent = 'Inspection in Progress...';
+        analyzeButton.disabled = true;
         await crawlSite(startUrl);
+
     } catch (error) {
         console.error("A critical error occurred:", error);
         alert(`An unexpected error occurred: ${error.message}. Please check the URL and try again.`);
-        uiReset(); // Reset UI on critical failure
+        // Reset UI on critical failure
+        uiReset();
         resultsSection.classList.remove('hidden');
         scoreCircle.textContent = "N/A";
         checklistContainer.innerHTML = '<h3>Site-Wide Compliance Checklist</h3><p>The analysis could not be completed.</p>';
+
     } finally {
+        // This block will always run, re-enabling the button
         analyzeButton.textContent = 'Start Full Site Inspection!';
         analyzeButton.disabled = false;
     }
@@ -40,7 +47,7 @@ analyzeButton.addEventListener('click', async () => {
 
 
 /**
- * The main CRAWLER function.
+ * The main CRAWLER function. It orchestrates the entire site analysis.
  * @param {string} startUrl The URL where the crawl begins.
  */
 async function crawlSite(startUrl) {
@@ -61,7 +68,9 @@ async function crawlSite(startUrl) {
 
             const response = await fetch(`/api/scrape?url=${encodeURIComponent(currentUrl)}`);
             if (!response.ok) {
-                throw new Error(`The scraping service failed with status: ${response.status}`);
+                // If a single page fails, log it but don't stop the whole crawl
+                console.error(`Scraping service failed for ${currentUrl} with status: ${response.status}`);
+                continue; // Skip to the next URL
             }
             
             const html = await response.text();
@@ -70,6 +79,16 @@ async function crawlSite(startUrl) {
             const checks = runAllChecks(doc, currentUrl);
             allPageResults.push({ url: currentUrl, checks });
 
+            doc.querySelectorAll('a[href]').forEach(link => {
+                try {
+                    const absoluteUrl = new URL(link.getAttribute('href'), startUrl).href;
+                    if (absoluteUrl.startsWith(siteOrigin) && !crawledUrls.has(absoluteUrl) && !urlsToCrawl.includes(absoluteUrl)) {
+                       if (urlsToCrawl.length + crawledUrls.size < MAX_PAGES_TO_CRAWL) {
+                            urlsToCrawl.push(absoluteUrl);
+                       }
+                    }
+                } catch (e) { /* Ignore invalid URLs */ }
+            });
         } catch (error) {
             console.error(`Failed to crawl ${currentUrl}:`, error);
         }
@@ -80,17 +99,17 @@ async function crawlSite(startUrl) {
 
 // --- UI Update Functions ---
 function uiReset() {
-    analyzeButton.textContent = 'Inspection in Progress...';
-    analyzeButton.disabled = true;
+    // Hide results, show progress
     resultsSection.classList.add('hidden');
     progressContainer.classList.remove('hidden');
-    checklistContainer.innerHTML = '<h3>Site-Wide Compliance Checklist</h3>';
     
-    // Hide CTA and reset score colors/text on new run
-    ctaButton.classList.add('hidden');
-    scoreCircle.className = 'score-circle';
+    // Clear out previous results completely
+    checklistContainer.innerHTML = '<h3>Site-Wide Compliance Checklist</h3>';
+    scoreCircle.className = 'score-circle'; // Reset to default class
+    scoreCircle.textContent = '0'; // Reset text to 0
     scoreLegend.className = 'score-legend';
     scoreLegend.textContent = '';
+    ctaButton.classList.add('hidden');
 }
 
 function uiUpdateProgress(crawledCount, currentUrl) {
@@ -127,39 +146,41 @@ function displayFinalReport(allPageResults) {
     let totalChecks = 0;
 
     allPageResults.forEach(result => {
-        result.checks.forEach(check => {
-            if (!checkStats[check.name]) {
-                checkStats[check.name] = { passed: 0, total: 0 };
-            }
-            checkStats[check.name].total++;
-            totalChecks++;
-            if (check.passed) {
-                checkStats[check.name].passed++;
-                totalPasses++;
-            }
-        });
+        if (result.checks) { // Safety check
+            result.checks.forEach(check => {
+                if (!checkStats[check.name]) {
+                    checkStats[check.name] = { passed: 0, total: 0 };
+                }
+                checkStats[check.name].total++;
+                totalChecks++;
+                if (check.passed) {
+                    checkStats[check.name].passed++;
+                    totalPasses++;
+                }
+            });
+        }
     });
 
-    const averageScore = Math.round((totalPasses / totalChecks) * 100) || 0;
+    // Prevent division by zero if no checks were processed
+    const averageScore = totalChecks > 0 ? Math.round((totalPasses / totalChecks) * 100) : 0;
     
-    // --- NEW LOGIC FOR SCORE AND CTA ---
     const scoreCategory = getScoreCategory(averageScore);
 
     scoreCircle.textContent = `${averageScore}`;
+    scoreCircle.className = 'score-circle'; // Reset classes before adding new one
     scoreCircle.classList.add(scoreCategory.className);
     
     scoreLegend.textContent = scoreCategory.label;
+    scoreLegend.className = 'score-legend'; // Reset classes
     scoreLegend.classList.add(scoreCategory.className);
 
     if (averageScore <= 73) {
         ctaButton.classList.remove('hidden');
     }
-    // --- END OF NEW LOGIC ---
-
 
     for (const name in checkStats) {
         const stats = checkStats[name];
-        const passPercent = Math.round((stats.passed / stats.total) * 100);
+        const passPercent = stats.total > 0 ? Math.round((stats.passed / stats.total) * 100) : 0;
         
         const checkItem = document.createElement('div');
         const icon = passPercent >= 75 ? '✔️' : '❌';
@@ -203,13 +224,11 @@ function runAllChecks(doc, url) {
         { name: 'FAQ or How-To Schema', passed: schemaTypes.includes('FAQPage') || schemaTypes.includes('HowTo') },
     ];
 }
-
 function checkAltText(doc) {
     const images = Array.from(doc.querySelectorAll('img'));
     if (images.length === 0) return true;
     return images.every(img => img.alt && img.alt.trim() !== '');
 }
-
 function checkConversationalTone(doc) {
     const headings = doc.querySelectorAll('h2, h3');
     const questionWords = ['what', 'how', 'why', 'when', 'where', 'is', 'can', 'do'];
@@ -218,7 +237,6 @@ function checkConversationalTone(doc) {
         return questionWords.some(word => headingText.startsWith(word));
     });
 }
-
 function checkOutboundLinks(doc, url) {
     try {
         const pageHost = new URL(url).hostname;
@@ -230,7 +248,6 @@ function checkOutboundLinks(doc, url) {
         });
     } catch (e) { return false; }
 }
-
 function countInternalLinks(doc, url) {
     try {
         const pageHost = new URL(url).hostname;
@@ -242,30 +259,4 @@ function countInternalLinks(doc, url) {
         }).length;
     } catch (e) { return 0; }
 }
-
-function checkReadability(text) {
-    const sentences = text.match(/[^.!?]+[.!?]+/g) || [];
-    const words = text.match(/\b\w+\b/g) || [];
-    if (sentences.length === 0 || words.length === 0) return true;
-    const average = words.length / sentences.length;
-    return average < 25;
-}
-
-function getSchemaTypes(doc) {
-    const schemas = [];
-    const schemaScripts = doc.querySelectorAll('script[type="application/ld+json"]');
-    schemaScripts.forEach(script => {
-        try {
-            const json = JSON.parse(script.textContent);
-            const graph = json['@graph'] || [json];
-            graph.forEach(item => {
-                if (item['@type']) {
-                    schemas.push(item['@type']);
-                }
-            });
-        } catch (e) {
-            console.error("Error parsing JSON-LD:", e);
-        }
-    });
-    return schemas.flat();
-}
+function checkReadability(text
