@@ -10,7 +10,6 @@ const progressBar = document.getElementById('progress-bar');
 const resultsSection = document.getElementById('results');
 const scoreWrapper = document.getElementById('score-wrapper');
 const scoreCircle = document.getElementById('score-circle');
-const scoreLegend = document.getElementById('score-legend');
 const ctaButton = document.getElementById('cta-button');
 const checklistContainer = document.getElementById('checklist-container');
 
@@ -108,14 +107,6 @@ function uiUpdateProgress(crawledCount, currentUrl) {
     progressStatus.textContent = `Analyzing page ${crawledCount}/${MAX_PAGES_TO_CRAWL}: ${currentUrl.substring(0, 70)}...`;
 }
 
-function getScoreCategory(score) {
-    if (score >= 90) return { label: 'Excellent', className: 'score-excellent' };
-    if (score >= 80) return { label: 'Good', className: 'score-good' };
-    if (score >= 70) return { label: 'Room to Improve', className: 'score-improve' };
-    if (score >= 60) return { label: 'Needs Help', className: 'score-needs-help' };
-    return { label: 'Needs Urgent Help', className: 'score-urgent' };
-}
-
 function displayFinalReport(allPageResults) {
     progressContainer.classList.add('hidden');
     resultsSection.classList.remove('hidden');
@@ -146,26 +137,19 @@ function displayFinalReport(allPageResults) {
     });
 
     const averageScore = totalChecks > 0 ? Math.round((totalPasses / totalChecks) * 100) : 0;
-    const scoreCategory = getScoreCategory(averageScore);
 
-    // Update score elements
+    // --- SIMPLIFIED DISPLAY LOGIC ---
     scoreCircle.textContent = `${averageScore}`;
-    scoreCircle.className = 'score-circle'; 
-    scoreCircle.classList.add(scoreCategory.className);
-    
-    scoreLegend.textContent = scoreCategory.label;
-    scoreLegend.className = 'score-legend'; 
-    scoreLegend.classList.add(scoreCategory.className);
 
-    // Update and show CTA button if needed
     if (averageScore <= 73) {
         ctaButton.classList.remove('hidden');
     } else {
         ctaButton.classList.add('hidden');
     }
     
-    // Unhide the entire score wrapper now that it's populated
     scoreWrapper.classList.remove('hidden');
+    // --- END OF SIMPLIFIED LOGIC ---
+
 
     // Populate the checklist
     for (const name in checkStats) {

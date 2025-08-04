@@ -126,9 +126,43 @@ header .subtitle {
     display: flex;
     justify-content: center;
     align-items: center;
-    gap: 20px;
+    gap: 30px;
     margin-bottom: 25px;
+    flex-wrap: wrap;
 }
+
+/* --- NEW STATIC LEGEND STYLES --- */
+.static-legend {
+    text-align: left;
+    font-size: 1rem;
+    font-weight: bold;
+    color: #333;
+    border: 2px solid #ddd;
+    padding: 15px;
+    border-radius: 10px;
+}
+.legend-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 8px;
+}
+.legend-item:last-child {
+    margin-bottom: 0;
+}
+.legend-swatch {
+    width: 20px;
+    height: 20px;
+    border-radius: 4px;
+    margin-right: 10px;
+    border: 1px solid rgba(0,0,0,0.1);
+}
+.legend-swatch.excellent { background-color: #2a9d8f; }
+.legend-swatch.good { background-color: #8ab17d; }
+.legend-swatch.improve { background-color: #e9c46a; }
+.legend-swatch.needs-help { background-color: #f4a261; }
+.legend-swatch.urgent { background-color: #e76f51; }
+/* --- END OF NEW STYLES --- */
+
 
 .score-circle {
     width: 150px;
@@ -139,37 +173,12 @@ header .subtitle {
     justify-content: center;
     align-items: center;
     font-family: 'Bangers', cursive;
-    font-size: 3rem;
-    color: #fff; /* Text color is ALWAYS white */
-    border: 8px solid #ccc; /* Default border color */
+    font-size: 4rem; /* Larger font size for the score */
+    color: #fff;
+    background-color: #264653; /* Fixed background color */
+    border: 8px solid #00509d;
     box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-    transition: background-color 0.5s, border-color 0.5s;
-    background-color: #ccc; /* Default background color */
 }
-
-.score-legend {
-    font-family: 'Bangers', cursive;
-    font-size: 2.5rem;
-    letter-spacing: 1px;
-    transition: color 0.5s;
-}
-
-/* --- CSS FIX IS HERE --- */
-/* These classes ONLY control background and border color now. */
-.score-excellent { background-color: #2a9d8f; border-color: #264653; }
-.score-good { background-color: #8ab17d; border-color: #264653; }
-.score-improve { background-color: #e9c46a; border-color: #264653; }
-.score-needs-help { background-color: #f4a261; border-color: #264653; }
-.score-urgent { background-color: #e76f51; border-color: #264653; }
-
-/* The legend's text color is set separately and explicitly. */
-.score-legend.score-excellent { color: #2a9d8f; }
-.score-legend.score-good { color: #8ab17d; }
-.score-legend.score-improve { color: #e9c46a; }
-.score-legend.score-needs-help { color: #f4a261; }
-.score-legend.score-urgent { color: #e76f51; }
-/* --- END OF CSS FIX --- */
-
 
 .cta-button {
     display: inline-block;
