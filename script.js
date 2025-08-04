@@ -32,8 +32,7 @@ analyzeButton.addEventListener('click', async () => {
     } catch (error) {
         console.error("A critical error occurred:", error);
         alert(`An unexpected error occurred: ${error.message}. Please check the URL and try again.`);
-        // Reset UI on critical failure
-        uiReset();
+        uiReset(); // Reset UI on critical failure
         resultsSection.classList.remove('hidden');
         scoreCircle.textContent = "N/A";
         checklistContainer.innerHTML = '<h3>Site-Wide Compliance Checklist</h3><p>The analysis could not be completed.</p>';
@@ -60,7 +59,9 @@ async function crawlSite(startUrl) {
 
     while (urlsToCrawl.length > 0 && crawledUrls.size < MAX_PAGES_TO_CRAWL) {
         const currentUrl = urlsToCrawl.shift();
-        if (crawledUrls.has(currentUrl)) continue;
+        if (crawledUrls.has(currentUrl)) {
+            continue;
+        }
 
         try {
             crawledUrls.add(currentUrl);
@@ -87,7 +88,9 @@ async function crawlSite(startUrl) {
                             urlsToCrawl.push(absoluteUrl);
                        }
                     }
-                } catch (e) { /* Ignore invalid URLs */ }
+                } catch (e) { 
+                    // Ignore invalid URLs found on the page
+                }
             });
         } catch (error) {
             console.error(`Failed to crawl ${currentUrl}:`, error);
@@ -161,7 +164,6 @@ function displayFinalReport(allPageResults) {
         }
     });
 
-    // Prevent division by zero if no checks were processed
     const averageScore = totalChecks > 0 ? Math.round((totalPasses / totalChecks) * 100) : 0;
     
     const scoreCategory = getScoreCategory(averageScore);
@@ -198,7 +200,7 @@ function displayFinalReport(allPageResults) {
 }
 
 
-// --- Analysis Functions (Unchanged) ---
+// --- Analysis Functions ---
 function runAllChecks(doc, url) {
     const textContent = doc.body.textContent || "";
     const schemaTypes = getSchemaTypes(doc);
@@ -224,11 +226,13 @@ function runAllChecks(doc, url) {
         { name: 'FAQ or How-To Schema', passed: schemaTypes.includes('FAQPage') || schemaTypes.includes('HowTo') },
     ];
 }
+
 function checkAltText(doc) {
     const images = Array.from(doc.querySelectorAll('img'));
     if (images.length === 0) return true;
     return images.every(img => img.alt && img.alt.trim() !== '');
 }
+
 function checkConversationalTone(doc) {
     const headings = doc.querySelectorAll('h2, h3');
     const questionWords = ['what', 'how', 'why', 'when', 'where', 'is', 'can', 'do'];
@@ -237,6 +241,7 @@ function checkConversationalTone(doc) {
         return questionWords.some(word => headingText.startsWith(word));
     });
 }
+
 function checkOutboundLinks(doc, url) {
     try {
         const pageHost = new URL(url).hostname;
@@ -248,6 +253,7 @@ function checkOutboundLinks(doc, url) {
         });
     } catch (e) { return false; }
 }
+
 function countInternalLinks(doc, url) {
     try {
         const pageHost = new URL(url).hostname;
@@ -259,4 +265,30 @@ function countInternalLinks(doc, url) {
         }).length;
     } catch (e) { return 0; }
 }
-function checkReadability(text
+
+function checkReadability(text) {
+    const sentences = text.match(/[^.!?]+[.!?]+/g) || [];
+    const words = text.match(/\b\w+\b/g) || [];
+    if (sentences.length === 0 || words.length === 0) return true;
+    const average = words.length / sentences.length;
+    return average < 25;
+}
+
+function getSchemaTypes(doc) {
+    const schemas = [];
+    const schemaScripts = doc.querySelectorAll('script[type="application/ld+json"]');
+    schemaScripts.forEach(script => {
+        try {
+            const json = JSON.parse(script.textContent);
+            const graph = json['@graph'] || [json];
+            graph.forEach(item => {
+                if (item['@type']) {
+                    schemas.push(item['@type']);
+                }
+            });
+        } catch (e) {
+            console.error("Error parsing JSON-LD:", e);
+        }
+    });
+    return schemas.flat();
+}
