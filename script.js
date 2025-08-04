@@ -8,6 +8,7 @@ const progressContainer = document.getElementById('progress-container');
 const progressStatus = document.getElementById('progress-status');
 const progressBar = document.getElementById('progress-bar');
 const resultsSection = document.getElementById('results');
+const scoreWrapper = document.getElementById('score-wrapper');
 const scoreCircle = document.getElementById('score-circle');
 const scoreLegend = document.getElementById('score-legend');
 const ctaButton = document.getElementById('cta-button');
@@ -34,7 +35,6 @@ analyzeButton.addEventListener('click', async () => {
         alert(`An unexpected error occurred: ${error.message}. Please check the URL and try again.`);
         uiReset(); // Reset UI on critical failure
         resultsSection.classList.remove('hidden');
-        scoreCircle.textContent = "N/A";
         checklistContainer.innerHTML = '<h3>Site-Wide Compliance Checklist</h3><p>The analysis could not be completed.</p>';
 
     } finally {
@@ -69,9 +69,8 @@ async function crawlSite(startUrl) {
 
             const response = await fetch(`/api/scrape?url=${encodeURIComponent(currentUrl)}`);
             if (!response.ok) {
-                // If a single page fails, log it but don't stop the whole crawl
                 console.error(`Scraping service failed for ${currentUrl} with status: ${response.status}`);
-                continue; // Skip to the next URL
+                continue; 
             }
             
             const html = await response.text();
@@ -89,7 +88,7 @@ async function crawlSite(startUrl) {
                        }
                     }
                 } catch (e) { 
-                    // Ignore invalid URLs found on the page
+                    // Ignore invalid URLs
                 }
             });
         } catch (error) {
@@ -108,10 +107,9 @@ function uiReset() {
     
     // Clear out previous results completely
     checklistContainer.innerHTML = '<h3>Site-Wide Compliance Checklist</h3>';
-    scoreCircle.className = 'score-circle'; // Reset to default class
-    scoreCircle.textContent = '0'; // Reset text to 0
-    scoreLegend.className = 'score-legend';
-    scoreLegend.textContent = '';
+    
+    // Hide the entire score wrapper initially
+    scoreWrapper.classList.add('hidden');
     ctaButton.classList.add('hidden');
 }
 
@@ -138,8 +136,8 @@ function displayFinalReport(allPageResults) {
     progressContainer.classList.add('hidden');
     resultsSection.classList.remove('hidden');
 
+    // Handle case where no pages could be analyzed
     if (allPageResults.length === 0) {
-        scoreCircle.textContent = "N/A";
         checklistContainer.innerHTML += '<p>Could not retrieve any pages to analyze.</p>';
         return;
     }
@@ -149,7 +147,7 @@ function displayFinalReport(allPageResults) {
     let totalChecks = 0;
 
     allPageResults.forEach(result => {
-        if (result.checks) { // Safety check
+        if (result.checks) {
             result.checks.forEach(check => {
                 if (!checkStats[check.name]) {
                     checkStats[check.name] = { passed: 0, total: 0 };
@@ -158,28 +156,32 @@ function displayFinalReport(allPageResults) {
                 totalChecks++;
                 if (check.passed) {
                     checkStats[check.name].passed++;
-                    totalPasses++;
                 }
             });
         }
     });
 
     const averageScore = totalChecks > 0 ? Math.round((totalPasses / totalChecks) * 100) : 0;
-    
     const scoreCategory = getScoreCategory(averageScore);
 
+    // Update score elements
     scoreCircle.textContent = `${averageScore}`;
-    scoreCircle.className = 'score-circle'; // Reset classes before adding new one
+    scoreCircle.className = 'score-circle'; // Reset classes
     scoreCircle.classList.add(scoreCategory.className);
     
     scoreLegend.textContent = scoreCategory.label;
     scoreLegend.className = 'score-legend'; // Reset classes
     scoreLegend.classList.add(scoreCategory.className);
 
+    // Update and show CTA button if needed
     if (averageScore <= 73) {
         ctaButton.classList.remove('hidden');
     }
+    
+    // Unhide the entire score wrapper now that it's populated
+    scoreWrapper.classList.remove('hidden');
 
+    // Populate the checklist
     for (const name in checkStats) {
         const stats = checkStats[name];
         const passPercent = stats.total > 0 ? Math.round((stats.passed / stats.total) * 100) : 0;
@@ -200,7 +202,7 @@ function displayFinalReport(allPageResults) {
 }
 
 
-// --- Analysis Functions ---
+// --- Analysis Functions (Unchanged) ---
 function runAllChecks(doc, url) {
     const textContent = doc.body.textContent || "";
     const schemaTypes = getSchemaTypes(doc);

@@ -1,7 +1,4 @@
 /* Import Google Fonts */
-/* font-family: 'Bangers', cursive; */
-/* font-family: 'Open Sans', sans-serif; */
-
 body {
     font-family: 'Open Sans', sans-serif;
     background-color: #e0f7fa;
@@ -120,6 +117,11 @@ header .subtitle {
 
 .score-card { margin: 20px auto; text-align: center; }
 
+#score-wrapper h3 {
+    font-size: 1.5rem;
+    margin-bottom: 15px;
+}
+
 .score-display {
     display: flex;
     justify-content: center;
@@ -138,7 +140,7 @@ header .subtitle {
     align-items: center;
     font-family: 'Bangers', cursive;
     font-size: 3rem;
-    color: #fff;
+    color: #fff; /* Text color is always white */
     border: 8px solid;
     box-shadow: 0 4px 10px rgba(0,0,0,0.1);
     transition: background-color 0.5s, border-color 0.5s;
@@ -151,12 +153,22 @@ header .subtitle {
     transition: color 0.5s;
 }
 
-/* Color-coded classes */
-.score-excellent { background-color: #2a9d8f; border-color: #264653; color: #2a9d8f; }
-.score-good { background-color: #8ab17d; border-color: #264653; color: #8ab17d; }
-.score-improve { background-color: #e9c46a; border-color: #264653; color: #e9c46a; }
-.score-needs-help { background-color: #f4a261; border-color: #264653; color: #f4a261; }
-.score-urgent { background-color: #e76f51; border-color: #26465_3; color: #e76f51; }
+/* --- CSS FIX IS HERE --- */
+/* The 'color' property was removed from these shared classes */
+.score-excellent { background-color: #2a9d8f; border-color: #264653; }
+.score-good { background-color: #8ab17d; border-color: #264653; }
+.score-improve { background-color: #e9c46a; border-color: #264653; }
+.score-needs-help { background-color: #f4a261; border-color: #264653; }
+.score-urgent { background-color: #e76f51; border-color: #264653; }
+
+/* The legend's text color is set separately */
+.score-legend.score-excellent { color: #2a9d8f; }
+.score-legend.score-good { color: #8ab17d; }
+.score-legend.score-improve { color: #e9c46a; }
+.score-legend.score-needs-help { color: #f4a261; }
+.score-legend.score-urgent { color: #e76f51; }
+/* --- END OF CSS FIX --- */
+
 
 .cta-button {
     display: inline-block;
@@ -184,4 +196,18 @@ header .subtitle {
     background-color: #f8f9fa;
     padding: 10px;
     border-radius: 5px;
-    border-left: 5px solid #
+    border-left: 5px solid #ccc;
+}
+.check-item.passed {
+    border-left-color: #2a9d8f;
+}
+.check-item.failed {
+    border-left-color: #e76f51;
+}
+
+.check-item-icon { margin-right: 15px; font-size: 1.5rem; }
+.check-item-text strong { color: #00509d; }
+.check-item-text span { font-size: 0.9rem; color: #666; display: block; }
+
+footer { margin-top: 30px; text-align: center; font-size: 0.9rem; color: #777; }
+.hidden { display: none; }
