@@ -1,5 +1,5 @@
 const express = require('express');
-const axios = require('axios');
+const axios =require('axios');
 const path = require('path');
 const cors = require('cors');
 const { JSDOM } = require('jsdom');
@@ -8,8 +8,7 @@ const sgMail = require('@sendgrid/mail');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// --- API KEYS ARE NOW READ SECURELY FROM THE ENVIRONMENT ---
-// We will add these in the Render dashboard in the next step.
+// --- API KEYS ARE READ SECURELY FROM THE ENVIRONMENT ---
 const SCRAPER_API_KEY = process.env.SCRAPER_API_KEY;
 const SENDGRID_API_KEY = process.env.SENDGRID_API_KEY;
 const FROM_EMAIL = process.env.FROM_EMAIL;
@@ -26,7 +25,6 @@ app.use(express.json());
 
 // --- API Routes ---
 app.post('/api/analyze', async (req, res) => {
-    // Check if keys are configured on the server
     if (!SCRAPER_API_KEY || !SENDGRID_API_KEY || !FROM_EMAIL || !TO_EMAIL) {
         console.error('One or more environment variables are not set on the server.');
         return res.status(500).json({ error: 'Server is not configured correctly.' });
@@ -41,7 +39,8 @@ app.post('/api/analyze', async (req, res) => {
     
     try {
         const results = await crawlSite(startUrl);
-        await sendEmailReport(startUrl, results);
+        // We don't wait for the email to send before responding to the user
+        sendEmailReport(startUrl, results).catch(console.error);
         res.status(200).json(results);
     } catch (error) {
         console.error(`Analysis failed for ${startUrl}:`, error);
@@ -50,11 +49,23 @@ app.post('/api/analyze', async (req, res) => {
 });
 
 
-// --- Frontend File Serving ---
-app.use(express.static('public'));
-app.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'index.html'));
+// --- CORRECTED FRONTEND FILE SERVING ---
+// This section now correctly serves your files from the root directory.
+
+app.get('/style.css', (req, res) => {
+    res.sendFile(path.join(__dirname, 'style.css'));
 });
+
+app.get('/script.js', (req, res) => {
+    res.sendFile(path.join(__dirname, 'script.js'));
+});
+
+// The Root route for index.html MUST be the last frontend route.
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'index.html'));
+});
+// --- END OF CORRECTION ---
+
 
 app.listen(PORT, () => {
     console.log(`GEO Thrill-O-Meter server listening on port ${PORT}`);
