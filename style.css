@@ -131,7 +131,6 @@ header .subtitle {
     flex-wrap: wrap;
 }
 
-/* --- NEW STATIC LEGEND STYLES --- */
 .static-legend {
     text-align: left;
     font-size: 1rem;
@@ -159,10 +158,10 @@ header .subtitle {
 .legend-swatch.excellent { background-color: #2a9d8f; }
 .legend-swatch.good { background-color: #8ab17d; }
 .legend-swatch.improve { background-color: #e9c46a; }
-.legend-swatch.needs-help { background-color: #f4a261; }
-.legend-swatch.urgent { background-color: #e76f51; }
-/* --- END OF NEW STYLES --- */
-
+/* --- COLOR FIX IS HERE --- */
+.legend-swatch.needs-help { background-color: #fca5a5; } /* Light Red */
+.legend-swatch.urgent { background-color: #dc2626; } /* Bright Ruby Red */
+/* --- END OF COLOR FIX --- */
 
 .score-circle {
     width: 150px;
@@ -173,9 +172,9 @@ header .subtitle {
     justify-content: center;
     align-items: center;
     font-family: 'Bangers', cursive;
-    font-size: 4rem; /* Larger font size for the score */
+    font-size: 4rem;
     color: #fff;
-    background-color: #264653; /* Fixed background color */
+    background-color: #264653;
     border: 8px solid #00509d;
     box-shadow: 0 4px 10px rgba(0,0,0,0.1);
 }

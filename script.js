@@ -131,6 +131,7 @@ function displayFinalReport(allPageResults) {
                 totalChecks++;
                 if (check.passed) {
                     checkStats[check.name].passed++;
+                    totalPasses++; // <-- THIS WAS THE MISSING LINE
                 }
             });
         }
@@ -138,7 +139,6 @@ function displayFinalReport(allPageResults) {
 
     const averageScore = totalChecks > 0 ? Math.round((totalPasses / totalChecks) * 100) : 0;
 
-    // --- SIMPLIFIED DISPLAY LOGIC ---
     scoreCircle.textContent = `${averageScore}`;
 
     if (averageScore <= 73) {
@@ -148,10 +148,7 @@ function displayFinalReport(allPageResults) {
     }
     
     scoreWrapper.classList.remove('hidden');
-    // --- END OF SIMPLIFIED LOGIC ---
 
-
-    // Populate the checklist
     for (const name in checkStats) {
         const stats = checkStats[name];
         const passPercent = stats.total > 0 ? Math.round((stats.passed / stats.total) * 100) : 0;
