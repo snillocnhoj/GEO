@@ -43,54 +43,97 @@ analyzeButton.addEventListener('click', async () => {
 
 
 /**
- * The main CRAWLER function. It orchestrates the entire site analysis.
+ * The main CRAWLER function. Now updated to be more selective.
  * @param {string} startUrl The URL where the crawl begins.
  */
 async function crawlSite(startUrl) {
     uiReset();
 
-    const urlsToCrawl = [startUrl];
     const crawledUrls = new Set();
     const allPageResults = [];
     const siteOrigin = new URL(startUrl).origin;
+    
+    try {
+        // --- STEP 1: Always crawl and analyze the homepage first ---
+        crawledUrls.add(startUrl);
+        uiUpdateProgress(crawledUrls.size, startUrl);
+        const homePageHtml = await fetchHtml(startUrl);
+        const homePageDoc = new DOMParser().parseFromString(homePageHtml, 'text/html');
+        const homePageChecks = runAllChecks(homePageDoc, startUrl);
+        allPageResults.push({ url: startUrl, checks: homePageChecks });
 
-    while (urlsToCrawl.length > 0 && crawledUrls.size < MAX_PAGES_TO_CRAWL) {
-        const currentUrl = urlsToCrawl.shift();
-        if (crawledUrls.has(currentUrl)) continue;
+        // --- STEP 2: Intelligently find ONLY menu links from the homepage ---
+        const menuUrlsToCrawl = findMenuLinks(homePageDoc, startUrl, crawledUrls);
 
-        try {
+        // --- STEP 3: Loop through and crawl only the menu pages ---
+        while (menuUrlsToCrawl.length > 0 && crawledUrls.size < MAX_PAGES_TO_CRAWL) {
+            const currentUrl = menuUrlsToCrawl.shift();
+            if (crawledUrls.has(currentUrl)) continue;
+
             crawledUrls.add(currentUrl);
             uiUpdateProgress(crawledUrls.size, currentUrl);
-
-            const response = await fetch(`/api/scrape?url=${encodeURIComponent(currentUrl)}`);
-            if (!response.ok) {
-                console.error(`Scraping service failed for ${currentUrl} with status: ${response.status}`);
-                continue; 
-            }
             
-            const html = await response.text();
-            const doc = new DOMParser().parseFromString(html, 'text/html');
-
-            const checks = runAllChecks(doc, currentUrl);
-            allPageResults.push({ url: currentUrl, checks });
-
-            doc.querySelectorAll('a[href]').forEach(link => {
-                try {
-                    const absoluteUrl = new URL(link.getAttribute('href'), startUrl).href;
-                    if (absoluteUrl.startsWith(siteOrigin) && !crawledUrls.has(absoluteUrl) && !urlsToCrawl.includes(absoluteUrl)) {
-                       if (urlsToCrawl.length + crawledUrls.size < MAX_PAGES_TO_CRAWL) {
-                            urlsToCrawl.push(absoluteUrl);
-                       }
-                    }
-                } catch (e) { /* Ignore invalid URLs */ }
-            });
-        } catch (error) {
-            console.error(`Failed to crawl ${currentUrl}:`, error);
+            try {
+                const pageHtml = await fetchHtml(currentUrl);
+                const pageDoc = new DOMParser().parseFromString(pageHtml, 'text/html');
+                const pageChecks = runAllChecks(pageDoc, currentUrl);
+                allPageResults.push({ url: currentUrl, checks: pageChecks });
+            } catch (error) {
+                console.error(`Failed to crawl menu page ${currentUrl}:`, error);
+            }
         }
+    } catch (error) {
+         console.error(`Failed to crawl homepage ${startUrl}:`, error);
     }
-
+    
     displayFinalReport(allPageResults);
 }
+
+
+/**
+ * Helper function to fetch HTML for a given URL.
+ * @param {string} url - The URL to fetch.
+ * @returns {Promise<string>} The HTML content.
+ */
+async function fetchHtml(url) {
+    const response = await fetch(`/api/scrape?url=${encodeURIComponent(url)}`);
+    if (!response.ok) {
+        throw new Error(`Scraping service failed with status: ${response.status}`);
+    }
+    return await response.text();
+}
+
+
+/**
+ * NEW: Smartly finds links within common navigation elements.
+ * @param {Document} doc - The parsed HTML document of the homepage.
+ * @param {string} startUrl - The base URL for resolving relative links.
+ * @param {Set<string>} crawledUrls - A set of already crawled URLs to avoid duplication.
+ * @returns {Array<string>} A unique array of menu link URLs.
+ */
+function findMenuLinks(doc, startUrl, crawledUrls) {
+    // This selector targets links inside <nav> tags or elements with "nav" or "menu" in their ID/class.
+    const navLinkSelectors = 'nav a, [id*="nav"] a, [id*="menu"] a, [class*="nav"] a, [class*="menu"] a';
+    const links = new Set(); // Use a Set to automatically handle duplicates
+    const siteOrigin = new URL(startUrl).origin;
+
+    doc.querySelectorAll(navLinkSelectors).forEach(link => {
+        try {
+            const href = link.getAttribute('href');
+            if (!href || href.startsWith('#')) return; // Ignore empty or anchor links
+
+            const absoluteUrl = new URL(href, startUrl).href;
+            
+            // Add if it's an internal link and not already crawled
+            if (absoluteUrl.startsWith(siteOrigin) && !crawledUrls.has(absoluteUrl)) {
+                links.add(absoluteUrl);
+            }
+        } catch (e) { /* Ignore invalid hrefs */ }
+    });
+
+    return Array.from(links); // Convert the Set back to an array
+}
+
 
 // --- UI Update Functions ---
 function uiReset() {
@@ -102,9 +145,10 @@ function uiReset() {
 }
 
 function uiUpdateProgress(crawledCount, currentUrl) {
-    const percent = Math.round((crawledCount / MAX_PAGES_TO_CRAWL) * 100);
+    const totalToCrawl = MAX_PAGES_TO_CRAWL; // We can improve this later if needed
+    const percent = Math.round((crawledCount / totalToCrawl) * 100);
     progressBar.style.width = `${percent}%`;
-    progressStatus.textContent = `Analyzing page ${crawledCount}/${MAX_PAGES_TO_CRAWL}: ${currentUrl.substring(0, 70)}...`;
+    progressStatus.textContent = `Analyzing page ${crawledCount}/${totalToCrawl} (max): ${currentUrl.substring(0, 60)}...`;
 }
 
 function displayFinalReport(allPageResults) {
@@ -131,7 +175,7 @@ function displayFinalReport(allPageResults) {
                 totalChecks++;
                 if (check.passed) {
                     checkStats[check.name].passed++;
-                    totalPasses++; // <-- THIS WAS THE MISSING LINE
+                    totalPasses++;
                 }
             });
         }
