@@ -38,7 +38,20 @@ header .subtitle {
     color: #00509d;
     font-weight: bold;
     margin-top: -10px;
-    margin-bottom: 30px;
+    margin-bottom: 10px;
+}
+
+/* New Trust Signal Styles */
+.brand-line {
+    font-size: 1.1rem;
+    color: #333;
+    margin: 10px 0 0;
+}
+.expertise-line {
+    font-size: 0.9rem;
+    color: #555;
+    margin: 5px 0 20px;
+    font-style: italic;
 }
 
 .ticket-booth {
@@ -54,6 +67,16 @@ header .subtitle {
     color: #00509d;
     margin-top: 0;
 }
+
+/* New Value Proposition Style */
+.value-prop {
+    margin: 25px auto;
+    max-width: 90%;
+    font-size: 1.1rem;
+    line-height: 1.6;
+    color: #264653;
+}
+
 
 #urlInput {
     width: 80%;
@@ -99,7 +122,7 @@ header .subtitle {
 
 /* Progress Bar Styles */
 #progress-container { margin-top: 20px; }
-#progress-status { font-size: 1.2rem; color: #00509d; }
+#progress-status { font-size: 1.2rem; color: #00509d; font-weight: bold; }
 .progress-bar-outline { width: 100%; height: 30px; background-color: #e0e0e0; border-radius: 15px; border: 2px solid #00509d; padding: 3px; }
 #progress-bar { width: 0%; height: 100%; background-image: linear-gradient(to right, #ffd166, #fca311); border-radius: 10px; transition: width 0.3s ease-in-out; }
 
@@ -127,7 +150,7 @@ header .subtitle {
     justify-content: center;
     align-items: center;
     gap: 30px;
-    margin-bottom: 25px;
+    margin-bottom: 20px;
     flex-wrap: wrap;
 }
 
@@ -158,10 +181,8 @@ header .subtitle {
 .legend-swatch.excellent { background-color: #2a9d8f; }
 .legend-swatch.good { background-color: #8ab17d; }
 .legend-swatch.improve { background-color: #e9c46a; }
-/* --- COLOR FIX IS HERE --- */
-.legend-swatch.needs-help { background-color: #fca5a5; } /* Light Red */
-.legend-swatch.urgent { background-color: #dc2626; } /* Bright Ruby Red */
-/* --- END OF COLOR FIX --- */
+.legend-swatch.needs-help { background-color: #fca5a5; }
+.legend-swatch.urgent { background-color: #dc2626; }
 
 .score-circle {
     width: 150px;
@@ -178,6 +199,41 @@ header .subtitle {
     border: 8px solid #00509d;
     box-shadow: 0 4px 10px rgba(0,0,0,0.1);
 }
+
+/* New Score Interpretation Style */
+#score-interpretation {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #c1121f;
+    margin: 0 auto 25px;
+    max-width: 80%;
+}
+
+/* New Humanized CTA Styles */
+.cta-humanizer {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+    background-color: #f8f9fa;
+    padding: 15px;
+    border-radius: 10px;
+    margin: 0 auto 20px;
+    max-width: 80%;
+}
+.cta-humanizer img {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    border: 3px solid #00509d;
+}
+.cta-humanizer p {
+    margin: 0;
+    text-align: left;
+    font-size: 1.1rem;
+    color: #333;
+}
+
 
 .cta-button {
     display: inline-block;
