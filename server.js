@@ -50,31 +50,21 @@ app.post('/api/analyze', async (req, res) => {
 
 
 // --- Frontend File Serving ---
-// Explicit routes for each asset, including the new images.
-
 app.get('/style.css', (req, res) => {
     res.sendFile(path.join(__dirname, 'style.css'));
 });
-
 app.get('/script.js', (req, res) => {
     res.sendFile(path.join(__dirname, 'script.js'));
 });
-
-// --- NEW ROUTES FOR IMAGES ---
 app.get('/logo.png', (req, res) => {
     res.sendFile(path.join(__dirname, 'logo.png'));
 });
-
 app.get('/john-photo.png', (req, res) => {
     res.sendFile(path.join(__dirname, 'john-photo.png'));
 });
-// --- END OF NEW ROUTES ---
-
-// The Root route for index.html MUST be the last frontend route.
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
 });
-
 
 app.listen(PORT, () => {
     console.log(`GEO Thrill-O-Meter server listening on port ${PORT}`);
@@ -82,7 +72,7 @@ app.listen(PORT, () => {
 
 
 // --- Core Application Logic (Now on the Server) ---
-// This section is unchanged.
+
 async function crawlSite(startUrl) {
     const allPageResults = [];
     const siteOrigin = new URL(startUrl).origin;
@@ -193,7 +183,32 @@ async function sendEmailReport(url, results) {
 
 
 // --- Analysis helper functions ---
-function findMenuLinks(e,t,n){const o='nav a, [id*="nav"] a, [id*="menu"] a, [class*="nav"] a, [class*="menu"] a',r=new Set,s=new URL(t).origin;return e.querySelectorAll(o).forEach(e=>{try{const o=e.getAttribute("href");if(!o||o.startsWith("#"))return;const a=new URL(o,t).href;a.startsWith(s)&&!n.has(a)&&r.add(a)}catch(e){}}),Array.from(r)}
+function findMenuLinks(doc, startUrl, crawledUrls) {
+    const navLinkSelectors = 'nav a, [id*="nav"] a, [id*="menu"] a, [class*="nav"] a, [class*="menu"] a';
+    const links = new Set();
+    const siteOrigin = new URL(startUrl).origin;
+
+    doc.querySelectorAll(navLinkSelectors).forEach(link => {
+        try {
+            const href = link.getAttribute('href');
+            if (!href || href.startsWith('#')) return; // Ignore empty or anchor-only links
+
+            const urlObject = new URL(href, startUrl);
+
+            // --- THIS IS THE FIX ---
+            // Remove the hash (#) from the URL to avoid crawling the same page multiple times
+            urlObject.hash = '';
+            const cleanUrl = urlObject.href;
+            // --- END OF FIX ---
+            
+            if (cleanUrl.startsWith(siteOrigin) && !crawledUrls.has(cleanUrl)) {
+                links.add(cleanUrl);
+            }
+        } catch (e) { /* Ignore invalid hrefs */ }
+    });
+
+    return Array.from(links);
+}
 function runAllChecks(e,t){const n=e.body.textContent||"",o=getSchemaTypes(e);return[{name:"Title Tag",passed:!!e.querySelector("title")?.textContent},{name:"Meta Description",passed:!!e.querySelector('meta[name="description"]')?.content},{name:"H1 Heading",passed:1===e.querySelectorAll("h1").length},{name:"Mobile-Friendly Viewport",passed:!!e.querySelector('meta[name="viewport"]')},{name:"Internal Linking",passed:countInternalLinks(e,t)>2},{name:"Image Alt Text",passed:checkAltText(e)},{name:"Conversational Tone",passed:checkConversationalTone(e)},{name:"Clear Structure (Lists)",passed:e.querySelectorAll("ul, ol").length>0},{name:"Readability",passed:checkReadability(n)},{name:"Unique Data/Insights",passed:/our data|our research|we surveyed/i.test(n)||e.querySelector("table")},{name:"Author Byline/Bio",passed:!!e.querySelector('a[href*="author/"], a[rel="author"]')},{name:"First-Hand Experience",passed:/in our test|hands-on|my experience|we visited/i.test(n)},{name:"Content Freshness",passed:/updated|published/i.test(n)||!!e.querySelector('meta[property*="time"]')},{name:"Contact Information",passed:!!e.querySelector('a[href*="contact"], a[href*="about"]')},{name:"Outbound Links",passed:checkOutboundLinks(e,t)},{name:"Cited Sources",passed:/source:|according to:|citation:/i.test(n)},{name:"Schema Found",passed:o.length>0},{name:"Article or Org Schema",passed:o.includes("Article")||o.includes("Organization")},{name:"FAQ or How-To Schema",passed:o.includes("FAQPage")||o.includes("HowTo")}]}
 function checkAltText(e){const t=Array.from(e.querySelectorAll("img"));return 0===t.length||t.every(e=>e.alt&&""!==e.alt.trim())}
 function checkConversationalTone(e){const t=e.querySelectorAll("h2, h3"),n=["what","how","why","when","where","is","can","do"];return Array.from(t).some(e=>{const t=e.textContent.trim().toLowerCase();return n.some(n=>t.startsWith(n))})}
