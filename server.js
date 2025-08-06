@@ -1,5 +1,5 @@
 const express = require('express');
-const axios =require('axios');
+const axios = require('axios');
 const path = require('path');
 const cors = require('cors');
 const { JSDOM } = require('jsdom');
@@ -49,8 +49,8 @@ app.post('/api/analyze', async (req, res) => {
 });
 
 
-// --- CORRECTED FRONTEND FILE SERVING ---
-// This section now correctly serves your files from the root directory.
+// --- Frontend File Serving ---
+// Explicit routes for each asset, including the new images.
 
 app.get('/style.css', (req, res) => {
     res.sendFile(path.join(__dirname, 'style.css'));
@@ -60,11 +60,20 @@ app.get('/script.js', (req, res) => {
     res.sendFile(path.join(__dirname, 'script.js'));
 });
 
+// --- NEW ROUTES FOR IMAGES ---
+app.get('/logo.png', (req, res) => {
+    res.sendFile(path.join(__dirname, 'logo.png'));
+});
+
+app.get('/john-photo.png', (req, res) => {
+    res.sendFile(path.join(__dirname, 'john-photo.png'));
+});
+// --- END OF NEW ROUTES ---
+
 // The Root route for index.html MUST be the last frontend route.
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
 });
-// --- END OF CORRECTION ---
 
 
 app.listen(PORT, () => {
@@ -73,7 +82,7 @@ app.listen(PORT, () => {
 
 
 // --- Core Application Logic (Now on the Server) ---
-
+// This section is unchanged.
 async function crawlSite(startUrl) {
     const allPageResults = [];
     const siteOrigin = new URL(startUrl).origin;
