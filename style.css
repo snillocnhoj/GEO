@@ -75,6 +75,7 @@ header .subtitle {
 #results h3 { font-size: 2rem; margin-top: 30px; }
 .score-card { margin: 20px auto; text-align: center; }
 #score-wrapper h3 { font-size: 1.5rem; margin-bottom: 15px; }
+
 .score-display {
     display: flex;
     justify-content: center;
@@ -83,10 +84,43 @@ header .subtitle {
     margin-bottom: 20px;
     flex-wrap: wrap;
 }
+
+.static-legend {
+    text-align: left;
+    font-size: 1rem;
+    font-weight: bold;
+    color: #333;
+    border: 2px solid #ddd;
+    padding: 15px;
+    border-radius: 10px;
+    background-color: rgba(255, 255, 255, 0.7);
+}
+.legend-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 8px;
+}
+.legend-item:last-child {
+    margin-bottom: 0;
+}
+.legend-swatch {
+    width: 20px;
+    height: 20px;
+    border-radius: 4px;
+    margin-right: 10px;
+    border: 1px solid rgba(0,0,0,0.1);
+}
+.legend-swatch.excellent { background-color: #2a9d8f; }
+.legend-swatch.good { background-color: #8ab17d; }
+.legend-swatch.improve { background-color: #e9c46a; }
+.legend-swatch.needs-help { background-color: #fca5a5; }
+.legend-swatch.urgent { background-color: #dc2626; }
+
+
 .score-tower-container {
     position: relative;
-    width: 250px;
-    margin: 20px auto;
+    width: 250px; /* Adjust as needed */
+    margin: 0; /* Changed from auto */
 }
 .score-tower-container img {
     width: 100%;

@@ -43,14 +43,17 @@ app.post('/api/analyze', async (req, res) => {
     }
 });
 
+
 // --- Frontend File Serving ---
 app.get('/style.css', (req, res) => { res.sendFile(path.join(__dirname, 'style.css')); });
 app.get('/script.js', (req, res) => { res.sendFile(path.join(__dirname, 'script.js')); });
 app.get('/logo.png', (req, res) => { res.sendFile(path.join(__dirname, 'logo.png')); });
 app.get('/john-photo.png', (req, res) => { res.sendFile(path.join(__dirname, 'john-photo.png')); });
 
-// --- NEW ROUTE FOR BACKGROUND ---
+// --- FIX: ADDED MISSING ROUTES FOR NEW DESIGN ASSETS ---
 app.get('/twilight-skyline.png', (req, res) => { res.sendFile(path.join(__dirname, 'twilight-skyline.png')); });
+app.get('/score-tower.png', (req, res) => { res.sendFile(path.join(__dirname, 'score-tower.png')); });
+// --- END OF FIX ---
 
 app.get('/', (req, res) => { res.sendFile(path.join(__dirname, 'index.html')); });
 
