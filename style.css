@@ -25,7 +25,15 @@ body {
     text-align: center;
     border: 8px solid transparent;
     border-image: linear-gradient(45deg, #f72585, #7209b7, #3a0ca3, #4361ee, #4cc9f0) 1;
-    animation: marquee-glow 5s linear infinite;
+    /* New Fade-in Animation */
+    opacity: 0;
+    animation: fadeIn 1s ease-out forwards;
+    animation-delay: 0.2s; /* Allows background to appear first */
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
 @keyframes marquee-glow {
@@ -78,78 +86,47 @@ header .subtitle {
 
 .score-display {
     display: flex;
-    flex-direction: column; /* This creates the vertical stacking */
+    justify-content: center;
     align-items: center;
-    gap: 25px;
+    gap: 30px;
     margin-bottom: 20px;
+    flex-wrap: wrap;
 }
 
-.score-tower-container {
-    position: relative;
-    width: 300px; /* Can be larger now */
-    margin: 0;
-}
-.score-tower-container img {
-    width: 100%;
-    height: auto;
-}
-#score-puck {
-    position: absolute;
-    bottom: 5%; 
-    left: 50%;
-    transform: translateX(-50%);
-    width: 30px;
-    height: 15px;
-    background-color: #f72585;
-    border-radius: 5px;
-    box-shadow: 0 0 10px #f72585;
-    transition: bottom 1.5s cubic-bezier(0.25, 1, 0.5, 1);
-}
-#score-readout {
-    position: absolute;
-    top: 10%;
-    left: 50%;
-    transform: translateX(-50%);
-    font-family: 'Bangers', cursive;
-    font-size: 4rem;
-    color: #fff;
-    text-shadow: 0 0 15px #4cc9f0;
-}
-
-/* --- NEW "PRIZE TICKET" LEGEND STYLE --- */
 .static-legend {
     text-align: left;
     font-size: 1rem;
     font-weight: bold;
     color: #333;
-    border: 2px dashed #7209b7; /* Dashed border */
-    padding: 20px;
-    border-radius: 15px;
-    background-color: #fdfcdc; /* Creamy ticket color */
-    max-width: 300px; /* Match width of tower */
-    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    border: 2px solid #ddd;
+    padding: 15px;
+    border-radius: 10px;
+    background-color: rgba(255, 255, 255, 0.7);
 }
-.legend-item {
-    display: flex;
-    align-items: center;
-    margin-bottom: 8px;
-}
-.legend-item:last-child {
-    margin-bottom: 0;
-}
-.legend-swatch {
-    width: 20px;
-    height: 20px;
-    border-radius: 4px;
-    margin-right: 10px;
-    border: 1px solid rgba(0,0,0,0.1);
-}
+.legend-item { display: flex; align-items: center; margin-bottom: 8px; }
+.legend-item:last-child { margin-bottom: 0; }
+.legend-swatch { width: 20px; height: 20px; border-radius: 4px; margin-right: 10px; border: 1px solid rgba(0,0,0,0.1); }
 .legend-swatch.excellent { background-color: #2a9d8f; }
 .legend-swatch.good { background-color: #8ab17d; }
 .legend-swatch.improve { background-color: #e9c46a; }
 .legend-swatch.needs-help { background-color: #fca5a5; }
 .legend-swatch.urgent { background-color: #dc2626; }
-/* --- END OF NEW STYLES --- */
+
+.score-circle {
+    width: 150px;
+    height: 150px;
+    margin: 0;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: 'Bangers', cursive;
+    font-size: 4rem;
+    color: #fff;
+    background-color: #264653;
+    border: 8px solid #00509d;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
 
 #score-interpretation { font-size: 1.2rem; font-weight: bold; color: #f72585; margin: 0 auto 25px; max-width: 80%; }
 .cta-humanizer { display: flex; align-items: center; justify-content: center; gap: 15px; background-color: rgba(248, 249, 250, 0.8); padding: 15px; border-radius: 10px; margin: 0 auto 10px; max-width: 80%; }

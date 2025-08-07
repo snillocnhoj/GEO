@@ -7,7 +7,7 @@ const PROGRESS_MESSAGES = [
     "Checking if your content is 'quotable' for search results...",
     "Analyzing your site's structure for readability...",
     "A high score means more visibility in AI Overviews!",
-    "Compiling the final report..."
+    "Compiling final report..."
 ];
 let progressInterval;
 
@@ -19,11 +19,11 @@ const progressStatus = document.getElementById('progress-status');
 const progressBar = document.getElementById('progress-bar');
 const resultsSection = document.getElementById('results');
 const scoreWrapper = document.getElementById('score-wrapper');
-const scorePuck = document.getElementById('score-puck');
-const scoreReadout = document.getElementById('score-readout');
+const scoreCircle = document.getElementById('score-circle'); // Reverted to scoreCircle
 const scoreInterpretation = document.getElementById('score-interpretation');
 const ctaButton = document.getElementById('cta-button');
 const checklistContainer = document.getElementById('checklist-container');
+
 
 // --- Main Event Listener ---
 analyzeButton.addEventListener('click', async () => {
@@ -32,22 +32,29 @@ analyzeButton.addEventListener('click', async () => {
         alert('Please enter a website URL.');
         return;
     }
+
     uiReset();
+    
     try {
         const startUrl = rawUrl.startsWith('http') ? rawUrl : `https://${rawUrl}`;
         analyzeButton.textContent = 'Inspection in Progress...';
         analyzeButton.disabled = true;
+
         animateProgressBar();
+
         const response = await fetch('/api/analyze', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ startUrl: startUrl })
         });
+
         if (!response.ok) {
             throw new Error('Analysis failed on the server.');
         }
+
         const results = await response.json();
         displayFinalReport(results);
+
     } catch (error) {
         console.error("A critical error occurred:", error);
         progressContainer.classList.add('hidden');
@@ -61,31 +68,35 @@ analyzeButton.addEventListener('click', async () => {
     }
 });
 
+
 // --- UI Update Functions ---
 function uiReset() {
     resultsSection.classList.add('hidden');
     progressContainer.classList.remove('hidden');
     progressBar.style.transition = 'none';
     progressBar.style.width = '0%';
+    
     checklistContainer.innerHTML = '';
     scoreWrapper.classList.add('hidden');
-    scorePuck.style.transition = 'none';
-    scorePuck.style.bottom = '5%';
-    scoreReadout.textContent = '0';
+    
     clearInterval(progressInterval);
 }
 
 function animateProgressBar() {
     let messageIndex = 0;
     progressStatus.textContent = PROGRESS_MESSAGES[messageIndex];
+    
     setTimeout(() => {
         progressBar.style.transition = 'width 25s ease-in-out';
         progressBar.style.width = '90%';
     }, 100);
+
     progressInterval = setInterval(() => {
         messageIndex++;
+        // NEW LOGIC: Cycle between last two messages
         if (messageIndex >= PROGRESS_MESSAGES.length) {
-            messageIndex = PROGRESS_MESSAGES.length - 1;
+            // It will now alternate between the last and second-to-last message
+            messageIndex = PROGRESS_MESSAGES.length - 2; 
         }
         progressStatus.textContent = PROGRESS_MESSAGES[messageIndex];
     }, 4000);
@@ -101,9 +112,10 @@ function getScoreInterpretation(score) {
 function displayFinalReport(results) {
     clearInterval(progressInterval);
     progressStatus.textContent = "Analysis complete!";
+    
     progressBar.style.transition = 'width 0.5s ease-in-out';
     progressBar.style.width = '100%';
-
+    
     setTimeout(() => {
         progressContainer.classList.add('hidden');
         resultsSection.classList.remove('hidden');
@@ -111,27 +123,21 @@ function displayFinalReport(results) {
 
     const { averageScore, checkStats } = results;
     checklistContainer.innerHTML = '<h3>Site-Wide Compliance Checklist</h3>';
-
+    
     if (!checkStats || Object.keys(checkStats).length === 0) {
         checklistContainer.innerHTML += '<p>Could not retrieve any pages to analyze.</p>';
         return;
     }
 
-    // --- SCORE TOWER ANIMATION LOGIC ---
-    // The puck's 'bottom' position is a percentage of the tower's height.
-    // We map the 0-100 score to a 5%-85% position range.
-    const puckPosition = 5 + (averageScore * 0.8); 
-    scorePuck.style.transition = 'bottom 1.5s cubic-bezier(0.25, 1, 0.5, 1)';
-    scorePuck.style.bottom = `${puckPosition}%`;
-    scoreReadout.textContent = `${averageScore}`;
-    // --- END OF ANIMATION LOGIC ---
-
+    scoreCircle.textContent = `${averageScore}`; // Reverted to scoreCircle
     scoreInterpretation.textContent = getScoreInterpretation(averageScore);
+
     if (averageScore <= 73) {
         ctaButton.classList.remove('hidden');
     } else {
         ctaButton.classList.add('hidden');
     }
+    
     scoreWrapper.classList.remove('hidden');
 
     for (const name in checkStats) {
