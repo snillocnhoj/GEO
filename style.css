@@ -1,7 +1,6 @@
 /* Import Google Fonts */
 body {
     font-family: 'Open Sans', sans-serif;
-    /* New Illustrated Background */
     background-image: url('twilight-skyline.png');
     background-size: cover;
     background-position: center;
@@ -19,13 +18,12 @@ body {
 .container {
     width: 100%;
     max-width: 800px;
-    background: rgba(255, 255, 255, 0.95); /* Semi-transparent white */
+    background: rgba(255, 255, 255, 0.95);
     border-radius: 20px;
     box-shadow: 0 10px 40px rgba(0,0,0,0.5);
     padding: 30px 40px;
     text-align: center;
     border: 8px solid transparent;
-    /* New Animated Marquee Border */
     border-image: linear-gradient(45deg, #f72585, #7209b7, #3a0ca3, #4361ee, #4cc9f0) 1;
     animation: marquee-glow 5s linear infinite;
 }
@@ -37,7 +35,6 @@ body {
     75% { border-image-source: linear-gradient(45deg, #3a0ca3, #4361ee, #4cc9f0, #f72585, #7209b7); }
     100% { border-image-source: linear-gradient(45deg, #7209b7, #3a0ca3, #4361ee, #4cc9f0, #f72585); }
 }
-
 
 header .title {
     font-family: 'Bangers', cursive;
@@ -57,43 +54,6 @@ header .subtitle {
     margin-bottom: 15px;
     line-height: 1.5;
 }
-
-/* --- SCORE TOWER STYLES --- */
-.score-tower-container {
-    position: relative;
-    width: 250px; /* Adjust as needed */
-    margin: 20px auto;
-}
-.score-tower-container img {
-    width: 100%;
-    height: auto;
-}
-#score-puck {
-    position: absolute;
-    bottom: 5%; /* Start at the bottom */
-    left: 50%;
-    transform: translateX(-50%);
-    width: 30px;
-    height: 15px;
-    background-color: #f72585;
-    border-radius: 5px;
-    box-shadow: 0 0 10px #f72585;
-    transition: bottom 1.5s cubic-bezier(0.25, 1, 0.5, 1); /* Smooth animation */
-}
-#score-readout {
-    position: absolute;
-    top: 10%;
-    left: 50%;
-    transform: translateX(-50%);
-    font-family: 'Bangers', cursive;
-    font-size: 4rem;
-    color: #fff;
-    text-shadow: 0 0 15px #4cc9f0;
-}
-/* --- END OF SCORE TOWER STYLES --- */
-
-
-/* Other styles remain largely the same, only minor color tweaks might be needed */
 .brand-line { font-size: 1.1rem; color: #333; margin: 10px 0 0; display: flex; align-items: center; justify-content: center; gap: 15px; }
 .brand-line img { max-height: 40px; }
 .expertise-line { font-size: 0.9rem; color: #555; margin: 5px 0 20px; font-style: italic; }
@@ -115,6 +75,45 @@ header .subtitle {
 #results h3 { font-size: 2rem; margin-top: 30px; }
 .score-card { margin: 20px auto; text-align: center; }
 #score-wrapper h3 { font-size: 1.5rem; margin-bottom: 15px; }
+.score-display {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 30px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+.score-tower-container {
+    position: relative;
+    width: 250px;
+    margin: 20px auto;
+}
+.score-tower-container img {
+    width: 100%;
+    height: auto;
+}
+#score-puck {
+    position: absolute;
+    bottom: 5%; 
+    left: 50%;
+    transform: translateX(-50%);
+    width: 30px;
+    height: 15px;
+    background-color: #f72585;
+    border-radius: 5px;
+    box-shadow: 0 0 10px #f72585;
+    transition: bottom 1.5s cubic-bezier(0.25, 1, 0.5, 1);
+}
+#score-readout {
+    position: absolute;
+    top: 10%;
+    left: 50%;
+    transform: translateX(-50%);
+    font-family: 'Bangers', cursive;
+    font-size: 4rem;
+    color: #fff;
+    text-shadow: 0 0 15px #4cc9f0;
+}
 #score-interpretation { font-size: 1.2rem; font-weight: bold; color: #f72585; margin: 0 auto 25px; max-width: 80%; }
 .cta-humanizer { display: flex; align-items: center; justify-content: center; gap: 15px; background-color: rgba(248, 249, 250, 0.8); padding: 15px; border-radius: 10px; margin: 0 auto 10px; max-width: 80%; }
 .cta-humanizer img { width: 80px; height: 80px; border-radius: 50%; border: 3px solid #4361ee; }
