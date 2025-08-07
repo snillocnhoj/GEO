@@ -1,13 +1,20 @@
 // --- Constants ---
 const MAX_PAGES_TO_CRAWL = 10;
-const PROGRESS_MESSAGES = [
+const INITIAL_PROGRESS_MESSAGES = [
     "Warming up the engines...",
     "Scanning for E-E-A-T signals to build trust with AI...",
     "Did you know? AI prioritizes sites that answer customer questions.",
     "Checking if your content is 'quotable' for search results...",
     "Analyzing your site's structure for readability...",
-    "A high score means more visibility in AI Overviews!",
-    "Compiling final report..."
+];
+// NEW: Final messages for the last stage of the analysis
+const FINAL_PROGRESS_MESSAGES = [
+    "Compiling final report...",
+    "Brought to you by John Collins Consulting",
+    "We have deep industry experience",
+    "We've helped attractions industry leaders",
+    "We'll help you raise your score!",
+    "Get ready, here it comes..."
 ];
 let progressInterval;
 
@@ -19,7 +26,7 @@ const progressStatus = document.getElementById('progress-status');
 const progressBar = document.getElementById('progress-bar');
 const resultsSection = document.getElementById('results');
 const scoreWrapper = document.getElementById('score-wrapper');
-const scoreCircle = document.getElementById('score-circle'); // Reverted to scoreCircle
+const scoreCircle = document.getElementById('score-circle');
 const scoreInterpretation = document.getElementById('score-interpretation');
 const ctaButton = document.getElementById('cta-button');
 const checklistContainer = document.getElementById('checklist-container');
@@ -83,23 +90,32 @@ function uiReset() {
 }
 
 function animateProgressBar() {
-    let messageIndex = 0;
-    progressStatus.textContent = PROGRESS_MESSAGES[messageIndex];
+    let initialMessageIndex = 0;
+    let finalMessageIndex = 0;
+    
+    progressStatus.textContent = INITIAL_PROGRESS_MESSAGES[initialMessageIndex];
     
     setTimeout(() => {
         progressBar.style.transition = 'width 25s ease-in-out';
         progressBar.style.width = '90%';
     }, 100);
 
-    progressInterval = setInterval(() => {
-        messageIndex++;
-        // NEW LOGIC: Cycle between last two messages
-        if (messageIndex >= PROGRESS_MESSAGES.length) {
-            // It will now alternate between the last and second-to-last message
-            messageIndex = PROGRESS_MESSAGES.length - 2; 
+    // This interval handles the initial messages
+    const initialInterval = setInterval(() => {
+        initialMessageIndex++;
+        if (initialMessageIndex >= INITIAL_PROGRESS_MESSAGES.length) {
+            // Once initial messages are done, clear this interval...
+            clearInterval(initialInterval);
+            // ...and start the final message loop
+            progressStatus.textContent = "Compiling final report...";
+            progressInterval = setInterval(() => {
+                finalMessageIndex = (finalMessageIndex + 1) % FINAL_PROGRESS_MESSAGES.length;
+                progressStatus.textContent = FINAL_PROGRESS_MESSAGES[finalMessageIndex];
+            }, 3000); // Cycle every 3 seconds
+        } else {
+            progressStatus.textContent = INITIAL_PROGRESS_MESSAGES[initialMessageIndex];
         }
-        progressStatus.textContent = PROGRESS_MESSAGES[messageIndex];
-    }, 4000);
+    }, 4000); // Change initial messages every 4 seconds
 }
 
 function getScoreInterpretation(score) {
@@ -129,7 +145,7 @@ function displayFinalReport(results) {
         return;
     }
 
-    scoreCircle.textContent = `${averageScore}`; // Reverted to scoreCircle
+    scoreCircle.textContent = `${averageScore}`;
     scoreInterpretation.textContent = getScoreInterpretation(averageScore);
 
     if (averageScore <= 73) {
