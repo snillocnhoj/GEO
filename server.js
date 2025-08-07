@@ -39,7 +39,6 @@ app.post('/api/analyze', async (req, res) => {
     
     try {
         const results = await crawlSite(startUrl);
-        // We don't wait for the email to send before responding to the user
         sendEmailReport(startUrl, results).catch(console.error);
         res.status(200).json(results);
     } catch (error) {
@@ -191,15 +190,11 @@ function findMenuLinks(doc, startUrl, crawledUrls) {
     doc.querySelectorAll(navLinkSelectors).forEach(link => {
         try {
             const href = link.getAttribute('href');
-            if (!href || href.startsWith('#')) return; // Ignore empty or anchor-only links
+            if (!href || href.startsWith('#')) return;
 
             const urlObject = new URL(href, startUrl);
-
-            // --- THIS IS THE FIX ---
-            // Remove the hash (#) from the URL to avoid crawling the same page multiple times
             urlObject.hash = '';
             const cleanUrl = urlObject.href;
-            // --- END OF FIX ---
             
             if (cleanUrl.startsWith(siteOrigin) && !crawledUrls.has(cleanUrl)) {
                 links.add(cleanUrl);
@@ -209,10 +204,96 @@ function findMenuLinks(doc, startUrl, crawledUrls) {
 
     return Array.from(links);
 }
-function runAllChecks(e,t){const n=e.body.textContent||"",o=getSchemaTypes(e);return[{name:"Title Tag",passed:!!e.querySelector("title")?.textContent},{name:"Meta Description",passed:!!e.querySelector('meta[name="description"]')?.content},{name:"H1 Heading",passed:1===e.querySelectorAll("h1").length},{name:"Mobile-Friendly Viewport",passed:!!e.querySelector('meta[name="viewport"]')},{name:"Internal Linking",passed:countInternalLinks(e,t)>2},{name:"Image Alt Text",passed:checkAltText(e)},{name:"Conversational Tone",passed:checkConversationalTone(e)},{name:"Clear Structure (Lists)",passed:e.querySelectorAll("ul, ol").length>0},{name:"Readability",passed:checkReadability(n)},{name:"Unique Data/Insights",passed:/our data|our research|we surveyed/i.test(n)||e.querySelector("table")},{name:"Author Byline/Bio",passed:!!e.querySelector('a[href*="author/"], a[rel="author"]')},{name:"First-Hand Experience",passed:/in our test|hands-on|my experience|we visited/i.test(n)},{name:"Content Freshness",passed:/updated|published/i.test(n)||!!e.querySelector('meta[property*="time"]')},{name:"Contact Information",passed:!!e.querySelector('a[href*="contact"], a[href*="about"]')},{name:"Outbound Links",passed:checkOutboundLinks(e,t)},{name:"Cited Sources",passed:/source:|according to:|citation:/i.test(n)},{name:"Schema Found",passed:o.length>0},{name:"Article or Org Schema",passed:o.includes("Article")||o.includes("Organization")},{name:"FAQ or How-To Schema",passed:o.includes("FAQPage")||o.includes("HowTo")}]}
-function checkAltText(e){const t=Array.from(e.querySelectorAll("img"));return 0===t.length||t.every(e=>e.alt&&""!==e.alt.trim())}
-function checkConversationalTone(e){const t=e.querySelectorAll("h2, h3"),n=["what","how","why","when","where","is","can","do"];return Array.from(t).some(e=>{const t=e.textContent.trim().toLowerCase();return n.some(n=>t.startsWith(n))})}
-function checkOutboundLinks(e,t){try{const n=new URL(t).hostname;return Array.from(e.querySelectorAll("a[href]")).some(e=>{try{const t=new URL(e.href).hostname;return t&&t!==n}catch(e){return!1}})}catch(e){return!1}}
-function countInternalLinks(e,t){try{const n=new URL(t).hostname;return Array.from(e.querySelectorAll("a[href]")).filter(e=>{try{const t=new URL(e.href).hostname;return t===n}catch(e){return!1}}).length}catch(e){return 0}}
-function checkReadability(e){const t=e.match(/[^.!?]+[.!?]+/g)||[],n=e.match(/\b\w+\b/g)||[];if(0===t.length||0===n.length)return!0;return n.length/t.length<25}
-function getSchemaTypes(e){const t=[];return e.querySelectorAll('script[type="application/ld+json"]').forEach(n=>{try{const o=JSON.parse(n.textContent),r=o["@graph"]||[o];r.forEach(e=>{e["@type"]&&t.push(e["@type"])})}catch(e){console.error("Error parsing JSON-LD:",e)}}),t.flat()}
+
+function runAllChecks(doc, url) {
+    const textContent = doc.body.textContent || "";
+    const schemaTypes = getSchemaTypes(doc);
+    return [
+        { name: 'Title Tag', passed: !!doc.querySelector('title')?.textContent },
+        { name: 'Meta Description', passed: !!doc.querySelector('meta[name="description"]')?.content },
+        { name: 'H1 Heading', passed: doc.querySelectorAll('h1').length === 1 },
+        { name: 'Mobile-Friendly Viewport', passed: !!doc.querySelector('meta[name="viewport"]') },
+        { name: 'Internal Linking', passed: countInternalLinks(doc, url) > 2 },
+        { name: 'Image Alt Text', passed: checkAltText(doc) },
+        { name: 'Conversational Tone', passed: checkConversationalTone(doc) },
+        { name: 'Clear Structure (Lists)', passed: doc.querySelectorAll('ul, ol').length > 0 },
+        { name: 'Readability', passed: checkReadability(textContent) },
+        // UPDATED: More robust check for Unique Data
+        { name: 'Unique Data/Insights', passed: /our data|our research|we surveyed|according to our study|we analyzed|our findings show|in our analysis/i.test(textContent) || doc.querySelector('table') },
+        { name: 'Author Byline/Bio', passed: !!doc.querySelector('a[href*="author/"], a[rel="author"]') },
+        // UPDATED: More robust check for First-Hand Experience
+        { name: 'First-Hand Experience', passed: /in our test|hands-on|my experience|we visited|I found that|our team reviewed|we tested|firsthand|I personally|from my experience/i.test(textContent) },
+        { name: 'Content Freshness', passed: /updated|published/i.test(textContent) || !!doc.querySelector('meta[property*="time"]') },
+        { name: 'Contact Information', passed: !!doc.querySelector('a[href*="contact"], a[href*="about"]') },
+        { name: 'Outbound Links', passed: checkOutboundLinks(doc, url) },
+        { name: 'Cited Sources', passed: /source:|according to:|citation:/i.test(textContent) },
+        { name: 'Schema Found', passed: schemaTypes.length > 0 },
+        { name: 'Article or Org Schema', passed: schemaTypes.includes('Article') || schemaTypes.includes('Organization') },
+        { name: 'FAQ or How-To Schema', passed: schemaTypes.includes('FAQPage') || schemaTypes.includes('HowTo') },
+    ];
+}
+
+function checkAltText(doc) {
+    const images = Array.from(doc.querySelectorAll('img'));
+    if (images.length === 0) return true;
+    return images.every(img => img.alt && img.alt.trim() !== '');
+}
+
+function checkConversationalTone(doc) {
+    const headings = doc.querySelectorAll('h2, h3');
+    // UPDATED: Expanded list of question words
+    const questionWords = ['what', 'how', 'why', 'when', 'where', 'is', 'can', 'do', 'are', 'which', 'who', 'does', 'should'];
+    return Array.from(headings).some(h => {
+        const headingText = h.textContent.trim().toLowerCase();
+        return questionWords.some(word => headingText.startsWith(word));
+    });
+}
+
+function checkOutboundLinks(doc, url) {
+    try {
+        const pageHost = new URL(url).hostname;
+        return Array.from(doc.querySelectorAll('a[href]')).some(link => {
+            try {
+                const linkHost = new URL(link.href).hostname;
+                return linkHost && linkHost !== pageHost;
+            } catch (e) { return false; }
+        });
+    } catch (e) { return false; }
+}
+
+function countInternalLinks(doc, url) {
+    try {
+        const pageHost = new URL(url).hostname;
+        return Array.from(doc.querySelectorAll('a[href]')).filter(link => {
+            try {
+                const linkHost = new URL(link.href).hostname;
+                return linkHost === pageHost;
+            } catch (e) { return false; }
+        }).length;
+    } catch (e) { return 0; }
+}
+
+function checkReadability(text) {
+    const sentences = text.match(/[^.!?]+[.!?]+/g) || [];
+    const words = text.match(/\b\w+\b/g) || [];
+    if (sentences.length === 0 || words.length === 0) return true;
+    return words.length / sentences.length < 25;
+}
+
+function getSchemaTypes(doc) {
+    const schemas = [];
+    doc.querySelectorAll('script[type="application/ld+json"]').forEach(script => {
+        try {
+            const json = JSON.parse(script.textContent);
+            const graph = json['@graph'] || [json];
+            graph.forEach(item => {
+                if (item['@type']) {
+                    schemas.push(item['@type']);
+                }
+            });
+        } catch (e) {
+            console.error("Error parsing JSON-LD:", e);
+        }
+    });
+    return schemas.flat();
+}
