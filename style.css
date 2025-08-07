@@ -78,49 +78,16 @@ header .subtitle {
 
 .score-display {
     display: flex;
-    justify-content: center;
+    flex-direction: column; /* This creates the vertical stacking */
     align-items: center;
-    gap: 30px;
+    gap: 25px;
     margin-bottom: 20px;
-    flex-wrap: wrap;
 }
-
-.static-legend {
-    text-align: left;
-    font-size: 1rem;
-    font-weight: bold;
-    color: #333;
-    border: 2px solid #ddd;
-    padding: 15px;
-    border-radius: 10px;
-    background-color: rgba(255, 255, 255, 0.7);
-}
-.legend-item {
-    display: flex;
-    align-items: center;
-    margin-bottom: 8px;
-}
-.legend-item:last-child {
-    margin-bottom: 0;
-}
-.legend-swatch {
-    width: 20px;
-    height: 20px;
-    border-radius: 4px;
-    margin-right: 10px;
-    border: 1px solid rgba(0,0,0,0.1);
-}
-.legend-swatch.excellent { background-color: #2a9d8f; }
-.legend-swatch.good { background-color: #8ab17d; }
-.legend-swatch.improve { background-color: #e9c46a; }
-.legend-swatch.needs-help { background-color: #fca5a5; }
-.legend-swatch.urgent { background-color: #dc2626; }
-
 
 .score-tower-container {
     position: relative;
-    width: 250px; /* Adjust as needed */
-    margin: 0; /* Changed from auto */
+    width: 300px; /* Can be larger now */
+    margin: 0;
 }
 .score-tower-container img {
     width: 100%;
@@ -148,6 +115,42 @@ header .subtitle {
     color: #fff;
     text-shadow: 0 0 15px #4cc9f0;
 }
+
+/* --- NEW "PRIZE TICKET" LEGEND STYLE --- */
+.static-legend {
+    text-align: left;
+    font-size: 1rem;
+    font-weight: bold;
+    color: #333;
+    border: 2px dashed #7209b7; /* Dashed border */
+    padding: 20px;
+    border-radius: 15px;
+    background-color: #fdfcdc; /* Creamy ticket color */
+    max-width: 300px; /* Match width of tower */
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+.legend-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 8px;
+}
+.legend-item:last-child {
+    margin-bottom: 0;
+}
+.legend-swatch {
+    width: 20px;
+    height: 20px;
+    border-radius: 4px;
+    margin-right: 10px;
+    border: 1px solid rgba(0,0,0,0.1);
+}
+.legend-swatch.excellent { background-color: #2a9d8f; }
+.legend-swatch.good { background-color: #8ab17d; }
+.legend-swatch.improve { background-color: #e9c46a; }
+.legend-swatch.needs-help { background-color: #fca5a5; }
+.legend-swatch.urgent { background-color: #dc2626; }
+/* --- END OF NEW STYLES --- */
+
 #score-interpretation { font-size: 1.2rem; font-weight: bold; color: #f72585; margin: 0 auto 25px; max-width: 80%; }
 .cta-humanizer { display: flex; align-items: center; justify-content: center; gap: 15px; background-color: rgba(248, 249, 250, 0.8); padding: 15px; border-radius: 10px; margin: 0 auto 10px; max-width: 80%; }
 .cta-humanizer img { width: 80px; height: 80px; border-radius: 50%; border: 3px solid #4361ee; }
