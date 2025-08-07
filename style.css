@@ -1,8 +1,12 @@
 /* Import Google Fonts */
 body {
     font-family: 'Open Sans', sans-serif;
-    background-color: #e0f7fa;
-    background-image: linear-gradient(to bottom, #81d4fa, #e0f7fa);
+    /* New Illustrated Background */
+    background-image: url('twilight-skyline.png');
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    background-color: #0c0a1a;
     color: #333;
     margin: 0;
     padding: 40px 20px;
@@ -15,289 +19,116 @@ body {
 .container {
     width: 100%;
     max-width: 800px;
-    background: #ffffff;
+    background: rgba(255, 255, 255, 0.95); /* Semi-transparent white */
     border-radius: 20px;
-    box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+    box-shadow: 0 10px 40px rgba(0,0,0,0.5);
     padding: 30px 40px;
     text-align: center;
-    border: 8px solid #00509d;
-    border-image: linear-gradient(45deg, #e63946, #ffd166) 1;
+    border: 8px solid transparent;
+    /* New Animated Marquee Border */
+    border-image: linear-gradient(45deg, #f72585, #7209b7, #3a0ca3, #4361ee, #4cc9f0) 1;
+    animation: marquee-glow 5s linear infinite;
 }
+
+@keyframes marquee-glow {
+    0% { border-image-source: linear-gradient(45deg, #f72585, #7209b7, #3a0ca3, #4361ee, #4cc9f0); }
+    25% { border-image-source: linear-gradient(45deg, #4cc9f0, #f72585, #7209b7, #3a0ca3, #4361ee); }
+    50% { border-image-source: linear-gradient(45deg, #4361ee, #4cc9f0, #f72585, #7209b7, #3a0ca3); }
+    75% { border-image-source: linear-gradient(45deg, #3a0ca3, #4361ee, #4cc9f0, #f72585, #7209b7); }
+    100% { border-image-source: linear-gradient(45deg, #7209b7, #3a0ca3, #4361ee, #4cc9f0, #f72585); }
+}
+
 
 header .title {
     font-family: 'Bangers', cursive;
-    font-size: 3rem; /* Slightly smaller to fit new text */
-    color: #e63946;
-    margin: 0 0 15px 0; /* Added margin-bottom */
+    font-size: 3rem;
+    color: #7209b7;
+    margin: 0 0 15px 0;
     letter-spacing: 2px;
-    text-shadow: 3px 3px 0 #ffd166;
+    text-shadow: 2px 2px 0 #4cc9f0;
     line-height: 1.2;
 }
 
 header .subtitle {
     font-size: 1.2rem;
-    color: #00509d;
+    color: #4361ee;
     font-weight: bold;
     margin-top: -10px;
     margin-bottom: 15px;
     line-height: 1.5;
 }
 
-.brand-line {
-    font-size: 1.1rem;
-    color: #333;
-    margin: 10px 0 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 15px;
+/* --- SCORE TOWER STYLES --- */
+.score-tower-container {
+    position: relative;
+    width: 250px; /* Adjust as needed */
+    margin: 20px auto;
 }
-.brand-line img {
-    max-height: 40px; /* Control logo size */
-}
-
-.expertise-line {
-    font-size: 0.9rem;
-    color: #555;
-    margin: 5px 0 20px;
-    font-style: italic;
-}
-
-.ticket-booth {
-    background: #fffbe8;
-    border: 3px dashed #e63946;
-    padding: 20px;
-    border-radius: 10px;
-}
-
-.ticket-booth h2 {
-    font-family: 'Bangers', cursive;
-    font-size: 2rem;
-    color: #00509d;
-    margin-top: 0;
-}
-
-.value-prop {
-    margin: 25px auto;
-    max-width: 90%;
-    font-size: 1.1rem;
-    line-height: 1.6;
-    color: #264653;
-}
-
-
-#urlInput {
-    width: 80%;
-    padding: 12px;
-    border: 2px solid #ccc;
-    border-radius: 5px;
-    font-size: 1rem;
-    margin-bottom: 20px;
-}
-
-#analyzeButton {
-    display: block;
+.score-tower-container img {
     width: 100%;
-    padding: 15px;
-    font-family: 'Bangers', cursive;
-    font-size: 1.8rem;
-    color: #fff;
-    background-image: linear-gradient(to right, #e63946, #f77f00);
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: transform 0.2s ease, box-shadow 0.2s;
-    letter-spacing: 1px;
-    box-shadow: 0 5px 0 #c1121f;
+    height: auto;
 }
-
-#analyzeButton:hover {
-    transform: scale(1.02) translateY(-2px);
-    box-shadow: 0 7px 0 #c1121f;
+#score-puck {
+    position: absolute;
+    bottom: 5%; /* Start at the bottom */
+    left: 50%;
+    transform: translateX(-50%);
+    width: 30px;
+    height: 15px;
+    background-color: #f72585;
+    border-radius: 5px;
+    box-shadow: 0 0 10px #f72585;
+    transition: bottom 1.5s cubic-bezier(0.25, 1, 0.5, 1); /* Smooth animation */
 }
-
-#analyzeButton:active {
-    transform: translateY(2px);
-    box-shadow: 0 3px 0 #c1121f;
-}
-
-#analyzeButton:disabled {
-    background-image: none;
-    background-color: #999;
-    box-shadow: 0 5px 0 #666;
-    cursor: not-allowed;
-}
-
-/* Progress Bar Styles */
-#progress-container { margin-top: 20px; }
-#progress-status { font-size: 1.2rem; color: #00509d; font-weight: bold; }
-.progress-bar-outline { width: 100%; height: 30px; background-color: #e0e0e0; border-radius: 15px; border: 2px solid #00509d; padding: 3px; }
-#progress-bar { width: 0%; height: 100%; background-image: linear-gradient(to right, #ffd166, #fca311); border-radius: 10px; transition: width 0.3s ease-in-out; }
-
-#results {
-    margin-top: 40px;
-    text-align: left;
-}
-#results h2, #results h3 {
-    font-family: 'Bangers', cursive;
-    text-align: center;
-    color: #00509d;
-}
-#results h2 { font-size: 2.5rem; }
-#results h3 { font-size: 2rem; margin-top: 30px; }
-
-.score-card { margin: 20px auto; text-align: center; }
-
-#score-wrapper h3 {
-    font-size: 1.5rem;
-    margin-bottom: 15px;
-}
-
-.score-display {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 30px;
-    margin-bottom: 20px;
-    flex-wrap: wrap;
-}
-
-.static-legend {
-    text-align: left;
-    font-size: 1rem;
-    font-weight: bold;
-    color: #333;
-    border: 2px solid #ddd;
-    padding: 15px;
-    border-radius: 10px;
-}
-.legend-item {
-    display: flex;
-    align-items: center;
-    margin-bottom: 8px;
-}
-.legend-item:last-child {
-    margin-bottom: 0;
-}
-.legend-swatch {
-    width: 20px;
-    height: 20px;
-    border-radius: 4px;
-    margin-right: 10px;
-    border: 1px solid rgba(0,0,0,0.1);
-}
-.legend-swatch.excellent { background-color: #2a9d8f; }
-.legend-swatch.good { background-color: #8ab17d; }
-.legend-swatch.improve { background-color: #e9c46a; }
-.legend-swatch.needs-help { background-color: #fca5a5; }
-.legend-swatch.urgent { background-color: #dc2626; }
-
-.score-circle {
-    width: 150px;
-    height: 150px;
-    margin: 0;
-    border-radius: 50%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+#score-readout {
+    position: absolute;
+    top: 10%;
+    left: 50%;
+    transform: translateX(-50%);
     font-family: 'Bangers', cursive;
     font-size: 4rem;
     color: #fff;
-    background-color: #264653;
-    border: 8px solid #00509d;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    text-shadow: 0 0 15px #4cc9f0;
 }
-
-#score-interpretation {
-    font-size: 1.2rem;
-    font-weight: bold;
-    color: #c1121f;
-    margin: 0 auto 25px;
-    max-width: 80%;
-}
-
-.cta-humanizer {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 15px;
-    background-color: #f8f9fa;
-    padding: 15px;
-    border-radius: 10px;
-    margin: 0 auto 10px;
-    max-width: 80%;
-}
-.cta-humanizer img {
-    width: 80px;
-    height: 80px;
-    border-radius: 50%;
-    border: 3px solid #00509d;
-}
-.cta-humanizer p {
-    margin: 0;
-    text-align: left;
-    font-size: 1.1rem;
-    color: #333;
-}
-
-/* New Pointing Hand Style */
-.pointing-hand {
-    font-size: 2.5rem;
-    margin: 10px 0;
-    animation: bounce 2s infinite;
-}
-
-@keyframes bounce {
-    0%, 20%, 50%, 80%, 100% {
-        transform: translateY(0);
-    }
-    40% {
-        transform: translateY(-20px);
-    }
-    60% {
-        transform: translateY(-10px);
-    }
-}
+/* --- END OF SCORE TOWER STYLES --- */
 
 
-.cta-button {
-    display: inline-block;
-    padding: 12px 25px;
-    font-family: 'Bangers', cursive;
-    font-size: 1.5rem;
-    color: #fff;
-    background-color: #264653;
-    border-radius: 8px;
-    text-decoration: none;
-    transition: transform 0.2s, background-color 0.2s;
-}
-.cta-button:hover {
-    transform: scale(1.05);
-    background-color: #2a9d8f;
-}
-
+/* Other styles remain largely the same, only minor color tweaks might be needed */
+.brand-line { font-size: 1.1rem; color: #333; margin: 10px 0 0; display: flex; align-items: center; justify-content: center; gap: 15px; }
+.brand-line img { max-height: 40px; }
+.expertise-line { font-size: 0.9rem; color: #555; margin: 5px 0 20px; font-style: italic; }
+.ticket-booth { background: rgba(255, 251, 232, 0.8); border: 3px dashed #f72585; padding: 20px; border-radius: 10px; }
+.ticket-booth h2 { font-family: 'Bangers', cursive; font-size: 2rem; color: #7209b7; margin-top: 0; }
+.value-prop { margin: 25px auto; max-width: 90%; font-size: 1.1rem; line-height: 1.6; color: #3a0ca3; }
+#urlInput { width: 80%; padding: 12px; border: 2px solid #ccc; border-radius: 5px; font-size: 1rem; margin-bottom: 20px; }
+#analyzeButton { display: block; width: 100%; padding: 15px; font-family: 'Bangers', cursive; font-size: 1.8rem; color: #fff; background-image: linear-gradient(to right, #f72585, #7209b7); border: none; border-radius: 8px; cursor: pointer; transition: transform 0.2s ease, box-shadow 0.2s; letter-spacing: 1px; box-shadow: 0 5px 0 #3a0ca3; }
+#analyzeButton:hover { transform: scale(1.02) translateY(-2px); box-shadow: 0 7px 0 #3a0ca3; }
+#analyzeButton:active { transform: translateY(2px); box-shadow: 0 3px 0 #3a0ca3; }
+#analyzeButton:disabled { background-image: none; background-color: #999; box-shadow: 0 5px 0 #666; cursor: not-allowed; }
+#progress-container { margin-top: 20px; }
+#progress-status { font-size: 1.2rem; color: #4361ee; font-weight: bold; }
+.progress-bar-outline { width: 100%; height: 30px; background-color: #e0e0e0; border-radius: 15px; border: 2px solid #4361ee; padding: 3px; }
+#progress-bar { width: 0%; height: 100%; background-image: linear-gradient(to right, #4cc9f0, #4361ee); border-radius: 10px; transition: width 0.3s ease-in-out; }
+#results { margin-top: 40px; text-align: left; }
+#results h2, #results h3 { font-family: 'Bangers', cursive; text-align: center; color: #7209b7; }
+#results h2 { font-size: 2.5rem; }
+#results h3 { font-size: 2rem; margin-top: 30px; }
+.score-card { margin: 20px auto; text-align: center; }
+#score-wrapper h3 { font-size: 1.5rem; margin-bottom: 15px; }
+#score-interpretation { font-size: 1.2rem; font-weight: bold; color: #f72585; margin: 0 auto 25px; max-width: 80%; }
+.cta-humanizer { display: flex; align-items: center; justify-content: center; gap: 15px; background-color: rgba(248, 249, 250, 0.8); padding: 15px; border-radius: 10px; margin: 0 auto 10px; max-width: 80%; }
+.cta-humanizer img { width: 80px; height: 80px; border-radius: 50%; border: 3px solid #4361ee; }
+.cta-humanizer p { margin: 0; text-align: left; font-size: 1.1rem; color: #333; }
+.pointing-hand { font-size: 2.5rem; margin: 10px 0; animation: bounce 2s infinite; }
+@keyframes bounce { 0%, 20%, 50%, 80%, 100% { transform: translateY(0); } 40% { transform: translateY(-20px); } 60% { transform: translateY(-10px); } }
+.cta-button { display: inline-block; padding: 12px 25px; font-family: 'Bangers', cursive; font-size: 1.5rem; color: #fff; background-color: #3a0ca3; border-radius: 8px; text-decoration: none; transition: transform 0.2s, background-color 0.2s; }
+.cta-button:hover { transform: scale(1.05); background-color: #4361ee; }
 #checklist-container { margin-top: 20px; }
-
-.check-item {
-    display: flex; 
-    align-items: center; 
-    margin-bottom: 12px; 
-    font-size: 1.1rem;
-    background-color: #f8f9fa;
-    padding: 10px;
-    border-radius: 5px;
-    border-left: 5px solid #ccc;
-}
-.check-item.passed {
-    border-left-color: #2a9d8f;
-}
-.check-item.failed {
-    border-left-color: #e76f51;
-}
-
+.check-item { display: flex; align-items: center; margin-bottom: 12px; font-size: 1.1rem; background-color: rgba(248, 249, 250, 0.8); padding: 10px; border-radius: 5px; border-left: 5px solid #ccc; }
+.check-item.passed { border-left-color: #4cc9f0; }
+.check-item.failed { border-left-color: #f72585; }
 .check-item-icon { margin-right: 15px; font-size: 1.5rem; }
-.check-item-text strong { color: #00509d; }
+.check-item-text strong { color: #3a0ca3; }
 .check-item-text span { font-size: 0.9rem; color: #666; display: block; }
-
-footer { margin-top: 30px; text-align: center; font-size: 0.9rem; color: #777; }
+footer { margin-top: 30px; text-align: center; font-size: 0.9rem; color: #fff; text-shadow: 1px 1px 2px #000; }
 .hidden { display: none; }
