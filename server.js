@@ -4,6 +4,7 @@ const path = require('path');
 const cors = require('cors');
 const { JSDOM } = require('jsdom');
 const sgMail = require('@sendgrid/mail');
+const rateLimit = require('express-rate-limit'); // <-- ADD THIS LINE
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -22,17 +23,31 @@ if (SENDGRID_API_KEY) {
 app.use(cors());
 app.use(express.json());
 
+// --- NEW: Rate Limiter Configuration ---
+const apiLimiter = rateLimit({
+	windowMs: 15 * 60 * 1000, // 15 minutes
+	max: 10, // Limit each IP to 10 requests per window
+	standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
+	legacyHeaders: false, // Disable the `X-RateLimit-*` headers
+    message: 'Too many requests from this IP, please try again after 15 minutes',
+});
+
+
 // --- API Routes ---
-app.post('/api/analyze', async (req, res) => {
+// Apply the rate limiter only to the analysis endpoint
+app.post('/api/analyze', apiLimiter, async (req, res) => {
     if (!SCRAPER_API_KEY || !SENDGRID_API_KEY || !FROM_EMAIL || !TO_EMAIL) {
         console.error('One or more environment variables are not set on the server.');
         return res.status(500).json({ error: 'Server is not configured correctly.' });
     }
+    
     const { startUrl } = req.body;
     if (!startUrl) {
         return res.status(400).json({ error: 'startUrl is required' });
     }
+
     console.log(`Starting analysis for: ${startUrl}`);
+    
     try {
         const results = await crawlSite(startUrl);
         sendEmailReport(startUrl, results).catch(console.error);
@@ -49,12 +64,8 @@ app.get('/style.css', (req, res) => { res.sendFile(path.join(__dirname, 'style.c
 app.get('/script.js', (req, res) => { res.sendFile(path.join(__dirname, 'script.js')); });
 app.get('/logo.png', (req, res) => { res.sendFile(path.join(__dirname, 'logo.png')); });
 app.get('/john-photo.png', (req, res) => { res.sendFile(path.join(__dirname, 'john-photo.png')); });
-
-// --- FIX: ADDED MISSING ROUTES FOR NEW DESIGN ASSETS ---
 app.get('/twilight-skyline.png', (req, res) => { res.sendFile(path.join(__dirname, 'twilight-skyline.png')); });
 app.get('/score-tower.png', (req, res) => { res.sendFile(path.join(__dirname, 'score-tower.png')); });
-// --- END OF FIX ---
-
 app.get('/', (req, res) => { res.sendFile(path.join(__dirname, 'index.html')); });
 
 app.listen(PORT, () => {
@@ -165,7 +176,7 @@ function runAllChecks(doc, url) {
         { name: 'Mobile-Friendly Viewport', passed: !!doc.querySelector('meta[name="viewport"]') },
         { name: 'Internal Linking', passed: countInternalLinks(doc, url) > 2 },
         { name: 'Image Alt Text', passed: checkAltText(doc) },
-        { name: 'Conversational Tone', passed: checkConversationalTone(doc) },
+        { name: 'Conversational Tone', passed: checkConversationalTone(_doc) },
         { name: 'Clear Structure (Lists)', passed: doc.querySelectorAll('ul, ol').length > 0 },
         { name: 'Readability', passed: checkReadability(textContent) },
         { name: 'Unique Data/Insights', passed: /our data|our research|we surveyed|according to our study|we analyzed|our findings show|in our analysis/i.test(textContent) || doc.querySelector('table') },
