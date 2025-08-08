@@ -7,12 +7,11 @@ const INITIAL_PROGRESS_MESSAGES = [
     "Checking if your content is 'quotable' for search results...",
     "Analyzing your site's structure for readability...",
 ];
-// NEW: Final messages for the last stage of the analysis
-const FINAL_PROGRESS_MESSAGES = [
-    "Compiling final report...",
+// NEW: Final marketing phrases for the last stage
+const FINAL_MARKETING_MESSAGES = [
     "Brought to you by John Collins Consulting",
     "We have deep industry experience",
-    "We've helped attractions industry leaders",
+    "We're trusted by attractions industry leaders",
     "We'll help you raise your score!",
     "Get ready, here it comes..."
 ];
@@ -92,6 +91,7 @@ function uiReset() {
 function animateProgressBar() {
     let initialMessageIndex = 0;
     let finalMessageIndex = 0;
+    let finalAlternatingCounter = 0;
     
     progressStatus.textContent = INITIAL_PROGRESS_MESSAGES[initialMessageIndex];
     
@@ -100,22 +100,29 @@ function animateProgressBar() {
         progressBar.style.width = '90%';
     }, 100);
 
-    // This interval handles the initial messages
     const initialInterval = setInterval(() => {
         initialMessageIndex++;
         if (initialMessageIndex >= INITIAL_PROGRESS_MESSAGES.length) {
-            // Once initial messages are done, clear this interval...
             clearInterval(initialInterval);
-            // ...and start the final message loop
+            
+            // --- NEW ALTERNATING LOGIC ---
             progressStatus.textContent = "Compiling final report...";
             progressInterval = setInterval(() => {
-                finalMessageIndex = (finalMessageIndex + 1) % FINAL_PROGRESS_MESSAGES.length;
-                progressStatus.textContent = FINAL_PROGRESS_MESSAGES[finalMessageIndex];
-            }, 3000); // Cycle every 3 seconds
+                finalAlternatingCounter++;
+                if (finalAlternatingCounter % 2 === 0) {
+                    // On even counts, show "Compiling..."
+                    progressStatus.textContent = "Compiling final report...";
+                } else {
+                    // On odd counts, show the next marketing message
+                    progressStatus.textContent = FINAL_MARKETING_MESSAGES[finalMessageIndex];
+                    finalMessageIndex = (finalMessageIndex + 1) % FINAL_MARKETING_MESSAGES.length;
+                }
+            }, 3000); // Alternate every 3 seconds
+
         } else {
             progressStatus.textContent = INITIAL_PROGRESS_MESSAGES[initialMessageIndex];
         }
-    }, 4000); // Change initial messages every 4 seconds
+    }, 4000); 
 }
 
 function getScoreInterpretation(score) {
