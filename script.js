@@ -7,12 +7,17 @@ const INITIAL_PROGRESS_MESSAGES = [
     "Checking if your content is 'quotable' for search results...",
     "Analyzing your site's structure for readability...",
 ];
-// NEW: Final marketing phrases for the last stage
+// UPDATED: Combined list with both original and new phrases
 const FINAL_MARKETING_MESSAGES = [
     "Brought to you by John Collins Consulting",
+    "Are you mentioned when AI answers questions about your industry?",
     "We have deep industry experience",
+    "Good GEO turns your website into a primary source for AI.",
     "We're trusted by attractions industry leaders",
+    "Did you know? AI favors content that demonstrates first-hand experience.",
     "We'll help you raise your score!",
+    "Optimizing for AI today means more customers tomorrow.",
+    "Don't let AI choose your competitors over you.",
     "Get ready, here it comes..."
 ];
 let progressInterval;
@@ -105,19 +110,16 @@ function animateProgressBar() {
         if (initialMessageIndex >= INITIAL_PROGRESS_MESSAGES.length) {
             clearInterval(initialInterval);
             
-            // --- NEW ALTERNATING LOGIC ---
             progressStatus.textContent = "Compiling final report...";
             progressInterval = setInterval(() => {
                 finalAlternatingCounter++;
                 if (finalAlternatingCounter % 2 === 0) {
-                    // On even counts, show "Compiling..."
                     progressStatus.textContent = "Compiling final report...";
                 } else {
-                    // On odd counts, show the next marketing message
                     progressStatus.textContent = FINAL_MARKETING_MESSAGES[finalMessageIndex];
                     finalMessageIndex = (finalMessageIndex + 1) % FINAL_MARKETING_MESSAGES.length;
                 }
-            }, 3000); // Alternate every 3 seconds
+            }, 3000);
 
         } else {
             progressStatus.textContent = INITIAL_PROGRESS_MESSAGES[initialMessageIndex];

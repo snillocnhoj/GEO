@@ -10,7 +10,8 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 // --- API KEYS ARE READ SECURELY FROM THE ENVIRONMENT ---
-const SCRAPER_API_KEY = process.env.SCRAPER_API_KEY;
+// UPDATED: Now looks for SCRAPINGBEE_API_KEY
+const SCRAPINGBEE_API_KEY = process.env.SCRAPINGBEE_API_KEY;
 const SENDGRID_API_KEY = process.env.SENDGRID_API_KEY;
 const FROM_EMAIL = process.env.FROM_EMAIL;
 const TO_EMAIL = process.env.TO_EMAIL;
@@ -23,10 +24,9 @@ if (SENDGRID_API_KEY) {
 app.use(cors());
 app.use(express.json());
 
-// --- Rate Limiter Configuration ---
 const apiLimiter = rateLimit({
-	windowMs: 15 * 60 * 1000, // 15 minutes
-	max: 10, // Limit each IP to 10 requests per window
+	windowMs: 15 * 60 * 1000, 
+	max: 10,
 	standardHeaders: true,
 	legacyHeaders: false,
     message: 'Too many requests from this IP, please try again after 15 minutes',
@@ -34,7 +34,7 @@ const apiLimiter = rateLimit({
 
 // --- API Routes ---
 app.post('/api/analyze', apiLimiter, async (req, res) => {
-    if (!SCRAPER_API_KEY || !SENDGRID_API_KEY || !FROM_EMAIL || !TO_EMAIL) {
+    if (!SCRAPINGBEE_API_KEY || !SENDGRID_API_KEY || !FROM_EMAIL || !TO_EMAIL) {
         console.error('One or more environment variables are not set on the server.');
         return res.status(500).json({ error: 'Server is not configured correctly.' });
     }
@@ -56,7 +56,8 @@ app.post('/api/analyze', apiLimiter, async (req, res) => {
     }
 });
 
-// --- Frontend File Serving ---
+
+// --- Frontend File Serving (Unchanged) ---
 app.get('/style.css', (req, res) => { res.sendFile(path.join(__dirname, 'style.css')); });
 app.get('/script.js', (req, res) => { res.sendFile(path.join(__dirname, 'script.js')); });
 app.get('/logo.png', (req, res) => { res.sendFile(path.join(__dirname, 'logo.png')); });
@@ -69,8 +70,10 @@ app.listen(PORT, () => {
     console.log(`GEO Thrill-O-Meter server listening on port ${PORT}`);
 });
 
+
 // --- Core Application Logic ---
 async function crawlSite(startUrl) {
+    // ... crawl logic is unchanged ...
     const allPageResults = [];
     const siteOrigin = new URL(startUrl).origin;
     const homePageHtml = await fetchHtml(startUrl);
@@ -95,12 +98,18 @@ async function crawlSite(startUrl) {
     return calculateFinalResults(allPageResults);
 }
 
+// UPDATED: fetchHtml now uses ScrapingBee
 async function fetchHtml(url) {
-    const scraperApiUrl = `http://api.scraperapi.com?api_key=${SCRAPER_API_KEY}&url=${encodeURIComponent(url)}`;
-    const response = await axios.get(scraperApiUrl, { timeout: 45000 });
+    const scraperUrl = 'https://app.scrapingbee.com/api/v1/';
+    const params = {
+        api_key: SCRAPINGBEE_API_KEY,
+        url: url,
+    };
+    const response = await axios.get(scraperUrl, { params: params, timeout: 45000 });
     return response.data;
 }
 
+// ... all other functions (calculateFinalResults, sendEmailReport, runAllChecks, etc.) are unchanged ...
 function calculateFinalResults(allPageResults) {
     const checkStats = {};
     let totalPasses = 0, totalChecks = 0;
@@ -123,7 +132,6 @@ function calculateFinalResults(allPageResults) {
     const averageScore = totalChecks > 0 ? Math.round((totalPasses / totalChecks) * 100) : 0;
     return { averageScore, checkStats, pagesCrawled: allPageResults.length };
 }
-
 async function sendEmailReport(url, results) {
     const { averageScore, checkStats, pagesCrawled } = results;
     let reportHtml = `<h1>GEO Inspection Report for ${url}</h1><h2>Overall Score: ${averageScore}/100</h2><p>Analyzed ${pagesCrawled} pages.</p><hr>`;
@@ -147,7 +155,6 @@ async function sendEmailReport(url, results) {
         console.error('Error sending email report:', error.toString());
     }
 }
-
 function findMenuLinks(doc, startUrl, crawledUrls) {
     const navLinkSelectors = 'nav a, [id*="nav"] a, [id*="menu"] a, [class*="nav"] a, [class*="menu"] a';
     const links = new Set();
@@ -166,7 +173,6 @@ function findMenuLinks(doc, startUrl, crawledUrls) {
     });
     return Array.from(links);
 }
-
 function runAllChecks(doc, url) {
     const textContent = doc.body.textContent || "";
     const schemaTypes = getSchemaTypes(doc);
@@ -177,9 +183,7 @@ function runAllChecks(doc, url) {
         { name: 'Mobile-Friendly Viewport', passed: !!doc.querySelector('meta[name="viewport"]') },
         { name: 'Internal Linking', passed: countInternalLinks(doc, url) > 2 },
         { name: 'Image Alt Text', passed: checkAltText(doc) },
-        // --- THIS IS THE FIX ---
-        { name: 'Conversational Tone', passed: checkConversationalTone(doc) }, // Changed _doc to doc
-        // --- END OF FIX ---
+        { name: 'Conversational Tone', passed: checkConversationalTone(doc) },
         { name: 'Clear Structure (Lists)', passed: doc.querySelectorAll('ul, ol').length > 0 },
         { name: 'Readability', passed: checkReadability(textContent) },
         { name: 'Unique Data/Insights', passed: /our data|our research|we surveyed|according to our study|we analyzed|our findings show|in our analysis/i.test(textContent) || doc.querySelector('table') },
@@ -194,7 +198,6 @@ function runAllChecks(doc, url) {
         { name: 'FAQ or How-To Schema', passed: schemaTypes.includes('FAQPage') || schemaTypes.includes('HowTo') },
     ];
 }
-
 function checkAltText(doc) { const images = Array.from(doc.querySelectorAll('img')); if (images.length === 0) return true; return images.every(img => img.alt && img.alt.trim() !== ''); }
 function checkConversationalTone(doc) { const headings = doc.querySelectorAll('h2, h3'); const questionWords = ['what', 'how', 'why', 'when', 'where', 'is', 'can', 'do', 'are', 'which', 'who', 'does', 'should']; return Array.from(headings).some(h => { const headingText = h.textContent.trim().toLowerCase(); return questionWords.some(word => headingText.startsWith(word)); }); }
 function checkOutboundLinks(doc, url) { try { const pageHost = new URL(url).hostname; return Array.from(doc.querySelectorAll('a[href]')).some(link => { try { const linkHost = new URL(link.href).hostname; return linkHost && linkHost !== pageHost; } catch (e) { return false; } }); } catch (e) { return false; } }
