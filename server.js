@@ -4,7 +4,7 @@ const path = require('path');
 const cors = require('cors');
 const { JSDOM } = require('jsdom');
 const sgMail = require('@sendgrid/mail');
-const rateLimit = require('express-rate-limit'); // <-- ADD THIS LINE
+const rateLimit = require('express-rate-limit');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -23,18 +23,16 @@ if (SENDGRID_API_KEY) {
 app.use(cors());
 app.use(express.json());
 
-// --- NEW: Rate Limiter Configuration ---
+// --- Rate Limiter Configuration ---
 const apiLimiter = rateLimit({
 	windowMs: 15 * 60 * 1000, // 15 minutes
 	max: 10, // Limit each IP to 10 requests per window
-	standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
-	legacyHeaders: false, // Disable the `X-RateLimit-*` headers
+	standardHeaders: true,
+	legacyHeaders: false,
     message: 'Too many requests from this IP, please try again after 15 minutes',
 });
 
-
 // --- API Routes ---
-// Apply the rate limiter only to the analysis endpoint
 app.post('/api/analyze', apiLimiter, async (req, res) => {
     if (!SCRAPER_API_KEY || !SENDGRID_API_KEY || !FROM_EMAIL || !TO_EMAIL) {
         console.error('One or more environment variables are not set on the server.');
@@ -58,7 +56,6 @@ app.post('/api/analyze', apiLimiter, async (req, res) => {
     }
 });
 
-
 // --- Frontend File Serving ---
 app.get('/style.css', (req, res) => { res.sendFile(path.join(__dirname, 'style.css')); });
 app.get('/script.js', (req, res) => { res.sendFile(path.join(__dirname, 'script.js')); });
@@ -72,8 +69,7 @@ app.listen(PORT, () => {
     console.log(`GEO Thrill-O-Meter server listening on port ${PORT}`);
 });
 
-
-// --- Core Application Logic (Unchanged) ---
+// --- Core Application Logic ---
 async function crawlSite(startUrl) {
     const allPageResults = [];
     const siteOrigin = new URL(startUrl).origin;
@@ -98,11 +94,13 @@ async function crawlSite(startUrl) {
     }
     return calculateFinalResults(allPageResults);
 }
+
 async function fetchHtml(url) {
     const scraperApiUrl = `http://api.scraperapi.com?api_key=${SCRAPER_API_KEY}&url=${encodeURIComponent(url)}`;
     const response = await axios.get(scraperApiUrl, { timeout: 45000 });
     return response.data;
 }
+
 function calculateFinalResults(allPageResults) {
     const checkStats = {};
     let totalPasses = 0, totalChecks = 0;
@@ -125,6 +123,7 @@ function calculateFinalResults(allPageResults) {
     const averageScore = totalChecks > 0 ? Math.round((totalPasses / totalChecks) * 100) : 0;
     return { averageScore, checkStats, pagesCrawled: allPageResults.length };
 }
+
 async function sendEmailReport(url, results) {
     const { averageScore, checkStats, pagesCrawled } = results;
     let reportHtml = `<h1>GEO Inspection Report for ${url}</h1><h2>Overall Score: ${averageScore}/100</h2><p>Analyzed ${pagesCrawled} pages.</p><hr>`;
@@ -148,6 +147,7 @@ async function sendEmailReport(url, results) {
         console.error('Error sending email report:', error.toString());
     }
 }
+
 function findMenuLinks(doc, startUrl, crawledUrls) {
     const navLinkSelectors = 'nav a, [id*="nav"] a, [id*="menu"] a, [class*="nav"] a, [class*="menu"] a';
     const links = new Set();
@@ -166,6 +166,7 @@ function findMenuLinks(doc, startUrl, crawledUrls) {
     });
     return Array.from(links);
 }
+
 function runAllChecks(doc, url) {
     const textContent = doc.body.textContent || "";
     const schemaTypes = getSchemaTypes(doc);
@@ -176,7 +177,9 @@ function runAllChecks(doc, url) {
         { name: 'Mobile-Friendly Viewport', passed: !!doc.querySelector('meta[name="viewport"]') },
         { name: 'Internal Linking', passed: countInternalLinks(doc, url) > 2 },
         { name: 'Image Alt Text', passed: checkAltText(doc) },
-        { name: 'Conversational Tone', passed: checkConversationalTone(_doc) },
+        // --- THIS IS THE FIX ---
+        { name: 'Conversational Tone', passed: checkConversationalTone(doc) }, // Changed _doc to doc
+        // --- END OF FIX ---
         { name: 'Clear Structure (Lists)', passed: doc.querySelectorAll('ul, ol').length > 0 },
         { name: 'Readability', passed: checkReadability(textContent) },
         { name: 'Unique Data/Insights', passed: /our data|our research|we surveyed|according to our study|we analyzed|our findings show|in our analysis/i.test(textContent) || doc.querySelector('table') },
@@ -191,6 +194,7 @@ function runAllChecks(doc, url) {
         { name: 'FAQ or How-To Schema', passed: schemaTypes.includes('FAQPage') || schemaTypes.includes('HowTo') },
     ];
 }
+
 function checkAltText(doc) { const images = Array.from(doc.querySelectorAll('img')); if (images.length === 0) return true; return images.every(img => img.alt && img.alt.trim() !== ''); }
 function checkConversationalTone(doc) { const headings = doc.querySelectorAll('h2, h3'); const questionWords = ['what', 'how', 'why', 'when', 'where', 'is', 'can', 'do', 'are', 'which', 'who', 'does', 'should']; return Array.from(headings).some(h => { const headingText = h.textContent.trim().toLowerCase(); return questionWords.some(word => headingText.startsWith(word)); }); }
 function checkOutboundLinks(doc, url) { try { const pageHost = new URL(url).hostname; return Array.from(doc.querySelectorAll('a[href]')).some(link => { try { const linkHost = new URL(link.href).hostname; return linkHost && linkHost !== pageHost; } catch (e) { return false; } }); } catch (e) { return false; } }
