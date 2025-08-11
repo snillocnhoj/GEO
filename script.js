@@ -1,13 +1,12 @@
 // --- Constants ---
 const MAX_PAGES_TO_CRAWL = 10;
 const INITIAL_PROGRESS_MESSAGES = [
-    "Warming up the engines...",
-    "Scanning for E-E-A-T signals to build trust with AI...",
-    "Did you know? AI prioritizes sites that answer customer questions.",
-    "Checking if your content is 'quotable' for search results...",
-    "Analyzing your site's structure for readability...",
+    "Loading up the ride vehicles...",
+    "Checking the safety harnesses...",
+    "Consulting the park map for all the attractions...",
+    "Calibrating the thrill sensors...",
+    "Getting ready for the big drop...",
 ];
-// UPDATED: Combined list with both original and new phrases
 const FINAL_MARKETING_MESSAGES = [
     "Brought to you by John Collins Consulting",
     "Are you mentioned when AI answers questions about your industry?",
@@ -21,6 +20,7 @@ const FINAL_MARKETING_MESSAGES = [
     "Get ready, here it comes..."
 ];
 let progressInterval;
+let coasterAnimationInterval;
 
 // --- DOM Elements ---
 const urlInput = document.getElementById('urlInput');
@@ -34,9 +34,18 @@ const scoreCircle = document.getElementById('score-circle');
 const scoreInterpretation = document.getElementById('score-interpretation');
 const ctaButton = document.getElementById('cta-button');
 const checklistContainer = document.getElementById('checklist-container');
+const ticketWebsiteName = document.getElementById('ticket-website-name');
+const coasterCar = document.getElementById('coaster-car');
+const scoreSnapshotContainer = document.getElementById('score-snapshot-container');
+const scoreSnapshotDiv = document.getElementById('score-snapshot');
+const downloadSnapshotButton = document.getElementById('download-snapshot');
 
 
-// --- Main Event Listener ---
+// --- Event Listeners ---
+urlInput.addEventListener('input', () => {
+    ticketWebsiteName.textContent = urlInput.value || "https://your-website.com";
+});
+
 analyzeButton.addEventListener('click', async () => {
     const rawUrl = urlInput.value.trim();
     if (!rawUrl) {
@@ -45,7 +54,7 @@ analyzeButton.addEventListener('click', async () => {
     }
 
     uiReset();
-    
+
     try {
         const startUrl = rawUrl.startsWith('http') ? rawUrl : `https://${rawUrl}`;
         analyzeButton.textContent = 'Inspection in Progress...';
@@ -72,10 +81,12 @@ analyzeButton.addEventListener('click', async () => {
         resultsSection.classList.remove('hidden');
         checklistContainer.innerHTML = '<h3>Site-Wide Compliance Checklist</h3><p>The analysis could not be completed.</p>';
     } finally {
-        analyzeButton.textContent = 'Start Full Site Inspection!';
+        analyzeButton.textContent = 'ADMIT ONE - Start Full Site Inspection!';
         analyzeButton.disabled = false;
         clearInterval(progressInterval);
-        progressBar.style.width = '100%';
+        clearInterval(coasterAnimationInterval);
+        if (progressBar) progressBar.style.width = '100%';
+        if (coasterCar) coasterCar.style.left = 'calc(100% - 15px)';
     }
 });
 
@@ -84,13 +95,18 @@ analyzeButton.addEventListener('click', async () => {
 function uiReset() {
     resultsSection.classList.add('hidden');
     progressContainer.classList.remove('hidden');
-    progressBar.style.transition = 'none';
-    progressBar.style.width = '0%';
-    
+    if (progressBar) {
+        progressBar.style.transition = 'none';
+        progressBar.style.width = '0%';
+    }
+    if (coasterCar) coasterCar.style.left = '-15px';
+
     checklistContainer.innerHTML = '';
     scoreWrapper.classList.add('hidden');
-    
+    scoreSnapshotContainer.style.display = 'none';
+
     clearInterval(progressInterval);
+    clearInterval(coasterAnimationInterval);
 }
 
 function animateProgressBar() {
@@ -125,30 +141,48 @@ function animateProgressBar() {
             progressStatus.textContent = INITIAL_PROGRESS_MESSAGES[initialMessageIndex];
         }
     }, 4000); 
+
+    if (coasterCar) {
+        let currentPos = 0;
+        coasterAnimationInterval = setInterval(() => {
+            currentPos += 1;
+            if(currentPos <= 90) {
+                 coasterCar.style.left = `calc(${currentPos}% - 15px)`;
+            }
+            if(currentPos >= 90) {
+                clearInterval(coasterAnimationInterval);
+            }
+        }, 250); // Matches the 25s total transition time for 90%
+    }
 }
 
+
 function getScoreInterpretation(score) {
-    if (score >= 90) return "Your site is a prime candidate for AI features! You have a powerful advantage over competitors.";
-    if (score >= 80) return "Your site has a strong foundation. Let's discuss how to leverage this advantage.";
-    if (score <= 73) return "Your site is missing key signals and is likely being ignored by generative AI. This represents a significant lost opportunity.";
+    if (score >= 90) return "Your site is a prime candidate for AI features! Prepare for maximum thrills!";
+    if (score >= 80) return "Your site has a strong foundation. A few more loops and you'll be soaring!";
+    if (score <= 73) return "Your site has potential, but there are a few unexpected drops ahead.";
     return "";
 }
 
 function displayFinalReport(results) {
     clearInterval(progressInterval);
-    progressStatus.textContent = "Analysis complete!";
-    
+    clearInterval(coasterAnimationInterval);
+    progressStatus.textContent = "The ride has finished! Checking your photos...";
+
     progressBar.style.transition = 'width 0.5s ease-in-out';
     progressBar.style.width = '100%';
-    
+    if (coasterCar) coasterCar.style.left = 'calc(100% - 15px)';
+
     setTimeout(() => {
         progressContainer.classList.add('hidden');
         resultsSection.classList.remove('hidden');
+        scoreSnapshotContainer.style.display = 'block';
+        generateScoreSnapshot(results);
     }, 500);
 
     const { averageScore, checkStats } = results;
     checklistContainer.innerHTML = '<h3>Site-Wide Compliance Checklist</h3>';
-    
+
     if (!checkStats || Object.keys(checkStats).length === 0) {
         checklistContainer.innerHTML += '<p>Could not retrieve any pages to analyze.</p>';
         return;
@@ -162,7 +196,7 @@ function displayFinalReport(results) {
     } else {
         ctaButton.classList.add('hidden');
     }
-    
+
     scoreWrapper.classList.remove('hidden');
 
     for (const name in checkStats) {
@@ -173,5 +207,49 @@ function displayFinalReport(results) {
         checkItem.className = `check-item ${passPercent >= 75 ? 'passed' : 'failed'}`;
         checkItem.innerHTML = `<div class="check-item-icon">${icon}</div><div class="check-item-text"><strong>${name}</strong><span>Passed on ${stats.passed} of ${stats.total} pages (${passPercent}%)</span></div>`;
         checklistContainer.appendChild(checkItem);
+    }
+}
+
+// --- Score Snapshot Functions ---
+function generateScoreSnapshot(results) {
+    const { averageScore } = results;
+    const siteUrl = urlInput.value.trim();
+    
+    scoreSnapshotDiv.innerHTML = `
+        <div style="padding: 20px; text-align: center; background: #0c0a1a; color: white; border-radius: 10px; font-family: 'Open Sans', sans-serif;">
+            <img src="logo.png" style="max-width: 100px; margin-bottom: 15px;">
+            <h4 style="font-family: 'Bangers', cursive; font-size: 1.8rem; color: #4cc9f0; margin: 0;">My GEO Thrill Score</h4>
+            <p style="font-size: 1.1rem; margin: 5px 0 15px;">for ${siteUrl}</p>
+            <div style="font-family: 'Bangers', cursive; font-size: 4rem; color: #fff; margin-bottom: 15px;">${averageScore}</div>
+            <p style="font-size: 0.8rem; color: #ccc;">Analyzed by the GEO Thrill-O-Meter</p>
+        </div>
+    `;
+}
+
+if (downloadSnapshotButton) {
+    downloadSnapshotButton.addEventListener('click', () => {
+        html2canvas(scoreSnapshotDiv).then(canvas => {
+            const link = document.createElement('a');
+            link.download = 'geo-score-snapshot.png';
+            link.href = canvas.toDataURL();
+            link.click();
+        });
+    });
+}
+
+function shareScore(platform) {
+    const siteUrl = urlInput.value.trim();
+    const text = encodeURIComponent(`I just tested my website's GEO score with the Thrill-O-Meter! Check it out:`);
+    const url = `https://geo-thrill-o-matic.onrender.com/`; // Link back to your app
+    let shareUrl = '';
+
+    if (platform === 'linkedin') {
+        shareUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}`;
+    } else if (platform === 'twitter') {
+        shareUrl = `https://twitter.com/intent/tweet?url=${encodeURIComponent(url)}&text=${text}`;
+    }
+
+    if(shareUrl) {
+        window.open(shareUrl, '_blank');
     }
 }

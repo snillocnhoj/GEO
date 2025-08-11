@@ -8,12 +8,26 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Open+Sans:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        /* Basic inline styles for initial elements - can be moved to style.css */
+        .thrill-ticket-wrapper { margin-bottom: 20px; }
+        .thrill-ticket { border: 2px dashed #555; background-color: #f8f8f8; padding: 20px; border-radius: 10px; display: flex; flex-direction: column; align-items: center; }
+        .ticket-stub { flex: 1; text-align: center; }
+        .ticket-body { flex: 2; text-align: center; margin-top: 10px; }
+        .ticket-field { font-weight: bold; font-size: 1.2em; color: #333; margin-top: 5px; }
+        .coaster-progress-container { position: relative; background-color: #ddd; height: 30px; border-radius: 15px; overflow: hidden; margin-bottom: 20px; }
+        .coaster-track { background-color: #333; height: 10px; position: absolute; top: 50%; left: 0; right: 0; transform: translateY(-50%); border-radius: 5px; }
+        .coaster-car { position: absolute; top: 50%; left: 0; transform: translate(-50%, -50%); width: 30px; height: 30px; background-color: #ff6f00; border-radius: 50%; display: flex; justify-content: center; align-items: center; color: white; font-size: 0.8em; }
+        .share-snapshot { margin-top: 20px; text-align: center; }
+        .share-snapshot button { padding: 10px 20px; margin: 5px; cursor: pointer; }
+        #score-snapshot-container { margin-top: 20px; border: 1px solid #ccc; padding: 15px; border-radius: 5px; background-color: #f9f9f9; display: none; }
+    </style>
 </head>
 <body>
     <div class="container">
         <header>
             <h1 class="title">Generative Engine Optimization (GEO) Thrill-O-Meter</h1>
-            <p class="subtitle">Is your website a headline attraction or a sideshow?<br>Test your strength now!</p>
+            <p class="subtitle">Is your website a headline attraction or a sideshow?<br>Claim your Thrill Ticket now!</p>
             <div class="brand-line">
                 <img src="logo.png" alt="John Collins Consulting Logo">
                 <span>Brought to you by <strong>John Collins Consulting</strong></span>
@@ -23,19 +37,32 @@
 
         <main>
             <div class="ticket-booth">
-                <h2>Enter Your Website's Homepage URL</h2>
-                <input type="text" id="urlInput" placeholder="https://your-website.com">
-                <button id="analyzeButton">Start Full Site Inspection!</button>
+                <h2>Claim Your Thrill Ticket</h2>
+                <div class="thrill-ticket-wrapper">
+                    <div class="thrill-ticket">
+                        <div class="ticket-stub">
+                            <img src="logo.png" alt="Logo" style="max-width: 80px;">
+                            <p style="font-size: 0.8em; margin-top: 5px;">GEO Thrill-O-Meter</p>
+                        </div>
+                        <div class="ticket-body">
+                            <h3>Website Admission</h3>
+                            <div class="ticket-field" id="ticket-website-name">https://your-website.com</div>
+                        </div>
+                    </div>
+                </div>
+                <input type="text" id="urlInput" placeholder="Enter your website URL to personalize your ticket">
+                <button id="analyzeButton" style="padding: 15px 30px; font-size: 1.1em;">ADMIT ONE - Start Full Site Inspection!</button>
             </div>
 
             <div class="value-prop">
-                <p>Generative AI such as Google's AI Overviews is changing how customers find you. Or don't find you. A high GEO score means your website is more likely to be featured, driving more traffic and driving more sales. Is your site ready?</p>
+                <p>Generative AI such as Google's AI Overviews is changing how customers find you. Or don't find you. A high GEO score means your website is more likely to be featured, driving more traffic and driving more sales. Is your site ready for the ride?</p>
             </div>
 
             <div id="progress-container" class="hidden">
-                <h3 id="progress-status">Preparing the inspection...</h3>
-                <div class="progress-bar-outline">
-                    <div id="progress-bar" style="width: 0%;"></div>
+                <h3 id="progress-status">Preparing the coaster for launch...</h3>
+                <div class="coaster-progress-container">
+                    <div class="coaster-track"></div>
+                    <div id="coaster-car" class="coaster-car">🎢</div>
                 </div>
             </div>
 
@@ -58,16 +85,27 @@
 
                         <div class="cta-humanizer">
                             <img src="john-photo.png" alt="John Collins">
-                            <p><strong>Hi, I'm John.</strong> I can help you fix these issues (and much more) and turn your website into a real headline attraction. Let's raise your score together!</p>
+                            <p><strong>Hi, I'm John.</strong> Ready to make your website a top attraction? Let's work together to boost your GEO score!</p>
                         </div>
                         <div class="pointing-hand">👇</div>
                         <a href="https://www.johncollins.biz/" target="_blank" rel="noopener" id="cta-button" class="cta-button hidden">
-                            Raise Your Score!
+                            Elevate My Score!
                         </a>
+                    </div>
+                    <div id="score-snapshot-container">
+                        <h3>Your GEO Score Snapshot</h3>
+                        <div id="score-snapshot">
+                            
+                        </div>
+                        <div class="share-snapshot">
+                            <button onclick="shareScore('linkedin')">Share on LinkedIn</button>
+                            <button onclick="shareScore('twitter')">Share on X</button>
+                            <button id="download-snapshot">Download Snapshot</button>
+                        </div>
                     </div>
                 </div>
                 <div id="checklist-container">
-                    </div>
+                </div>
             </div>
         </main>
 
@@ -76,6 +114,7 @@
         </footer>
     </div>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script defer src="script.js"></script>
 </body>
 </html>
