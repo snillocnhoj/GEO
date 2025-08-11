@@ -8,20 +8,6 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Open+Sans:wght@400;700&display=swap" rel="stylesheet">
-    <style>
-        /* Basic inline styles for initial elements - can be moved to style.css */
-        .thrill-ticket-wrapper { margin-bottom: 20px; }
-        .thrill-ticket { border: 2px dashed #555; background-color: #f8f8f8; padding: 20px; border-radius: 10px; display: flex; flex-direction: column; align-items: center; }
-        .ticket-stub { flex: 1; text-align: center; }
-        .ticket-body { flex: 2; text-align: center; margin-top: 10px; }
-        .ticket-field { font-weight: bold; font-size: 1.2em; color: #333; margin-top: 5px; }
-        .coaster-progress-container { position: relative; background-color: #ddd; height: 30px; border-radius: 15px; overflow: hidden; margin-bottom: 20px; }
-        .coaster-track { background-color: #333; height: 10px; position: absolute; top: 50%; left: 0; right: 0; transform: translateY(-50%); border-radius: 5px; }
-        .coaster-car { position: absolute; top: 50%; left: 0; transform: translate(-50%, -50%); width: 30px; height: 30px; background-color: #ff6f00; border-radius: 50%; display: flex; justify-content: center; align-items: center; color: white; font-size: 0.8em; }
-        .share-snapshot { margin-top: 20px; text-align: center; }
-        .share-snapshot button { padding: 10px 20px; margin: 5px; cursor: pointer; }
-        #score-snapshot-container { margin-top: 20px; border: 1px solid #ccc; padding: 15px; border-radius: 5px; background-color: #f9f9f9; display: none; }
-    </style>
 </head>
 <body>
     <div class="container">
@@ -37,21 +23,24 @@
 
         <main>
             <div class="ticket-booth">
-                <h2>Claim Your Thrill Ticket</h2>
-                <div class="thrill-ticket-wrapper">
-                    <div class="thrill-ticket">
-                        <div class="ticket-stub">
-                            <img src="logo.png" alt="Logo" style="max-width: 80px;">
-                            <p style="font-size: 0.8em; margin-top: 5px;">GEO Thrill-O-Meter</p>
+                <div class="thrill-ticket">
+                    <div class="ticket-top-section">
+                        <div class="ticket-logo-area">
+                            <img src="logo.png" alt="Logo">
+                            <p>GEO Thrill-O-Meter</p>
                         </div>
-                        <div class="ticket-body">
+                        <div class="ticket-details-area">
                             <h3>Website Admission</h3>
-                            <div class="ticket-field" id="ticket-website-name">https://your-website.com</div>
+                            <div class="ticket-website-name" id="ticket-website-name">your-website.com</div>
                         </div>
                     </div>
+                    <div class="ticket-input-section">
+                         <input type="text" id="urlInput" placeholder="Enter URL to personalize your ticket">
+                    </div>
+                    <div class="ticket-rip-section">
+                        <button id="analyzeButton"><span class="admit-one">ADMIT ONE</span> - Start Full Site Inspection!</button>
+                    </div>
                 </div>
-                <input type="text" id="urlInput" placeholder="Enter your website URL to personalize your ticket">
-                <button id="analyzeButton" style="padding: 15px 30px; font-size: 1.1em;">ADMIT ONE - Start Full Site Inspection!</button>
             </div>
 
             <div class="value-prop">
@@ -92,11 +81,10 @@
                             Elevate My Score!
                         </a>
                     </div>
-                    <div id="score-snapshot-container">
+                    <div id="score-snapshot-container" class="hidden">
                         <h3>Your GEO Score Snapshot</h3>
                         <div id="score-snapshot">
-                            
-                        </div>
+                            </div>
                         <div class="share-snapshot">
                             <button onclick="shareScore('linkedin')">Share on LinkedIn</button>
                             <button onclick="shareScore('twitter')">Share on X</button>

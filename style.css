@@ -1,13 +1,13 @@
-/* Import Google Fonts */
+/* General Styles */
 body {
     font-family: 'Open Sans', sans-serif;
+    margin: 0;
     background-image: url('twilight-skyline.png');
     background-size: cover;
     background-position: center;
     background-attachment: fixed;
     background-color: #0c0a1a;
     color: #333;
-    margin: 0;
     padding: 40px 20px;
     display: flex;
     justify-content: center;
@@ -25,10 +25,10 @@ body {
     text-align: center;
     border: 8px solid transparent;
     border-image: linear-gradient(45deg, #f72585, #7209b7, #3a0ca3, #4361ee, #4cc9f0) 1;
-    /* New Fade-in Animation */
+    animation: marquee-glow 5s linear infinite;
     opacity: 0;
     animation: fadeIn 1s ease-out forwards;
-    animation-delay: 0.2s; /* Allows background to appear first */
+    animation-delay: 0.2s;
 }
 
 @keyframes fadeIn {
@@ -44,35 +44,82 @@ body {
     100% { border-image-source: linear-gradient(45deg, #7209b7, #3a0ca3, #4361ee, #4cc9f0, #f72585); }
 }
 
-header .title {
-    font-family: 'Bangers', cursive;
-    font-size: 3rem;
-    color: #7209b7;
-    margin: 0 0 15px 0;
-    letter-spacing: 2px;
-    text-shadow: 2px 2px 0 #4cc9f0;
-    line-height: 1.2;
-}
-
-header .subtitle {
-    font-size: 1.2rem;
-    color: #4361ee;
-    font-weight: bold;
-    margin-top: -10px;
-    margin-bottom: 15px;
-    line-height: 1.5;
-}
+header .title { font-family: 'Bangers', cursive; font-size: 3rem; color: #7209b7; margin: 0 0 15px 0; letter-spacing: 2px; text-shadow: 2px 2px 0 #4cc9f0; line-height: 1.2; }
+header .subtitle { font-size: 1.2rem; color: #4361ee; font-weight: bold; margin-top: -10px; margin-bottom: 15px; line-height: 1.5; }
 .brand-line { font-size: 1.1rem; color: #333; margin: 10px 0 0; display: flex; align-items: center; justify-content: center; gap: 15px; }
 .brand-line img { max-height: 40px; }
 .expertise-line { font-size: 0.9rem; color: #555; margin: 5px 0 20px; font-style: italic; }
-.ticket-booth { background: rgba(255, 251, 232, 0.8); border: 3px dashed #f72585; padding: 20px; border-radius: 10px; }
-.ticket-booth h2 { font-family: 'Bangers', cursive; font-size: 2rem; color: #7209b7; margin-top: 0; }
 .value-prop { margin: 25px auto; max-width: 90%; font-size: 1.1rem; line-height: 1.6; color: #3a0ca3; }
-#urlInput { width: 80%; padding: 12px; border: 2px solid #ccc; border-radius: 5px; font-size: 1rem; margin-bottom: 20px; }
-#analyzeButton { display: block; width: 100%; padding: 15px; font-family: 'Bangers', cursive; font-size: 1.8rem; color: #fff; background-image: linear-gradient(to right, #f72585, #7209b7); border: none; border-radius: 8px; cursor: pointer; transition: transform 0.2s ease, box-shadow 0.2s; letter-spacing: 1px; box-shadow: 0 5px 0 #3a0ca3; }
-#analyzeButton:hover { transform: scale(1.02) translateY(-2px); box-shadow: 0 7px 0 #3a0ca3; }
-#analyzeButton:active { transform: translateY(2px); box-shadow: 0 3px 0 #3a0ca3; }
-#analyzeButton:disabled { background-image: none; background-color: #999; box-shadow: 0 5px 0 #666; cursor: not-allowed; }
+
+/* --- NEW THRILL TICKET STYLES --- */
+.ticket-booth {
+    background: rgba(255, 251, 232, 0.8);
+    border: none;
+    padding: 20px;
+    border-radius: 10px;
+}
+
+.thrill-ticket {
+    background-color: #fdd835;
+    border: 1px solid #c8ab2a;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    border-radius: 15px;
+    width: 100%;
+    max-width: 500px;
+    margin: 0 auto;
+    overflow: hidden;
+}
+.ticket-top-section {
+    display: flex;
+    background-color: #fff;
+    padding: 20px;
+}
+.ticket-logo-area {
+    text-align: center;
+    padding-right: 20px;
+    border-right: 2px dashed #aaa;
+}
+.ticket-logo-area img { max-height: 50px; }
+.ticket-logo-area p { font-size: 0.7rem; color: #666; margin: 5px 0 0; font-weight: bold; }
+
+.ticket-details-area { flex-grow: 1; padding-left: 20px; text-align: center; }
+.ticket-details-area h3 { font-family: 'Bangers', cursive; color: #e63946; font-size: 1.8rem; margin: 0 0 5px; }
+.ticket-website-name { font-size: 1rem; color: #333; font-weight: bold; word-break: break-all; }
+
+.ticket-input-section {
+    padding: 20px;
+    background-color: #fff;
+    border-top: 2px dashed #aaa;
+}
+#urlInput {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 12px;
+    border: 2px solid #ccc;
+    border-radius: 5px;
+    font-size: 1rem;
+}
+.ticket-rip-section {
+    background-color: #e63946;
+    border-top: 2px dashed #aaa;
+}
+#analyzeButton {
+    background: none;
+    border: none;
+    color: white;
+    font-family: 'Open Sans', sans-serif;
+    font-weight: bold;
+    font-size: 1.1rem;
+    width: 100%;
+    padding: 15px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+#analyzeButton:hover { background-color: rgba(0,0,0,0.1); }
+#analyzeButton .admit-one { font-family: 'Bangers', cursive; font-size: 1.5rem; letter-spacing: 1px; }
+
+
+/* --- PROGRESS AND RESULTS --- */
 #progress-container { margin-top: 20px; }
 #progress-status { font-size: 1.2rem; color: #4361ee; font-weight: bold; }
 .progress-bar-outline { width: 100%; height: 30px; background-color: #e0e0e0; border-radius: 15px; border: 2px solid #4361ee; padding: 3px; }
@@ -83,26 +130,8 @@ header .subtitle {
 #results h3 { font-size: 2rem; margin-top: 30px; }
 .score-card { margin: 20px auto; text-align: center; }
 #score-wrapper h3 { font-size: 1.5rem; margin-bottom: 15px; }
-
-.score-display {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 30px;
-    margin-bottom: 20px;
-    flex-wrap: wrap;
-}
-
-.static-legend {
-    text-align: left;
-    font-size: 1rem;
-    font-weight: bold;
-    color: #333;
-    border: 2px solid #ddd;
-    padding: 15px;
-    border-radius: 10px;
-    background-color: rgba(255, 255, 255, 0.7);
-}
+.score-display { display: flex; justify-content: center; align-items: center; gap: 30px; margin-bottom: 20px; flex-wrap: wrap; }
+.static-legend { text-align: left; font-size: 1rem; font-weight: bold; color: #333; border: 2px solid #ddd; padding: 15px; border-radius: 10px; background-color: rgba(255, 255, 255, 0.7); }
 .legend-item { display: flex; align-items: center; margin-bottom: 8px; }
 .legend-item:last-child { margin-bottom: 0; }
 .legend-swatch { width: 20px; height: 20px; border-radius: 4px; margin-right: 10px; border: 1px solid rgba(0,0,0,0.1); }
@@ -111,23 +140,15 @@ header .subtitle {
 .legend-swatch.improve { background-color: #e9c46a; }
 .legend-swatch.needs-help { background-color: #fca5a5; }
 .legend-swatch.urgent { background-color: #dc2626; }
+.score-circle { width: 150px; height: 150px; margin: 0; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-family: 'Bangers', cursive; font-size: 4rem; color: #fff; background-color: #264653; border: 8px solid #00509d; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
 
-.score-circle {
-    width: 150px;
-    height: 150px;
-    margin: 0;
-    border-radius: 50%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-family: 'Bangers', cursive;
-    font-size: 4rem;
-    color: #fff;
-    background-color: #264653;
-    border: 8px solid #00509d;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-}
+/* --- SCORE SNAPSHOT STYLES --- */
+#score-snapshot-container { display: none; margin-top: 20px; }
+.share-snapshot { margin-top: 15px; }
+.share-snapshot button { font-family: 'Open Sans', sans-serif; font-weight: bold; background-color: #3a0ca3; color: #fff; border: none; padding: 10px 15px; border-radius: 5px; cursor: pointer; transition: background-color 0.2s; }
+.share-snapshot button:hover { background-color: #4361ee; }
 
+/* --- CTA AND CHECKLIST --- */
 #score-interpretation { font-size: 1.2rem; font-weight: bold; color: #f72585; margin: 0 auto 25px; max-width: 80%; }
 .cta-humanizer { display: flex; align-items: center; justify-content: center; gap: 15px; background-color: rgba(248, 249, 250, 0.8); padding: 15px; border-radius: 10px; margin: 0 auto 10px; max-width: 80%; }
 .cta-humanizer img { width: 80px; height: 80px; border-radius: 50%; border: 3px solid #4361ee; }
