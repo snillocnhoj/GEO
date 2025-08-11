@@ -20,7 +20,6 @@ const FINAL_MARKETING_MESSAGES = [
     "Get ready, here it comes..."
 ];
 let progressInterval;
-let coasterAnimationInterval; // Keep this for clearing
 
 // --- DOM Elements ---
 const urlInput = document.getElementById('urlInput');
@@ -35,7 +34,6 @@ const scoreInterpretation = document.getElementById('score-interpretation');
 const ctaButton = document.getElementById('cta-button');
 const checklistContainer = document.getElementById('checklist-container');
 const ticketWebsiteName = document.getElementById('ticket-website-name');
-const coasterCar = document.getElementById('coaster-car');
 const scoreSnapshotContainer = document.getElementById('score-snapshot-container');
 const scoreSnapshotDiv = document.getElementById('score-snapshot');
 const downloadSnapshotButton = document.getElementById('download-snapshot');
@@ -43,7 +41,7 @@ const downloadSnapshotButton = document.getElementById('download-snapshot');
 // --- Event Listeners ---
 urlInput.addEventListener('input', () => {
     if (ticketWebsiteName) {
-        ticketWebsiteName.textContent = urlInput.value || "https://your-website.com";
+        ticketWebsiteName.textContent = urlInput.value || "your-website.com";
     }
 });
 
@@ -82,10 +80,9 @@ analyzeButton.addEventListener('click', async () => {
         resultsSection.classList.remove('hidden');
         checklistContainer.innerHTML = '<h3>Site-Wide Compliance Checklist</h3><p>The analysis could not be completed.</p>';
     } finally {
-        analyzeButton.textContent = 'ADMIT ONE - Start Full Site Inspection!';
+        analyzeButton.innerHTML = '<span class="admit-one">ADMIT ONE</span> - Start Full Site Inspection!';
         analyzeButton.disabled = false;
         clearInterval(progressInterval);
-        clearInterval(coasterAnimationInterval);
     }
 });
 
@@ -97,21 +94,19 @@ function uiReset() {
         progressBar.style.transition = 'none';
         progressBar.style.width = '0%';
     }
-    if (coasterCar) coasterCar.style.left = '-15px';
-
+    
     checklistContainer.innerHTML = '';
     scoreWrapper.classList.add('hidden');
-    if(scoreSnapshotContainer) scoreSnapshotContainer.style.display = 'none';
-
+    if (scoreSnapshotContainer) scoreSnapshotContainer.classList.add('hidden');
+    
     clearInterval(progressInterval);
-    clearInterval(coasterAnimationInterval);
 }
 
 function animateProgressBar() {
     let initialMessageIndex = 0;
     let finalMessageIndex = 0;
     let finalAlternatingCounter = 0;
-
+    
     progressStatus.textContent = INITIAL_PROGRESS_MESSAGES[initialMessageIndex];
     
     setTimeout(() => {
@@ -141,18 +136,6 @@ function animateProgressBar() {
             progressStatus.textContent = INITIAL_PROGRESS_MESSAGES[initialMessageIndex];
         }
     }, 4000); 
-
-    if (coasterCar) {
-        let currentPos = 0;
-        coasterAnimationInterval = setInterval(() => {
-            currentPos += 1;
-            if(currentPos <= 90) {
-                 coasterCar.style.left = `calc(${currentPos}% - 15px)`;
-            } else {
-                clearInterval(coasterAnimationInterval);
-            }
-        }, 278); // ~25s total time
-    }
 }
 
 function getScoreInterpretation(score) {
@@ -164,24 +147,23 @@ function getScoreInterpretation(score) {
 
 function displayFinalReport(results) {
     clearInterval(progressInterval);
-    progressStatus.textContent = "The ride has finished! Checking your photos...";
-
+    progressStatus.textContent = "Analysis complete!";
+    
     if (progressBar) {
         progressBar.style.transition = 'width 0.5s ease-in-out';
         progressBar.style.width = '100%';
     }
-    if (coasterCar) coasterCar.style.left = 'calc(100% - 15px)';
-
+    
     setTimeout(() => {
         progressContainer.classList.add('hidden');
         resultsSection.classList.remove('hidden');
-        if (scoreSnapshotContainer) scoreSnapshotContainer.style.display = 'block';
+        if (scoreSnapshotContainer) scoreSnapshotContainer.classList.remove('hidden');
         if (typeof generateScoreSnapshot === 'function') generateScoreSnapshot(results);
     }, 500);
 
     const { averageScore, checkStats } = results;
     checklistContainer.innerHTML = '<h3>Site-Wide Compliance Checklist</h3>';
-
+    
     if (!checkStats || Object.keys(checkStats).length === 0) {
         checklistContainer.innerHTML += '<p>Could not retrieve any pages to analyze.</p>';
         return;
@@ -195,7 +177,7 @@ function displayFinalReport(results) {
     } else {
         ctaButton.classList.add('hidden');
     }
-
+    
     scoreWrapper.classList.remove('hidden');
 
     for (const name in checkStats) {
@@ -209,26 +191,26 @@ function displayFinalReport(results) {
     }
 }
 
-// --- Score Snapshot Functions ---
 function generateScoreSnapshot(results) {
+    if (!scoreSnapshotDiv) return;
     const { averageScore } = results;
-    const siteUrl = urlInput.value.trim();
+    const siteUrl = urlInput.value.trim().replace(/^https?:\/\//, ''); // Clean up URL for display
     
     scoreSnapshotDiv.innerHTML = `
-        <div style="padding: 20px; text-align: center; background: #0c0a1a; color: white; border-radius: 10px; font-family: 'Open Sans', sans-serif;">
-            <img src="logo.png" style="max-width: 100px; margin-bottom: 15px;">
-            <h4 style="font-family: 'Bangers', cursive; font-size: 1.8rem; color: #4cc9f0; margin: 0;">My GEO Thrill Score</h4>
-            <p style="font-size: 1.1rem; margin: 5px 0 15px;">for ${siteUrl}</p>
-            <div style="font-family: 'Bangers', cursive; font-size: 4rem; color: #fff; margin-bottom: 15px;">${averageScore}</div>
-            <p style="font-size: 0.8rem; color: #ccc;">Analyzed by the GEO Thrill-O-Meter</p>
+        <div style="padding: 20px; text-align: center; background: #fff; color: #333; border: 2px dashed #e63946; border-radius: 10px; font-family: 'Open Sans', sans-serif;">
+            <img src="logo.png" style="max-height: 40px; margin-bottom: 10px;">
+            <h4 style="font-family: 'Bangers', cursive; font-size: 1.5rem; color: #7209b7; margin: 0;">My GEO Thrill Score</h4>
+            <p style="font-size: 1rem; margin: 5px 0 10px; font-weight: bold;">for ${siteUrl}</p>
+            <div style="font-family: 'Bangers', cursive; font-size: 3.5rem; color: #e63946; margin-bottom: 10px;">${averageScore}</div>
+            <p style="font-size: 0.7rem; color: #666; margin: 0;">Analyzed by the GEO Thrill-O-Meter</p>
         </div>
     `;
 }
 
 if (downloadSnapshotButton) {
     downloadSnapshotButton.addEventListener('click', () => {
-        if (typeof html2canvas === 'function') {
-            html2canvas(scoreSnapshotDiv).then(canvas => {
+        if (scoreSnapshotDiv && typeof html2canvas === 'function') {
+            html2canvas(scoreSnapshotDiv.firstElementChild).then(canvas => {
                 const link = document.createElement('a');
                 link.download = 'geo-score-snapshot.png';
                 link.href = canvas.toDataURL();
@@ -239,7 +221,6 @@ if (downloadSnapshotButton) {
 }
 
 function shareScore(platform) {
-    const siteUrl = urlInput.value.trim();
     const text = encodeURIComponent(`I just tested my website's GEO score with the Thrill-O-Meter! Check it out:`);
     const url = `https://geo-thrill-o-matic.onrender.com/`;
     let shareUrl = '';
