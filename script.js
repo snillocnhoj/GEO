@@ -1,11 +1,11 @@
 // --- Constants ---
 const MAX_PAGES_TO_CRAWL = 10;
 const INITIAL_PROGRESS_MESSAGES = [
-    "Loading up the ride vehicles...",
-    "Checking the safety harnesses...",
-    "Consulting the park map for all the attractions...",
-    "Calibrating the thrill sensors...",
-    "Getting ready for the big drop...",
+    "Warming up the engines...",
+    "Scanning for E-E-A-T signals to build trust with AI...",
+    "Did you know? AI prioritizes sites that answer customer questions.",
+    "Checking if your content is 'quotable' for search results...",
+    "Analyzing your site's structure for readability...",
 ];
 const FINAL_MARKETING_MESSAGES = [
     "Brought to you by John Collins Consulting",
@@ -20,7 +20,7 @@ const FINAL_MARKETING_MESSAGES = [
     "Get ready, here it comes..."
 ];
 let progressInterval;
-let coasterAnimationInterval;
+let coasterAnimationInterval; // Keep this for clearing
 
 // --- DOM Elements ---
 const urlInput = document.getElementById('urlInput');
@@ -40,10 +40,11 @@ const scoreSnapshotContainer = document.getElementById('score-snapshot-container
 const scoreSnapshotDiv = document.getElementById('score-snapshot');
 const downloadSnapshotButton = document.getElementById('download-snapshot');
 
-
 // --- Event Listeners ---
 urlInput.addEventListener('input', () => {
-    ticketWebsiteName.textContent = urlInput.value || "https://your-website.com";
+    if (ticketWebsiteName) {
+        ticketWebsiteName.textContent = urlInput.value || "https://your-website.com";
+    }
 });
 
 analyzeButton.addEventListener('click', async () => {
@@ -54,7 +55,7 @@ analyzeButton.addEventListener('click', async () => {
     }
 
     uiReset();
-
+    
     try {
         const startUrl = rawUrl.startsWith('http') ? rawUrl : `https://${rawUrl}`;
         analyzeButton.textContent = 'Inspection in Progress...';
@@ -85,11 +86,8 @@ analyzeButton.addEventListener('click', async () => {
         analyzeButton.disabled = false;
         clearInterval(progressInterval);
         clearInterval(coasterAnimationInterval);
-        if (progressBar) progressBar.style.width = '100%';
-        if (coasterCar) coasterCar.style.left = 'calc(100% - 15px)';
     }
 });
-
 
 // --- UI Update Functions ---
 function uiReset() {
@@ -103,7 +101,7 @@ function uiReset() {
 
     checklistContainer.innerHTML = '';
     scoreWrapper.classList.add('hidden');
-    scoreSnapshotContainer.style.display = 'none';
+    if(scoreSnapshotContainer) scoreSnapshotContainer.style.display = 'none';
 
     clearInterval(progressInterval);
     clearInterval(coasterAnimationInterval);
@@ -113,12 +111,14 @@ function animateProgressBar() {
     let initialMessageIndex = 0;
     let finalMessageIndex = 0;
     let finalAlternatingCounter = 0;
-    
+
     progressStatus.textContent = INITIAL_PROGRESS_MESSAGES[initialMessageIndex];
     
     setTimeout(() => {
-        progressBar.style.transition = 'width 25s ease-in-out';
-        progressBar.style.width = '90%';
+        if (progressBar) {
+            progressBar.style.transition = 'width 25s ease-in-out';
+            progressBar.style.width = '90%';
+        }
     }, 100);
 
     const initialInterval = setInterval(() => {
@@ -148,14 +148,12 @@ function animateProgressBar() {
             currentPos += 1;
             if(currentPos <= 90) {
                  coasterCar.style.left = `calc(${currentPos}% - 15px)`;
-            }
-            if(currentPos >= 90) {
+            } else {
                 clearInterval(coasterAnimationInterval);
             }
-        }, 250); // Matches the 25s total transition time for 90%
+        }, 278); // ~25s total time
     }
 }
-
 
 function getScoreInterpretation(score) {
     if (score >= 90) return "Your site is a prime candidate for AI features! Prepare for maximum thrills!";
@@ -166,18 +164,19 @@ function getScoreInterpretation(score) {
 
 function displayFinalReport(results) {
     clearInterval(progressInterval);
-    clearInterval(coasterAnimationInterval);
     progressStatus.textContent = "The ride has finished! Checking your photos...";
 
-    progressBar.style.transition = 'width 0.5s ease-in-out';
-    progressBar.style.width = '100%';
+    if (progressBar) {
+        progressBar.style.transition = 'width 0.5s ease-in-out';
+        progressBar.style.width = '100%';
+    }
     if (coasterCar) coasterCar.style.left = 'calc(100% - 15px)';
 
     setTimeout(() => {
         progressContainer.classList.add('hidden');
         resultsSection.classList.remove('hidden');
-        scoreSnapshotContainer.style.display = 'block';
-        generateScoreSnapshot(results);
+        if (scoreSnapshotContainer) scoreSnapshotContainer.style.display = 'block';
+        if (typeof generateScoreSnapshot === 'function') generateScoreSnapshot(results);
     }, 500);
 
     const { averageScore, checkStats } = results;
@@ -228,19 +227,21 @@ function generateScoreSnapshot(results) {
 
 if (downloadSnapshotButton) {
     downloadSnapshotButton.addEventListener('click', () => {
-        html2canvas(scoreSnapshotDiv).then(canvas => {
-            const link = document.createElement('a');
-            link.download = 'geo-score-snapshot.png';
-            link.href = canvas.toDataURL();
-            link.click();
-        });
+        if (typeof html2canvas === 'function') {
+            html2canvas(scoreSnapshotDiv).then(canvas => {
+                const link = document.createElement('a');
+                link.download = 'geo-score-snapshot.png';
+                link.href = canvas.toDataURL();
+                link.click();
+            });
+        }
     });
 }
 
 function shareScore(platform) {
     const siteUrl = urlInput.value.trim();
     const text = encodeURIComponent(`I just tested my website's GEO score with the Thrill-O-Meter! Check it out:`);
-    const url = `https://geo-thrill-o-matic.onrender.com/`; // Link back to your app
+    const url = `https://geo-thrill-o-matic.onrender.com/`;
     let shareUrl = '';
 
     if (platform === 'linkedin') {
