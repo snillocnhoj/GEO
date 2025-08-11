@@ -9,8 +9,13 @@ const rateLimit = require('express-rate-limit');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// --- THIS IS THE FIX ---
+// This tells Express to trust the 'X-Forwarded-For' header from Render's proxy.
+app.set('trust proxy', 1);
+// --- END OF FIX ---
+
+
 // --- API KEYS ARE READ SECURELY FROM THE ENVIRONMENT ---
-// UPDATED: Now looks for SCRAPINGBEE_API_KEY
 const SCRAPINGBEE_API_KEY = process.env.SCRAPINGBEE_API_KEY;
 const SENDGRID_API_KEY = process.env.SENDGRID_API_KEY;
 const FROM_EMAIL = process.env.FROM_EMAIL;
@@ -57,7 +62,7 @@ app.post('/api/analyze', apiLimiter, async (req, res) => {
 });
 
 
-// --- Frontend File Serving (Unchanged) ---
+// --- Frontend File Serving ---
 app.get('/style.css', (req, res) => { res.sendFile(path.join(__dirname, 'style.css')); });
 app.get('/script.js', (req, res) => { res.sendFile(path.join(__dirname, 'script.js')); });
 app.get('/logo.png', (req, res) => { res.sendFile(path.join(__dirname, 'logo.png')); });
@@ -71,9 +76,8 @@ app.listen(PORT, () => {
 });
 
 
-// --- Core Application Logic ---
+// --- Core Application Logic (Unchanged) ---
 async function crawlSite(startUrl) {
-    // ... crawl logic is unchanged ...
     const allPageResults = [];
     const siteOrigin = new URL(startUrl).origin;
     const homePageHtml = await fetchHtml(startUrl);
@@ -98,7 +102,6 @@ async function crawlSite(startUrl) {
     return calculateFinalResults(allPageResults);
 }
 
-// UPDATED: fetchHtml now uses ScrapingBee
 async function fetchHtml(url) {
     const scraperUrl = 'https://app.scrapingbee.com/api/v1/';
     const params = {
@@ -109,7 +112,6 @@ async function fetchHtml(url) {
     return response.data;
 }
 
-// ... all other functions (calculateFinalResults, sendEmailReport, runAllChecks, etc.) are unchanged ...
 function calculateFinalResults(allPageResults) {
     const checkStats = {};
     let totalPasses = 0, totalChecks = 0;
@@ -132,6 +134,7 @@ function calculateFinalResults(allPageResults) {
     const averageScore = totalChecks > 0 ? Math.round((totalPasses / totalChecks) * 100) : 0;
     return { averageScore, checkStats, pagesCrawled: allPageResults.length };
 }
+
 async function sendEmailReport(url, results) {
     const { averageScore, checkStats, pagesCrawled } = results;
     let reportHtml = `<h1>GEO Inspection Report for ${url}</h1><h2>Overall Score: ${averageScore}/100</h2><p>Analyzed ${pagesCrawled} pages.</p><hr>`;
@@ -155,6 +158,7 @@ async function sendEmailReport(url, results) {
         console.error('Error sending email report:', error.toString());
     }
 }
+
 function findMenuLinks(doc, startUrl, crawledUrls) {
     const navLinkSelectors = 'nav a, [id*="nav"] a, [id*="menu"] a, [class*="nav"] a, [class*="menu"] a';
     const links = new Set();
@@ -173,6 +177,7 @@ function findMenuLinks(doc, startUrl, crawledUrls) {
     });
     return Array.from(links);
 }
+
 function runAllChecks(doc, url) {
     const textContent = doc.body.textContent || "";
     const schemaTypes = getSchemaTypes(doc);
@@ -198,6 +203,7 @@ function runAllChecks(doc, url) {
         { name: 'FAQ or How-To Schema', passed: schemaTypes.includes('FAQPage') || schemaTypes.includes('HowTo') },
     ];
 }
+
 function checkAltText(doc) { const images = Array.from(doc.querySelectorAll('img')); if (images.length === 0) return true; return images.every(img => img.alt && img.alt.trim() !== ''); }
 function checkConversationalTone(doc) { const headings = doc.querySelectorAll('h2, h3'); const questionWords = ['what', 'how', 'why', 'when', 'where', 'is', 'can', 'do', 'are', 'which', 'who', 'does', 'should']; return Array.from(headings).some(h => { const headingText = h.textContent.trim().toLowerCase(); return questionWords.some(word => headingText.startsWith(word)); }); }
 function checkOutboundLinks(doc, url) { try { const pageHost = new URL(url).hostname; return Array.from(doc.querySelectorAll('a[href]')).some(link => { try { const linkHost = new URL(link.href).hostname; return linkHost && linkHost !== pageHost; } catch (e) { return false; } }); } catch (e) { return false; } }
