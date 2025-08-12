@@ -41,16 +41,26 @@ header .title { font-family: 'Bangers', cursive; font-size: 3rem; color: #7209b7
 header .subtitle { font-size: 1.2rem; color: #4361ee; font-weight: bold; margin-top: -10px; margin-bottom: 15px; line-height: 1.5; }
 .brand-line { font-size: 1.1rem; color: #333; margin: 10px 0 0; display: flex; align-items: center; justify-content: center; gap: 15px; }
 .brand-line img { max-height: 40px; }
-.brand-line a { text-decoration: none; } /* New: Removes underline from logo link */
+.brand-line a { text-decoration: none; }
 .expertise-line { font-size: 0.9rem; color: #555; margin: 5px 0 20px; font-style: italic; }
 
 .ticket-booth { background: transparent; border: none; padding: 0; }
-.thrill-ticket { background-color: #fdd835; border: 1px solid #c8ab2a; box-shadow: 0 5px 15px rgba(0,0,0,0.2); border-radius: 15px; width: 100%; max-width: 500px; margin: 0 auto; overflow: hidden; }
+.thrill-ticket {
+    background-color: #fdd835;
+    border: 1px solid #c8ab2a;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    border-radius: 15px;
+    width: 100%;
+    max-width: 500px;
+    margin: 0 auto;
+    overflow: hidden;
+    transition: background-color 0.5s ease-in-out; /* For color animation */
+}
 .ticket-top-section { display: flex; align-items: center; background-color: #fff; padding: 20px; border-bottom: 2px dashed #aaa; }
 .ticket-logo-area { text-align: center; padding-right: 20px; border-right: 2px dashed #aaa; }
 .ticket-logo-area img { max-height: 50px; }
 .ticket-logo-area p { font-size: 0.7rem; color: #666; margin: 5px 0 0; font-weight: bold; }
-.ticket-logo-area a { text-decoration: none; } /* New: Removes underline from logo link */
+.ticket-logo-area a { text-decoration: none; }
 .ticket-details-area { flex-grow: 1; padding-left: 20px; text-align: center; }
 .ticket-details-area h3 { font-family: 'Bangers', cursive; color: #e63946; font-size: 1.8rem; margin: 0 0 5px; }
 .ticket-website-name { font-size: 1rem; color: #333; font-weight: bold; word-break: break-all; min-height: 24px; }
@@ -69,7 +79,7 @@ header .subtitle { font-size: 1.2rem; color: #4361ee; font-weight: bold; margin-
 .progress-bar-outline { width: 100%; height: 30px; background-color: #e0e0e0; border-radius: 15px; border: 2px solid #4361ee; padding: 3px; }
 #progress-bar { width: 0%; height: 100%; background-image: linear-gradient(to right, #4cc9f0, #4361ee); border-radius: 10px; transition: width 0.3s ease-in-out; }
 
-/* --- MODAL STYLES --- */
+/* ... (rest of CSS is the same as the final correct version) ... */
 .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.7); display: flex; justify-content: center; align-items: center; z-index: 1000; opacity: 0; animation: fadeInModal 0.3s forwards; }
 @keyframes fadeInModal { to { opacity: 1; } }
 .modal-content { background-color: #fff; padding: 30px; border-radius: 15px; width: 90%; max-width: 600px; position: relative; box-shadow: 0 5px 25px rgba(0,0,0,0.4); transform: scale(0.9); animation: scaleInModal 0.3s forwards; }
@@ -77,7 +87,6 @@ header .subtitle { font-size: 1.2rem; color: #4361ee; font-weight: bold; margin-
 .modal-close { position: absolute; top: 15px; right: 15px; background: none; border: none; font-size: 2rem; color: #aaa; cursor: pointer; line-height: 1; }
 .modal-title { font-family: 'Bangers', cursive; color: #7209b7; margin-top: 0; }
 .modal-text { font-size: 1.1rem; line-height: 1.6; color: #333; }
-
 #results { margin-top: 40px; text-align: left; }
 #results h2, #results h3 { font-family: 'Bangers', cursive; text-align: center; color: #7209b7; }
 #results h2 { font-size: 2.5rem; }
@@ -101,7 +110,7 @@ header .subtitle { font-size: 1.2rem; color: #4361ee; font-weight: bold; margin-
 .cta-humanizer p { margin: 0; text-align: left; font-size: 1.1rem; color: #333; }
 .pointing-hand { font-size: 2.5rem; margin: 10px 0; animation: bounce 2s infinite; }
 @keyframes bounce { 0%, 20%, 50%, 80%, 100% { transform: translateY(0); } 40% { transform: translateY(-20px); } 60% { transform: translateY(-10px); } }
-.cta-button { display: inline-block; padding: 12px 25px; font-family: 'Bangers', cursive; font-size: 1.5rem; color: #fff; background-color: #3a0ca3; border-radius: 8px; text-decoration: none; transition: transform 0.2s, background-color 0.2s; }
+.cta-button { display: inline-block; padding: 12px 25px; font-family: 'Bangers', cursive; font-size: 1.5rem; color: #fff; background-color: #3a0ca3; border-radius: 8px; text-decoration: none; transition: transform 0.2s, background-color 0.2s; border: none; cursor: pointer; }
 .cta-button:hover { transform: scale(1.05); background-color: #4361ee; }
 #checklist-container { margin-top: 20px; }
 .check-item { display: flex; align-items: center; margin-bottom: 12px; font-size: 1.1rem; background-color: rgba(248, 249, 250, 0.8); padding: 10px; border-radius: 5px; border-left: 5px solid #ccc; }
