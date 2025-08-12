@@ -6,8 +6,14 @@ let progressInterval;
 
 const MODAL_CONTENT = {
     "why-geo": {
-        title: "Why is GEO so important?",
-        text: "Generative Engine Optimization (GEO) is the next evolution of SEO. As users increasingly get answers directly from AI like Google's AI Overviews, your website must be structured to be a trusted source. Good GEO ensures your brand is not just listed, but is actively cited and recommended by AI, putting you in front of customers before they even see a list of competitors."
+        title: "The New Frontier: Why GEO is Crucial",
+        text: `The world of search is undergoing its most significant change in a decade. Users are shifting from Browse lists of blue links to asking conversational questions and receiving direct, synthesized answers from AI like Google's AI Overviews and ChatGPT. This is where Generative Engine Optimization (GEO) becomes essential.
+
+Traditional SEO was about ranking your website to get a click. The goal of GEO is to make your website's content so clear, authoritative, and trustworthy that the AI chooses to use it as a primary source, citing your brand and expertise directly within its generated answers. It's about moving from being an option in a list to becoming part of the definitive answer.
+
+This requires a deeper focus on the signals of E-E-A-T (Experience, Expertise, Authoritativeness, and Trust). Because AI is putting its own reputation on the line with every response it generates, it has a strong incentive to pull from sources it deems the most credible.
+
+Optimizing for GEO means structuring your content to be easily understood and parsed by AI, demonstrating your first-hand experience, and building undeniable brand authority. Failing to adapt to this new landscape risks your brand becoming invisible to a growing segment of users who now get their answers without ever clicking a link.`
     },
     "Title Tag": {
         title: "Title Tag",
