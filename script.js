@@ -7,11 +7,11 @@ let progressInterval;
 const MODAL_CONTENT = {
     "why-geo": {
         title: "The New Frontier: Why GEO is Crucial",
-        text: `The world of search is undergoing its most significant change in a decade. Users are shifting from Browse lists of blue links to asking conversational questions and receiving direct, synthesized answers from AI like Google's AI Overviews and ChatGPT. This is where Generative Engine Optimization (GEO) becomes essential.
+        text: `The world of search is undergoing its most significant change in a decade. Users are shifting from browsing lists of blue links to asking conversational questions and receiving direct, synthesized answers from AI like Google's AI Overviews and ChatGPT.<br><br>
 
-Traditional SEO was about ranking your website to get a click. The goal of GEO is to make your website's content so clear, authoritative, and trustworthy that the AI chooses to use it as a primary source, citing your brand and expertise directly within its generated answers. It's about moving from being an option in a list to becoming part of the definitive answer.
+This is where Generative Engine Optimization (GEO) becomes essential. Traditional SEO was about ranking your website to get a click. The goal of GEO is to make your website's content so clear, authoritative, and trustworthy that the AI chooses to use it as a primary source, citing your brand and expertise directly within its generated answers. It's about moving from being an option in a list to becoming part of the definitive answer.<br><br>
 
-This requires a deeper focus on the signals of E-E-A-T (Experience, Expertise, Authoritativeness, and Trust). Because AI is putting its own reputation on the line with every response it generates, it has a strong incentive to pull from sources it deems the most credible.
+This requires a deeper focus on the signals of E-E-A-T (Experience, Expertise, Authoritativeness, and Trust). Because AI is putting its own reputation on the line with every response it generates, it has a strong incentive to pull from sources it deems the most credible.<br><br>
 
 Optimizing for GEO means structuring your content to be easily understood and parsed by AI, demonstrating your first-hand experience, and building undeniable brand authority. Failing to adapt to this new landscape risks your brand becoming invisible to a growing segment of users who now get their answers without ever clicking a link.`
     },
@@ -168,129 +168,4 @@ infoModal.addEventListener('click', (event) => {
 
 // --- Modal Functions ---
 function openModal(checkName) {
-    const content = MODAL_CONTENT[checkName];
-    if (content) {
-        modalTitle.textContent = content.title;
-        modalText.textContent = content.text;
-        infoModal.classList.remove('hidden');
-        document.body.classList.add('modal-open');
-    }
-}
-function closeModal() {
-    infoModal.classList.add('hidden');
-    document.body.classList.remove('modal-open');
-}
-
-// --- UI Update Functions ---
-function uiReset() {
-    resultsSection.classList.add('hidden');
-    progressContainer.classList.remove('hidden');
-    if (progressBar) {
-        progressBar.style.transition = 'none';
-        progressBar.style.width = '0%';
-    }
-    checklistContainer.innerHTML = '';
-    scoreWrapper.classList.add('hidden');
-    clearInterval(progressInterval);
-}
-
-function animateProgressBar() {
-    let initialMessageIndex = 0;
-    let finalMessageIndex = 0;
-    let finalAlternatingCounter = 0;
-    
-    progressStatus.textContent = INITIAL_PROGRESS_MESSAGES[initialMessageIndex];
-    
-    setTimeout(() => {
-        if (progressBar) {
-            progressBar.style.transition = 'width 25s ease-in-out';
-            progressBar.style.width = '90%';
-        }
-    }, 100);
-
-    const initialInterval = setInterval(() => {
-        initialMessageIndex++;
-        if (initialMessageIndex >= INITIAL_PROGRESS_MESSAGES.length) {
-            clearInterval(initialInterval);
-            progressStatus.textContent = "Compiling final report...";
-            progressInterval = setInterval(() => {
-                finalAlternatingCounter++;
-                if (finalAlternatingCounter % 2 === 0) {
-                    progressStatus.textContent = "Compiling final report...";
-                } else {
-                    progressStatus.textContent = FINAL_MARKETING_MESSAGES[finalMessageIndex];
-                    finalMessageIndex = (finalMessageIndex + 1) % FINAL_MARKETING_MESSAGES.length;
-                }
-            }, 3000);
-        } else {
-            progressStatus.textContent = INITIAL_PROGRESS_MESSAGES[initialMessageIndex];
-        }
-    }, 4000); 
-}
-
-function getScoreInterpretation(score) {
-    if (score >= 90) return "Your site is a prime candidate for AI features! Prepare for maximum thrills!";
-    if (score >= 80) return "Your site has a strong foundation. A few more loops and you'll be soaring!";
-    if (score <= 73) return "Your site has potential, but there are a few unexpected drops ahead.";
-    return "";
-}
-
-function displayFinalReport(results) {
-    clearInterval(progressInterval);
-    progressStatus.textContent = "Analysis complete!";
-    
-    if (progressBar) {
-        progressBar.style.transition = 'width 0.5s ease-in-out';
-        progressBar.style.width = '100%';
-    }
-    
-    setTimeout(() => {
-        progressContainer.classList.add('hidden');
-        resultsSection.classList.remove('hidden');
-    }, 500);
-
-    const { averageScore, checkStats } = results;
-    checklistContainer.innerHTML = '<h3>Site-Wide Compliance Checklist</h3>';
-    
-    if (!checkStats || Object.keys(checkStats).length === 0) {
-        checklistContainer.innerHTML += '<p>Could not retrieve any pages to analyze.</p>';
-        return;
-    }
-
-    scoreCircle.textContent = `${averageScore}`;
-    scoreInterpretation.textContent = getScoreInterpretation(averageScore);
-
-    if (averageScore <= 73) {
-        ctaButton.classList.remove('hidden');
-    } else {
-        ctaButton.classList.add('hidden');
-    }
-    
-    scoreWrapper.classList.remove('hidden');
-
-    for (const name in checkStats) {
-        const stats = checkStats[name];
-        const passPercent = stats.total > 0 ? Math.round((stats.passed / stats.total) * 100) : 0;
-        const icon = passPercent >= 75 ? '✔️' : '❌';
-        const checkItem = document.createElement('div');
-        checkItem.className = `check-item ${passPercent >= 75 ? 'passed' : 'failed'}`;
-        checkItem.innerHTML = `
-            <div class="check-item-icon">${icon}</div>
-            <div class="check-item-text">
-                <div>
-                    <strong>${name}</strong>
-                    <span>Passed on ${stats.passed} of ${stats.total} pages (${passPercent}%)</span>
-                </div>
-                <button class="check-item-info-button" data-check-name="${name}">?</button>
-            </div>
-        `;
-        checklistContainer.appendChild(checkItem);
-    }
-    
-    document.querySelectorAll('.check-item-info-button').forEach(button => {
-        button.addEventListener('click', (event) => {
-            const checkName = event.target.getAttribute('data-check-name');
-            openModal(checkName);
-        });
-    });
-}
+    const content = MODAL_CONTENT
