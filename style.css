@@ -41,6 +41,7 @@ header .title { font-family: 'Bangers', cursive; font-size: 3rem; color: #7209b7
 header .subtitle { font-size: 1.2rem; color: #4361ee; font-weight: bold; margin-top: -10px; margin-bottom: 15px; line-height: 1.5; }
 .brand-line { font-size: 1.1rem; color: #333; margin: 10px 0 0; display: flex; align-items: center; justify-content: center; gap: 15px; }
 .brand-line img { max-height: 40px; }
+.brand-line a { text-decoration: none; } /* New: Removes underline from logo link */
 .expertise-line { font-size: 0.9rem; color: #555; margin: 5px 0 20px; font-style: italic; }
 
 .ticket-booth { background: transparent; border: none; padding: 0; }
@@ -49,6 +50,7 @@ header .subtitle { font-size: 1.2rem; color: #4361ee; font-weight: bold; margin-
 .ticket-logo-area { text-align: center; padding-right: 20px; border-right: 2px dashed #aaa; }
 .ticket-logo-area img { max-height: 50px; }
 .ticket-logo-area p { font-size: 0.7rem; color: #666; margin: 5px 0 0; font-weight: bold; }
+.ticket-logo-area a { text-decoration: none; } /* New: Removes underline from logo link */
 .ticket-details-area { flex-grow: 1; padding-left: 20px; text-align: center; }
 .ticket-details-area h3 { font-family: 'Bangers', cursive; color: #e63946; font-size: 1.8rem; margin: 0 0 5px; }
 .ticket-website-name { font-size: 1rem; color: #333; font-weight: bold; word-break: break-all; min-height: 24px; }
@@ -63,6 +65,7 @@ header .subtitle { font-size: 1.2rem; color: #4361ee; font-weight: bold; margin-
 .why-button:hover { background-color: #3a0ca3; transform: scale(1.05); }
 
 #progress-container { margin-top: 20px; }
+#progress-status { font-size: 1.2rem; color: #4361ee; font-weight: bold; }
 .progress-bar-outline { width: 100%; height: 30px; background-color: #e0e0e0; border-radius: 15px; border: 2px solid #4361ee; padding: 3px; }
 #progress-bar { width: 0%; height: 100%; background-image: linear-gradient(to right, #4cc9f0, #4361ee); border-radius: 10px; transition: width 0.3s ease-in-out; }
 
