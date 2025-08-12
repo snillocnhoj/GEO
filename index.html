@@ -13,7 +13,7 @@
     <div class="container">
         <header>
             <h1 class="title">Generative Engine Optimization (GEO) Thrill-O-Meter</h1>
-            <p class="subtitle">Is your website a headline attraction or a sideshow?<br>Claim your Thrill Ticket now!</p>
+            <p class="subtitle">Is your website a headline attraction or a sideshow?<br>Test your strength now!</p>
             <div class="brand-line">
                 <img src="logo.png" alt="John Collins Consulting Logo">
                 <span>Brought to you by <strong>John Collins Consulting</strong></span>
@@ -42,10 +42,8 @@
                     </div>
                 </div>
             </div>
-
-            <div class="value-prop">
-                <p>Generative AI such as Google's AI Overviews is changing how customers find you. Or don't find you. A high GEO score means your website is more likely to be featured, driving more traffic and driving more sales. Is your site ready for the ride?</p>
-            </div>
+            
+            <button id="why-geo-button" class="why-button">Why is GEO so important?</button>
 
             <div id="progress-container" class="hidden">
                 <h3 id="progress-status">Preparing the inspection...</h3>
@@ -80,24 +78,25 @@
                             Elevate My Score!
                         </a>
                     </div>
-                    <div id="score-snapshot-container" class="hidden">
-                        <h3>Your GEO Score Snapshot</h3>
-                        <div id="score-snapshot"></div>
-                        <div class="share-snapshot">
-                            <button onclick="shareScore('linkedin')">Share on LinkedIn</button>
-                            <button onclick="shareScore('twitter')">Share on X</button>
-                            <button id="download-snapshot">Download Snapshot</button>
-                        </div>
-                    </div>
                 </div>
-                <div id="checklist-container"></div>
+                <div id="checklist-container">
+                    </div>
             </div>
         </main>
+
         <footer>
             <p>A GEO Compliance Tool for the Themed Attractions Industry</p>
         </footer>
     </div>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    
+    <div id="info-modal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <button id="modal-close-button" class="modal-close">&times;</button>
+            <h2 id="modal-title" class="modal-title"></h2>
+            <p id="modal-text" class="modal-text"></p>
+        </div>
+    </div>
+
     <script defer src="script.js"></script>
 </body>
 </html>
