@@ -25,6 +25,7 @@ body {
     width: 100%;
     height: 100%;
 }
+/* Static star layer using radial gradients */
 .stars {
     background-image: radial-gradient(1px 1px at 20% 20%, white, transparent),
                       radial-gradient(1px 1px at 80% 10%, white, transparent),
@@ -32,6 +33,7 @@ body {
                       radial-gradient(2px 2px at 90% 40%, white, transparent),
                       radial-gradient(2px 2px at 15% 90%, white, transparent);
 }
+/* Animated twinkling star layer using opacity keyframes */
 .twinkling {
     background-image: radial-gradient(1px 1px at 30% 80%, white, transparent),
                       radial-gradient(2px 2px at 5% 50%, white, transparent),
