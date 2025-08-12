@@ -11,7 +11,8 @@ const MODAL_CONTENT = {
     },
     "Title Tag": {
         title: "Title Tag",
-        text: "The <title> tag is the primary title of your webpage shown in browser tabs and search results. It is the single most important signal to all search engines about the page's core topic."
+        // --- THIS IS THE FIX ---
+        text: "The &lt;title&gt; tag is the primary title of your webpage shown in browser tabs and search results. It is the single most important signal to all search engines about the page's core topic."
     },
     "Meta Description": {
         title: "Meta Description",
@@ -19,7 +20,8 @@ const MODAL_CONTENT = {
     },
     "H1 Heading": {
         title: "H1 Heading",
-        text: "The <h1> is the main headline of your on-page content. Having exactly one reinforces the page's main topic for AI crawlers and helps them understand the content's hierarchy."
+        // --- THIS IS THE FIX ---
+        text: "The &lt;h1&gt; is the main headline of your on-page content. Having exactly one reinforces the page's main topic for AI crawlers and helps them understand the content's hierarchy."
     },
     "Mobile-Friendly Viewport": {
         title: "Mobile-Friendly Viewport",
@@ -164,8 +166,8 @@ infoModal.addEventListener('click', (event) => {
 function openModal(checkName) {
     const content = MODAL_CONTENT[checkName];
     if (content) {
-        modalTitle.innerHTML = content.title; // Use innerHTML to allow for simple tags if needed
-        modalText.innerHTML = content.text;   // Use innerHTML to render the <br> tags
+        modalTitle.innerHTML = content.title;
+        modalText.innerHTML = content.text;
         infoModal.classList.remove('hidden');
         document.body.classList.add('modal-open');
     }
