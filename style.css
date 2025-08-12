@@ -53,13 +53,13 @@ header .subtitle { font-size: 1.2rem; color: #4361ee; font-weight: bold; margin-
 
 /* --- THRILL TICKET STYLES --- */
 .ticket-booth {
-    background: transparent; /* Remove the old background */
+    background: transparent;
     border: none;
     padding: 0;
 }
 
 .thrill-ticket {
-    background-color: #fdd835; /* Bright yellow ticket color */
+    background-color: #fdd835;
     border: 1px solid #c8ab2a;
     box-shadow: 0 5px 15px rgba(0,0,0,0.2);
     border-radius: 15px;
@@ -116,7 +116,6 @@ header .subtitle { font-size: 1.2rem; color: #4361ee; font-weight: bold; margin-
 #analyzeButton:hover { background-color: rgba(0,0,0,0.1); }
 #analyzeButton .admit-one { font-family: 'Bangers', cursive; font-size: 1.5rem; letter-spacing: 1px; }
 
-
 /* --- PROGRESS AND RESULTS --- */
 #progress-container { margin-top: 20px; }
 #progress-status { font-size: 1.2rem; color: #4361ee; font-weight: bold; }
@@ -139,14 +138,10 @@ header .subtitle { font-size: 1.2rem; color: #4361ee; font-weight: bold; margin-
 .legend-swatch.needs-help { background-color: #fca5a5; }
 .legend-swatch.urgent { background-color: #dc2626; }
 .score-circle { width: 150px; height: 150px; margin: 0; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-family: 'Bangers', cursive; font-size: 4rem; color: #fff; background-color: #264653; border: 8px solid #00509d; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-
-/* --- SCORE SNAPSHOT STYLES --- */
 #score-snapshot-container { display: none; margin-top: 20px; }
 .share-snapshot { margin-top: 15px; }
 .share-snapshot button { font-family: 'Open Sans', sans-serif; font-weight: bold; background-color: #3a0ca3; color: #fff; border: none; padding: 10px 15px; border-radius: 5px; cursor: pointer; transition: background-color 0.2s; }
 .share-snapshot button:hover { background-color: #4361ee; }
-
-/* --- CTA AND CHECKLIST --- */
 #score-interpretation { font-size: 1.2rem; font-weight: bold; color: #f72585; margin: 0 auto 25px; max-width: 80%; }
 .cta-humanizer { display: flex; align-items: center; justify-content: center; gap: 15px; background-color: rgba(248, 249, 250, 0.8); padding: 15px; border-radius: 10px; margin: 0 auto 10px; max-width: 80%; }
 .cta-humanizer img { width: 80px; height: 80px; border-radius: 50%; border: 3px solid #4361ee; }
