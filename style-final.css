@@ -1,0 +1,149 @@
+/* General Styles */
+body {
+    font-family: 'Open Sans', sans-serif;
+    margin: 0;
+    background-color: #0c0a1a;
+    color: #333;
+    padding: 40px 20px;
+}
+
+/* --- FINAL, CORRECTED BACKGROUND ANIMATION --- */
+.background-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    background: #0c0a1a url('twilight-skyline.png') no-repeat center center;
+    background-size: cover;
+}
+.stars, .twinkling {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+/* Static star layer using radial gradients for better performance */
+.stars {
+    background-image: radial-gradient(1px 1px at 20% 20%, white, transparent),
+                      radial-gradient(1px 1px at 80% 10%, white, transparent),
+                      radial-gradient(1px 1px at 50% 70%, white, transparent),
+                      radial-gradient(2px 2px at 90% 40%, white, transparent),
+                      radial-gradient(2px 2px at 15% 90%, white, transparent);
+}
+/* Animated twinkling star layer using opacity keyframes */
+.twinkling {
+    background-image: radial-gradient(1px 1px at 30% 80%, white, transparent),
+                      radial-gradient(2px 2px at 5% 50%, white, transparent),
+                      radial-gradient(1px 1px at 70% 30%, white, transparent),
+                      radial-gradient(2px 2px at 45% 5%, white, transparent),
+                      radial-gradient(1px 1px at 95% 95%, white, transparent);
+    animation: twinkle 5s linear infinite;
+}
+@keyframes twinkle {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.2; }
+}
+
+body.modal-open { overflow: hidden; }
+.container {
+    width: 100%;
+    max-width: 800px;
+    margin: 40px auto;
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 20px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+    padding: 30px 40px;
+    text-align: center;
+    border: 8px solid;
+    border-image-slice: 1;
+    border-image-source: linear-gradient(45deg, #f72585, #7209b7, #3a0ca3, #4361ee, #4cc9f0);
+    animation: marquee-glow 5s linear infinite, fadeIn 1s ease-out forwards;
+    animation-delay: 0.2s;
+    opacity: 0;
+}
+
+@keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes marquee-glow {
+    0% { border-image-source: linear-gradient(45deg, #f72585, #7209b7, #3a0ca3, #4361ee, #4cc9f0); } 25% { border-image-source: linear-gradient(45deg, #4cc9f0, #f72585, #7209b7, #3a0ca3, #4361ee); } 50% { border-image-source: linear-gradient(45deg, #4361ee, #4cc9f0, #f72585, #7209b7, #3a0ca3); } 75% { border-image-source: linear-gradient(45deg, #3a0ca3, #4361ee, #4cc9f0, #f72585, #7209b7); } 100% { border-image-source: linear-gradient(45deg, #7209b7, #3a0ca3, #4361ee, #4cc9f0, #f72585); }
+}
+
+header .title { font-family: 'Bangers', cursive; font-size: 3rem; color: #7209b7; margin: 0 0 15px 0; letter-spacing: 2px; text-shadow: 2px 2px 0 #4cc9f0; line-height: 1.2; }
+header .subtitle { font-size: 1.2rem; color: #4361ee; font-weight: bold; margin-top: -10px; margin-bottom: 15px; line-height: 1.5; }
+.brand-line { font-size: 1.1rem; color: #333; margin: 10px 0 0; display: flex; align-items: center; justify-content: center; gap: 15px; }
+.brand-line img { max-height: 40px; }
+.brand-line a { text-decoration: none; }
+.expertise-line { font-size: 0.9rem; color: #555; margin: 5px 0 20px; font-style: italic; }
+
+.ticket-booth { background: transparent; border: none; padding: 20px 0; }
+.thrill-ticket { background-color: #fdd835; border: 1px solid #c8ab2a; box-shadow: 0 5px 15px rgba(0,0,0,0.2); border-radius: 15px; width: 100%; max-width: 500px; margin: 0 auto; overflow: hidden; transition: background-color 0.5s ease-in-out; }
+.ticket-top-section { display: flex; align-items: center; background-color: #fff; padding: 20px; border-bottom: 2px dashed #aaa; }
+.ticket-logo-area { text-align: center; padding-right: 20px; border-right: 2px dashed #aaa; }
+.ticket-logo-area img { max-height: 50px; }
+.ticket-logo-area p { font-size: 0.7rem; color: #666; margin: 5px 0 0; font-weight: bold; }
+.ticket-logo-area a { text-decoration: none; }
+.ticket-details-area { flex-grow: 1; padding-left: 20px; text-align: center; }
+.ticket-details-area h3 { font-family: 'Bangers', cursive; color: #e63946; font-size: 1.8rem; margin: 0 0 5px; }
+.ticket-website-name { font-size: 1rem; color: #333; font-weight: bold; word-break: break-all; min-height: 24px; }
+.ticket-input-section { padding: 20px; background-color: #fff; }
+#urlInput { width: 100%; box-sizing: border-box; padding: 12px; border: 2px solid #ccc; border-radius: 5px; font-size: 1rem; }
+.ticket-rip-section { background-color: #e63946; }
+#analyzeButton { background: none; border: none; color: white; font-family: 'Open Sans', sans-serif; font-weight: bold; font-size: 1.1rem; width: 100%; padding: 15px; cursor: pointer; transition: background-color 0.2s; }
+#analyzeButton:hover { background-color: rgba(0,0,0,0.1); }
+#analyzeButton .admit-one { font-family: 'Bangers', cursive; font-size: 1.5rem; letter-spacing: 1px; }
+
+.why-button { margin-top: 20px; background-color: #4361ee; color: white; border: none; padding: 10px 20px; font-size: 1rem; font-weight: bold; border-radius: 8px; cursor: pointer; transition: background-color 0.2s, transform 0.2s; }
+.why-button:hover { background-color: #3a0ca3; transform: scale(1.05); }
+
+#progress-container { margin-top: 20px; }
+#progress-status { font-size: 1.2rem; color: #4361ee; font-weight: bold; }
+.progress-bar-outline { width: 100%; height: 30px; background-color: #e0e0e0; border-radius: 15px; border: 2px solid #4361ee; padding: 3px; }
+#progress-bar { width: 0%; height: 100%; background-image: linear-gradient(to right, #4cc9f0, #4361ee); border-radius: 10px; transition: width 0.3s ease-in-out; }
+
+.modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.7); display: flex; justify-content: center; align-items: center; z-index: 1000; opacity: 0; animation: fadeInModal 0.3s forwards; }
+@keyframes fadeInModal { to { opacity: 1; } }
+.modal-content { background-color: #fff; padding: 30px; border-radius: 15px; width: 90%; max-width: 600px; position: relative; box-shadow: 0 5px 25px rgba(0,0,0,0.4); transform: scale(0.9); animation: scaleInModal 0.3s forwards; }
+@keyframes scaleInModal { to { transform: scale(1); } }
+.modal-close { position: absolute; top: 15px; right: 15px; background: none; border: none; font-size: 2rem; color: #aaa; cursor: pointer; line-height: 1; }
+.modal-title { font-family: 'Bangers', cursive; color: #7209b7; margin-top: 0; }
+.modal-text { font-size: 1.1rem; line-height: 1.6; color: #333; }
+
+#results { margin-top: 40px; text-align: left; }
+#results h2, #results h3 { font-family: 'Bangers', cursive; text-align: center; color: #7209b7; }
+#results h2 { font-size: 2.5rem; }
+#results h3 { font-size: 2rem; margin-top: 30px; }
+.score-card { margin: 20px auto; text-align: center; }
+#score-wrapper h3 { font-size: 1.5rem; margin-bottom: 15px; }
+.score-display { display: flex; justify-content: center; align-items: center; gap: 30px; margin-bottom: 20px; flex-wrap: wrap; }
+.static-legend { text-align: left; font-size: 1rem; font-weight: bold; color: #333; border: 2px solid #ddd; padding: 15px; border-radius: 10px; background-color: rgba(255, 255, 255, 0.7); }
+.legend-item { display: flex; align-items: center; margin-bottom: 8px; }
+.legend-item:last-child { margin-bottom: 0; }
+.legend-swatch { width: 20px; height: 20px; border-radius: 4px; margin-right: 10px; border: 1px solid rgba(0,0,0,0.1); }
+.legend-swatch.excellent { background-color: #2a9d8f; }
+.legend-swatch.good { background-color: #8ab17d; }
+.legend-swatch.improve { background-color: #e9c46a; }
+.legend-swatch.needs-help { background-color: #fca5a5; }
+.legend-swatch.urgent { background-color: #dc2626; }
+.score-circle { width: 150px; height: 150px; margin: 0; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-family: 'Bangers', cursive; font-size: 4rem; color: #fff; background-color: #264653; border: 8px solid #00509d; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+#score-interpretation { font-size: 1.2rem; font-weight: bold; color: #f72585; margin: 0 auto 25px; max-width: 80%; }
+.cta-humanizer { display: flex; align-items: center; justify-content: center; gap: 15px; background-color: rgba(248, 249, 250, 0.8); padding: 15px; border-radius: 10px; margin: 0 auto 10px; max-width: 80%; }
+.cta-humanizer img { width: 80px; height: 80px; border-radius: 50%; border: 3px solid #4361ee; }
+.cta-humanizer p { margin: 0; text-align: left; font-size: 1.1rem; color: #333; }
+.pointing-hand { font-size: 2.5rem; margin: 10px 0; animation: bounce 2s infinite; }
+@keyframes bounce { 0%, 20%, 50%, 80%, 100% { transform: translateY(0); } 40% { transform: translateY(-20px); } 60% { transform: translateY(-10px); } }
+.cta-button { display: inline-block; padding: 12px 25px; font-family: 'Bangers', cursive; font-size: 1.5rem; color: #fff; background-color: #3a0ca3; border-radius: 8px; text-decoration: none; transition: transform 0.2s, background-color 0.2s; border: none; cursor: pointer; }
+.cta-button:hover { transform: scale(1.05); background-color: #4361ee; }
+#checklist-container { margin-top: 20px; }
+.check-item { display: flex; align-items: center; margin-bottom: 12px; font-size: 1.1rem; background-color: rgba(248, 249, 250, 0.8); padding: 10px; border-radius: 5px; border-left: 5px solid #ccc; }
+.check-item.passed { border-left-color: #4cc9f0; }
+.check-item.failed { border-left-color: #f72585; }
+.check-item-icon { margin-right: 15px; font-size: 1.5rem; }
+.check-item-text { display: flex; align-items: center; justify-content: space-between; flex-grow: 1; }
+.check-item-text strong { color: #3a0ca3; }
+.check-item-text span { font-size: 0.9rem; color: #666; display: block; }
+.check-item-info-button { background-color: #ddd; color: #333; border: none; border-radius: 50%; width: 24px; height: 24px; font-weight: bold; cursor: pointer; margin-left: 10px; transition: background-color 0.2s; }
+.check-item-info-button:hover { background-color: #4361ee; color: white; }
+footer { margin-top: 30px; text-align: center; font-size: 0.9rem; color: #fff; text-shadow: 1px 1px 2px #000; }
+.hidden { display: none; }
