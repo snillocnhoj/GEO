@@ -37,7 +37,6 @@ header .subtitle { font-size: 1.2rem; color: #4361ee; font-weight: bold; margin-
 .brand-line img { max-height: 40px; }
 .brand-line a { text-decoration: none; }
 .expertise-line { font-size: 0.9rem; color: #555; margin: 5px 0 20px; font-style: italic; }
-
 .ticket-booth { background: transparent; border: none; padding: 0; }
 .thrill-ticket { background-color: #fdd835; border: 1px solid #c8ab2a; box-shadow: 0 5px 15px rgba(0,0,0,0.2); border-radius: 15px; width: 100%; max-width: 500px; margin: 0 auto; overflow: hidden; transition: background-color 0.5s ease-in-out; }
 .ticket-top-section { display: flex; align-items: center; background-color: #fff; padding: 20px; border-bottom: 2px dashed #aaa; }
@@ -54,15 +53,12 @@ header .subtitle { font-size: 1.2rem; color: #4361ee; font-weight: bold; margin-
 #analyzeButton { background: none; border: none; color: white; font-family: 'Open Sans', sans-serif; font-weight: bold; font-size: 1.1rem; width: 100%; padding: 15px; cursor: pointer; transition: background-color 0.2s; }
 #analyzeButton:hover { background-color: rgba(0,0,0,0.1); }
 #analyzeButton .admit-one { font-family: 'Bangers', cursive; font-size: 1.5rem; letter-spacing: 1px; }
-
 .why-button { margin-top: 20px; background-color: #4361ee; color: white; border: none; padding: 10px 20px; font-size: 1rem; font-weight: bold; border-radius: 8px; cursor: pointer; transition: background-color 0.2s, transform 0.2s; }
 .why-button:hover { background-color: #3a0ca3; transform: scale(1.05); }
-
 #progress-container { margin-top: 20px; }
 #progress-status { font-size: 1.2rem; color: #4361ee; font-weight: bold; }
 .progress-bar-outline { width: 100%; height: 30px; background-color: #e0e0e0; border-radius: 15px; border: 2px solid #4361ee; padding: 3px; }
 #progress-bar { width: 0%; height: 100%; background-image: linear-gradient(to right, #4cc9f0, #4361ee); border-radius: 10px; transition: width 0.3s ease-in-out; }
-
 .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.7); display: flex; justify-content: center; align-items: center; z-index: 1000; opacity: 0; animation: fadeInModal 0.3s forwards; }
 @keyframes fadeInModal { to { opacity: 1; } }
 .modal-content { background-color: #fff; padding: 30px; border-radius: 15px; width: 90%; max-width: 600px; position: relative; box-shadow: 0 5px 25px rgba(0,0,0,0.4); transform: scale(0.9); animation: scaleInModal 0.3s forwards; }
@@ -70,7 +66,6 @@ header .subtitle { font-size: 1.2rem; color: #4361ee; font-weight: bold; margin-
 .modal-close { position: absolute; top: 15px; right: 15px; background: none; border: none; font-size: 2rem; color: #aaa; cursor: pointer; line-height: 1; }
 .modal-title { font-family: 'Bangers', cursive; color: #7209b7; margin-top: 0; }
 .modal-text { font-size: 1.1rem; line-height: 1.6; color: #333; }
-
 #results { margin-top: 40px; text-align: left; }
 #results h2, #results h3 { font-family: 'Bangers', cursive; text-align: center; color: #7209b7; }
 #results h2 { font-size: 2.5rem; }
@@ -92,6 +87,19 @@ header .subtitle { font-size: 1.2rem; color: #4361ee; font-weight: bold; margin-
 .cta-humanizer { display: flex; align-items: center; justify-content: center; gap: 15px; background-color: rgba(248, 249, 250, 0.8); padding: 15px; border-radius: 10px; margin: 0 auto 10px; max-width: 80%; }
 .cta-humanizer img { width: 80px; height: 80px; border-radius: 50%; border: 3px solid #4361ee; }
 .cta-humanizer p { margin: 0; text-align: left; font-size: 1.1rem; color: #333; }
+
+/* New Email Capture Styles */
+.email-capture-wrapper { margin: 15px auto; max-width: 80%; }
+#user-email-input {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 12px;
+    border: 2px solid #4361ee;
+    border-radius: 5px;
+    font-size: 1rem;
+    text-align: center;
+}
+
 .pointing-hand { font-size: 2.5rem; margin: 10px 0; animation: bounce 2s infinite; }
 @keyframes bounce { 0%, 20%, 50%, 80%, 100% { transform: translateY(0); } 40% { transform: translateY(-20px); } 60% { transform: translateY(-10px); } }
 .cta-button { display: inline-block; padding: 12px 25px; font-family: 'Bangers', cursive; font-size: 1.5rem; color: #fff; background-color: #3a0ca3; border-radius: 8px; text-decoration: none; transition: transform 0.2s, background-color 0.2s; border: none; cursor: pointer; }
