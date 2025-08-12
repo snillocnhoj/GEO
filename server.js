@@ -12,6 +12,9 @@ const PORT = process.env.PORT || 3000;
 
 app.set('trust proxy', 1);
 
+// --- Simple in-memory cache for reports ---
+const reportCache = new Map();
+
 // --- API KEYS ---
 const SCRAPINGBEE_API_KEY = process.env.SCRAPINGBEE_API_KEY;
 const SENDGRID_API_KEY = process.env.SENDGRID_API_KEY;
@@ -25,9 +28,6 @@ app.use(cors());
 app.use(express.json());
 
 const apiLimiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 10, standardHeaders: true, legacyHeaders: false, message: 'Too many requests, please try again after 15 minutes' });
-
-// --- In-memory cache for reports ---
-const reportCache = new Map();
 
 // --- API Routes ---
 app.post('/api/analyze', apiLimiter, async (req, res) => {
