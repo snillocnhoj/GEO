@@ -11,7 +11,6 @@ body {
     padding: 40px 20px;
 }
 
-/* New class to prevent background scroll when modal is open */
 body.modal-open {
     overflow: hidden;
 }
@@ -60,80 +59,22 @@ header .subtitle { font-size: 1.2rem; color: #4361ee; font-weight: bold; margin-
 #analyzeButton:hover { background-color: rgba(0,0,0,0.1); }
 #analyzeButton .admit-one { font-family: 'Bangers', cursive; font-size: 1.5rem; letter-spacing: 1px; }
 
-.why-button {
-    margin-top: 20px;
-    background-color: #4361ee;
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    font-size: 1rem;
-    font-weight: bold;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: background-color 0.2s, transform 0.2s;
-}
+.why-button { margin-top: 20px; background-color: #4361ee; color: white; border: none; padding: 10px 20px; font-size: 1rem; font-weight: bold; border-radius: 8px; cursor: pointer; transition: background-color 0.2s, transform 0.2s; }
 .why-button:hover { background-color: #3a0ca3; transform: scale(1.05); }
 
 #progress-container { margin-top: 20px; }
-/* ... other styles unchanged ... */
+.progress-bar-outline { width: 100%; height: 30px; background-color: #e0e0e0; border-radius: 15px; border: 2px solid #4361ee; padding: 3px; }
+#progress-bar { width: 0%; height: 100%; background-image: linear-gradient(to right, #4cc9f0, #4361ee); border-radius: 10px; transition: width 0.3s ease-in-out; }
 
-/* --- NEW MODAL STYLES --- */
-.modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.7);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
-    opacity: 0;
-    animation: fadeInModal 0.3s forwards;
-}
+/* --- MODAL STYLES --- */
+.modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.7); display: flex; justify-content: center; align-items: center; z-index: 1000; opacity: 0; animation: fadeInModal 0.3s forwards; }
 @keyframes fadeInModal { to { opacity: 1; } }
-.modal-content {
-    background-color: #fff;
-    padding: 30px;
-    border-radius: 15px;
-    width: 90%;
-    max-width: 600px;
-    position: relative;
-    box-shadow: 0 5px 25px rgba(0,0,0,0.4);
-    transform: scale(0.9);
-    animation: scaleInModal 0.3s forwards;
-}
+.modal-content { background-color: #fff; padding: 30px; border-radius: 15px; width: 90%; max-width: 600px; position: relative; box-shadow: 0 5px 25px rgba(0,0,0,0.4); transform: scale(0.9); animation: scaleInModal 0.3s forwards; }
 @keyframes scaleInModal { to { transform: scale(1); } }
-.modal-close {
-    position: absolute;
-    top: 15px;
-    right: 15px;
-    background: none;
-    border: none;
-    font-size: 2rem;
-    color: #aaa;
-    cursor: pointer;
-    line-height: 1;
-}
+.modal-close { position: absolute; top: 15px; right: 15px; background: none; border: none; font-size: 2rem; color: #aaa; cursor: pointer; line-height: 1; }
 .modal-title { font-family: 'Bangers', cursive; color: #7209b7; margin-top: 0; }
 .modal-text { font-size: 1.1rem; line-height: 1.6; color: #333; }
 
-.check-item-info-button {
-    background-color: #ddd;
-    color: #333;
-    border: none;
-    border-radius: 50%;
-    width: 24px;
-    height: 24px;
-    font-weight: bold;
-    cursor: pointer;
-    margin-left: 10px;
-    transition: background-color 0.2s;
-}
-.check-item-info-button:hover { background-color: #4361ee; color: white; }
-
-/* Existing styles below... */
 #results { margin-top: 40px; text-align: left; }
 #results h2, #results h3 { font-family: 'Bangers', cursive; text-align: center; color: #7209b7; }
 #results h2 { font-size: 2.5rem; }
@@ -167,5 +108,7 @@ header .subtitle { font-size: 1.2rem; color: #4361ee; font-weight: bold; margin-
 .check-item-text { display: flex; align-items: center; justify-content: space-between; flex-grow: 1; }
 .check-item-text strong { color: #3a0ca3; }
 .check-item-text span { font-size: 0.9rem; color: #666; display: block; }
+.check-item-info-button { background-color: #ddd; color: #333; border: none; border-radius: 50%; width: 24px; height: 24px; font-weight: bold; cursor: pointer; margin-left: 10px; transition: background-color 0.2s; }
+.check-item-info-button:hover { background-color: #4361ee; color: white; }
 footer { margin-top: 30px; text-align: center; font-size: 0.9rem; color: #fff; text-shadow: 1px 1px 2px #000; }
 .hidden { display: none; }
