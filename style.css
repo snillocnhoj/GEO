@@ -2,22 +2,14 @@
 body {
     font-family: 'Open Sans', sans-serif;
     margin: 0;
+    background-color: #0c0a1a;
+    background-image: url('animated-background.gif');
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
     color: #333;
     padding: 40px 20px;
 }
-
-/* --- FINAL, CORRECTED BACKGROUND --- */
-.background-container {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: -1;
-    background: #0c0a1a url('animated-background.gif') no-repeat center center;
-    background-size: cover;
-}
-
 body.modal-open { overflow: hidden; }
 .container {
     width: 100%;
@@ -28,7 +20,7 @@ body.modal-open { overflow: hidden; }
     box-shadow: 0 10px 40px rgba(0,0,0,0.5);
     padding: 30px 40px;
     text-align: center;
-    border: 8px solid #4361ee; /* Simplified static border */
+    border: 8px solid #4361ee;
     opacity: 0;
     animation: fadeIn 1s ease-out forwards;
     animation-delay: 0.2s;
