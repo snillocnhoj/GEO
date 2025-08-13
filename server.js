@@ -68,7 +68,7 @@ app.get('/style.css', (req, res) => { res.sendFile(path.join(__dirname, 'style.c
 app.get('/script.js', (req, res) => { res.sendFile(path.join(__dirname, 'script.js')); });
 app.get('/logo.png', (req, res) => { res.sendFile(path.join(__dirname, 'logo.png')); });
 app.get('/john-photo.png', (req, res) => { res.sendFile(path.join(__dirname, 'john-photo.png')); });
-app.get('/animated-background.gif', (req, res) => { res.sendFile(path.join(__dirname, 'animated-background.gif')); });
+app.get('/animated-background.mp4', (req, res) => { res.sendFile(path.join(__dirname, 'animated-background.mp4')); });
 app.get('/', (req, res) => { res.sendFile(path.join(__dirname, 'index.html')); });
 
 app.listen(PORT, () => {

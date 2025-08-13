@@ -2,14 +2,34 @@
 body {
     font-family: 'Open Sans', sans-serif;
     margin: 0;
-    background-color: #0c0a1a;
-    background-image: url('animated-background.gif');
-    background-size: cover;
-    background-position: center;
-    background-attachment: fixed;
+    background-color: #0c0a1a; /* Fallback color */
     color: #333;
     padding: 40px 20px;
 }
+
+/* --- FINAL, CORRECTED VIDEO BACKGROUND --- */
+.video-background {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    overflow: hidden;
+}
+.video-background video {
+    min-width: 100%;
+    min-height: 100%;
+    width: auto;
+    height: auto;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    object-fit: cover; /* This ensures the video covers the screen without distortion */
+}
+
+
 body.modal-open { overflow: hidden; }
 .container {
     width: 100%;
