@@ -12,10 +12,7 @@ const PORT = process.env.PORT || 3000;
 
 app.set('trust proxy', 1);
 
-// --- In-memory cache for reports ---
 const reportCache = new Map();
-
-// --- API KEYS ---
 const SCRAPINGBEE_API_KEY = process.env.SCRAPINGBEE_API_KEY;
 const SENDGRID_API_KEY = process.env.SENDGRID_API_KEY;
 const FROM_EMAIL = process.env.FROM_EMAIL;
@@ -23,13 +20,11 @@ const TO_EMAIL = process.env.TO_EMAIL;
 
 if (SENDGRID_API_KEY) { sgMail.setApiKey(SENDGRID_API_KEY); }
 
-// --- Middleware ---
 app.use(cors());
 app.use(express.json());
 
 const apiLimiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 10, standardHeaders: true, legacyHeaders: false, message: 'Too many requests, please try again after 15 minutes' });
 
-// --- API Routes ---
 app.post('/api/analyze', apiLimiter, async (req, res) => {
     if (!SCRAPINGBEE_API_KEY || !SENDGRID_API_KEY || !FROM_EMAIL || !TO_EMAIL) {
         console.error('One or more environment variables are not set on the server.');
@@ -68,17 +63,12 @@ app.post('/api/send-report', async (req, res) => {
     }
 });
 
-// --- Frontend File Serving ---
+// --- UPDATED FILE SERVING ---
 app.get('/style.css', (req, res) => { res.sendFile(path.join(__dirname, 'style.css')); });
 app.get('/script.js', (req, res) => { res.sendFile(path.join(__dirname, 'script.js')); });
 app.get('/logo.png', (req, res) => { res.sendFile(path.join(__dirname, 'logo.png')); });
 app.get('/john-photo.png', (req, res) => { res.sendFile(path.join(__dirname, 'john-photo.png')); });
-
-// --- THIS IS THE FIX ---
-// The old route for the static image is replaced with the new one for the GIF
 app.get('/animated-background.gif', (req, res) => { res.sendFile(path.join(__dirname, 'animated-background.gif')); });
-// --- END OF FIX ---
-
 app.get('/', (req, res) => { res.sendFile(path.join(__dirname, 'index.html')); });
 
 app.listen(PORT, () => {

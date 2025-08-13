@@ -2,12 +2,11 @@
 body {
     font-family: 'Open Sans', sans-serif;
     margin: 0;
-    background-color: #0c0a1a;
     color: #333;
     padding: 40px 20px;
 }
 
-/* --- UPDATED BACKGROUND --- */
+/* --- FINAL, CORRECTED BACKGROUND --- */
 .background-container {
     position: fixed;
     top: 0;
@@ -15,27 +14,8 @@ body {
     width: 100%;
     height: 100%;
     z-index: -1;
-    background: #0c0a1a url('animated-background.gif') no-repeat center center; /* This line is updated */
+    background: #0c0a1a url('animated-background.gif') no-repeat center center;
     background-size: cover;
-}
-.stars, .twinkling {
-    /* These can be removed if your GIF has its own stars, but are kept for layering */
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-}
-.stars {
-    background-image: url('https://s3-us-west-2.amazonaws.com/s.cdpn.io/1231630/stars.png');
-}
-.twinkling {
-    background-image: url('https://s3-us-west-2.amazonaws.com/s.cdpn.io/1231630/twinkling.png');
-    animation: move-twink-back 200s linear infinite;
-}
-@keyframes move-twink-back {
-    from { background-position: 0 0; }
-    to { background-position: -10000px 5000px; }
 }
 
 body.modal-open { overflow: hidden; }
@@ -48,25 +28,20 @@ body.modal-open { overflow: hidden; }
     box-shadow: 0 10px 40px rgba(0,0,0,0.5);
     padding: 30px 40px;
     text-align: center;
-    border: 8px solid;
-    border-image-slice: 1;
-    border-image-source: linear-gradient(45deg, #f72585, #7209b7, #3a0ca3, #4361ee, #4cc9f0);
-    animation: marquee-glow 5s linear infinite, fadeIn 1s ease-out forwards;
-    animation-delay: 0.2s;
+    border: 8px solid #4361ee; /* Simplified static border */
     opacity: 0;
+    animation: fadeIn 1s ease-out forwards;
+    animation-delay: 0.2s;
 }
 @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-@keyframes marquee-glow {
-    0% { border-image-source: linear-gradient(45deg, #f72585, #7209b7, #3a0ca3, #4361ee, #4cc9f0); } 25% { border-image-source: linear-gradient(45deg, #4cc9f0, #f72585, #7209b7, #3a0ca3, #4361ee); } 50% { border-image-source: linear-gradient(45deg, #4361ee, #4cc9f0, #f72585, #7209b7, #3a0ca3); } 75% { border-image-source: linear-gradient(45deg, #3a0ca3, #4361ee, #4cc9f0, #f72585, #7209b7); } 100% { border-image-source: linear-gradient(45deg, #7209b7, #3a0ca3, #4361ee, #4cc9f0, #f72585); }
-}
 
-/* ... (The rest of the file is unchanged) ... */
 header .title { font-family: 'Bangers', cursive; font-size: 3rem; color: #7209b7; margin: 0 0 15px 0; letter-spacing: 2px; text-shadow: 2px 2px 0 #4cc9f0; line-height: 1.2; }
 header .subtitle { font-size: 1.2rem; color: #4361ee; font-weight: bold; margin-top: -10px; margin-bottom: 15px; line-height: 1.5; }
 .brand-line { font-size: 1.1rem; color: #333; margin: 10px 0 0; display: flex; align-items: center; justify-content: center; gap: 15px; }
 .brand-line img { max-height: 40px; }
 .brand-line a { text-decoration: none; }
 .expertise-line { font-size: 0.9rem; color: #555; margin: 5px 0 20px; font-style: italic; }
+
 .ticket-booth { background: transparent; border: none; padding: 20px 0; }
 .thrill-ticket { background-color: #fdd835; border: 1px solid #c8ab2a; box-shadow: 0 5px 15px rgba(0,0,0,0.2); border-radius: 15px; width: 100%; max-width: 500px; margin: 0 auto; overflow: hidden; }
 .ticket-top-section { display: flex; align-items: center; background-color: #fff; padding: 20px; border-bottom: 2px dashed #aaa; }
@@ -83,12 +58,15 @@ header .subtitle { font-size: 1.2rem; color: #4361ee; font-weight: bold; margin-
 #analyzeButton { background: none; border: none; color: white; font-family: 'Open Sans', sans-serif; font-weight: bold; font-size: 1.1rem; width: 100%; padding: 15px; cursor: pointer; transition: background-color 0.2s; }
 #analyzeButton:hover { background-color: rgba(0,0,0,0.1); }
 #analyzeButton .admit-one { font-family: 'Bangers', cursive; font-size: 1.5rem; letter-spacing: 1px; }
+
 .why-button { margin-top: 20px; background-color: #4361ee; color: white; border: none; padding: 10px 20px; font-size: 1rem; font-weight: bold; border-radius: 8px; cursor: pointer; transition: background-color 0.2s, transform 0.2s; }
 .why-button:hover { background-color: #3a0ca3; transform: scale(1.05); }
+
 #progress-container { margin-top: 20px; }
 #progress-status { font-size: 1.2rem; color: #4361ee; font-weight: bold; }
 .progress-bar-outline { width: 100%; height: 30px; background-color: #e0e0e0; border-radius: 15px; border: 2px solid #4361ee; padding: 3px; }
 #progress-bar { width: 0%; height: 100%; background-image: linear-gradient(to right, #4cc9f0, #4361ee); border-radius: 10px; transition: width 0.3s ease-in-out; }
+
 .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.7); display: flex; justify-content: center; align-items: center; z-index: 1000; opacity: 0; animation: fadeInModal 0.3s forwards; }
 @keyframes fadeInModal { to { opacity: 1; } }
 .modal-content { background-color: #fff; padding: 30px; border-radius: 15px; width: 90%; max-width: 600px; position: relative; box-shadow: 0 5px 25px rgba(0,0,0,0.4); transform: scale(0.9); animation: scaleInModal 0.3s forwards; }
@@ -96,6 +74,7 @@ header .subtitle { font-size: 1.2rem; color: #4361ee; font-weight: bold; margin-
 .modal-close { position: absolute; top: 15px; right: 15px; background: none; border: none; font-size: 2rem; color: #aaa; cursor: pointer; line-height: 1; }
 .modal-title { font-family: 'Bangers', cursive; color: #7209b7; margin-top: 0; }
 .modal-text { font-size: 1.1rem; line-height: 1.6; color: #333; }
+
 #results { margin-top: 40px; text-align: left; }
 #results h2, #results h3 { font-family: 'Bangers', cursive; text-align: center; color: #7209b7; }
 #results h2 { font-size: 2.5rem; }
