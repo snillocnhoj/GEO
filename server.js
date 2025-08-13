@@ -15,15 +15,11 @@ app.set('trust proxy', 1);
 // --- In-memory cache for reports ---
 const reportCache = new Map();
 
-// --- API KEYS & CONFIGURATION ---
-const SCRAPER_API_KEY = process.env.SCRAPER_API_KEY; // For ScraperAPI
-const SCRAPINGBEE_API_KEY = process.env.SCRAPINGBEE_API_KEY; // For ScrapingBee
+// --- API KEYS ---
+const SCRAPINGBEE_API_KEY = process.env.SCRAPINGBEE_API_KEY;
 const SENDGRID_API_KEY = process.env.SENDGRID_API_KEY;
 const FROM_EMAIL = process.env.FROM_EMAIL;
 const TO_EMAIL = process.env.TO_EMAIL;
-
-// New variable to choose the service. Defaults to ScrapingBee.
-const SCRAPER_SERVICE = process.env.SCRAPER_SERVICE || 'scrapingbee';
 
 if (SENDGRID_API_KEY) { sgMail.setApiKey(SENDGRID_API_KEY); }
 
@@ -35,7 +31,7 @@ const apiLimiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 10, standardHeader
 
 // --- API Routes ---
 app.post('/api/analyze', apiLimiter, async (req, res) => {
-    if ((SCRAPER_SERVICE === 'scraperapi' && !SCRAPER_API_KEY) || (SCRAPER_SERVICE === 'scrapingbee' && !SCRAPINGBEE_API_KEY) || !SENDGRID_API_KEY || !FROM_EMAIL || !TO_EMAIL) {
+    if (!SCRAPINGBEE_API_KEY || !SENDGRID_API_KEY || !FROM_EMAIL || !TO_EMAIL) {
         console.error('One or more environment variables are not set on the server.');
         return res.status(500).json({ error: 'Server is not configured correctly.' });
     }
@@ -77,17 +73,13 @@ app.get('/style.css', (req, res) => { res.sendFile(path.join(__dirname, 'style.c
 app.get('/script.js', (req, res) => { res.sendFile(path.join(__dirname, 'script.js')); });
 app.get('/logo.png', (req, res) => { res.sendFile(path.join(__dirname, 'logo.png')); });
 app.get('/john-photo.png', (req, res) => { res.sendFile(path.join(__dirname, 'john-photo.png')); });
-// --- THIS IS THE FINAL CORRECTION ---
-// Correctly serves the MP4 video and removes all other old background routes.
-app.get('/animated-background.mp4', (req, res) => { res.sendFile(path.join(__dirname, 'animated-background.mp4')); });
-// --- END OF CORRECTION ---
+app.get('/animated-background.gif', (req, res) => { res.sendFile(path.join(__dirname, 'animated-background.gif')); });
 app.get('/', (req, res) => { res.sendFile(path.join(__dirname, 'index.html')); });
 
 app.listen(PORT, () => {
     console.log(`GEO Thrill-O-Meter server listening on port ${PORT}`);
 });
 
-// --- Core Application Logic ---
 async function crawlSite(startUrl) {
     const allPageResults = [];
     const siteOrigin = new URL(startUrl).origin;
@@ -112,25 +104,12 @@ async function crawlSite(startUrl) {
     }
     return processResults(allPageResults);
 }
-
 async function fetchHtml(url) {
-    console.log(`Using scraper service: ${SCRAPER_SERVICE}`);
-    
-    if (SCRAPER_SERVICE === 'scraperapi') {
-        if (!SCRAPER_API_KEY) throw new Error('ScraperAPI key is not configured.');
-        const scraperApiUrl = `http://api.scraperapi.com?api_key=${SCRAPER_API_KEY}&url=${encodeURIComponent(url)}`;
-        const response = await axios.get(scraperApiUrl, { timeout: 45000 });
-        return response.data;
-    } 
-    
-    // Default to ScrapingBee
-    if (!SCRAPINGBEE_API_KEY) throw new Error('ScrapingBee key is not configured.');
     const scraperUrl = 'https://app.scrapingbee.com/api/v1/';
     const params = { api_key: SCRAPINGBEE_API_KEY, url: url };
     const response = await axios.get(scraperUrl, { params: params, timeout: 45000 });
     return response.data;
 }
-
 function processResults(allPageResults) {
     const detailedReport = {};
     let totalPasses = 0, totalChecks = 0;
@@ -159,7 +138,6 @@ function processResults(allPageResults) {
     };
     return { summary, detailedReport, pagesCrawled: allPageResults.length };
 }
-
 const REPORT_DETAILS = {
     "Title Tag": { what: "The presence of a `&lt;title&gt;` tag in the page's HTML code.", why: "This is the primary title of your webpage shown in browser tabs and search results. It is the single most important signal to all search engines about the page's core topic." },
     "Meta Description": { what: "A `&lt;meta name=\"description\"&gt;` tag in the page's code.", why: "This provides the short summary that appears under your title in search results. A compelling description encourages clicks and gives generative AI a quick, clear summary of the page's purpose." },
@@ -181,7 +159,6 @@ const REPORT_DETAILS = {
     "Article or Org Schema": { what: "Checks if the schema defines the page as an 'Article' or provides information about the 'Organization.'", why: "'Article' schema provides context like author and dates (E-E-A-T signals), while 'Organization' schema helps establish the entity behind the website (a Trust signal)." },
     "FAQ or How-To Schema": { what: "Specifically checks for 'FAQPage' or 'HowTo' schema.", why: "This is one of the most powerful schema types, as it structures your content in a Q&A or step-by-step format that generative AI can lift directly into its answers." }
 };
-
 async function sendEmailReport(url, results, userEmail, origin) {
     const { summary, detailedReport, pagesCrawled } = results;
     const { averageScore } = summary;

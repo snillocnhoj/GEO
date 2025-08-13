@@ -20,7 +20,7 @@ body.modal-open { overflow: hidden; }
     box-shadow: 0 10px 40px rgba(0,0,0,0.5);
     padding: 30px 40px;
     text-align: center;
-    border: 8px solid #4361ee;
+    border: 8px solid #4361ee; /* Simplified static border */
     opacity: 0;
     animation: fadeIn 1s ease-out forwards;
     animation-delay: 0.2s;
@@ -106,37 +106,3 @@ header .subtitle { font-size: 1.2rem; color: #4361ee; font-weight: bold; margin-
 .check-item-info-button:hover { background-color: #4361ee; color: white; }
 footer { margin-top: 30px; text-align: center; font-size: 0.9rem; color: #fff; text-shadow: 1px 1px 2px #000; }
 .hidden { display: none; }
-
-/* --- FINAL, CORRECTED Mobile & Responsive Styles --- */
-/* This media query applies styles ONLY on screens smaller than 768px */
-@media (max-width: 768px) {
-    body {
-        padding: 10px;
-    }
-    .container {
-        padding: 15px;
-        margin: 10px auto;
-    }
-    header .title {
-        font-size: 2.2rem;
-        line-height: 1.1;
-    }
-    .score-display {
-        flex-direction: column; /* Stack the legend and circle on small screens */
-        gap: 25px;
-    }
-    .cta-humanizer {
-        flex-direction: column;
-        max-width: 100%;
-    }
-    .cta-humanizer p {
-        text-align: center;
-        margin-top: 10px;
-    }
-    #score-interpretation {
-        max-width: 100%;
-    }
-    .email-capture-wrapper {
-        max-width: 100%;
-    }
-}
