@@ -108,22 +108,20 @@ async function crawlSite(startUrl) {
     }
     return processResults(allPageResults);
 }
-
 async function fetchHtml(url) {
     console.log(`Using scraper service: ${SCRAPER_SERVICE}`);
     if (SCRAPER_SERVICE === 'scraperapi') {
         if (!SCRAPER_API_KEY) throw new Error('ScraperAPI key is not configured.');
         const scraperApiUrl = `http://api.scraperapi.com?api_key=${SCRAPER_API_KEY}&url=${encodeURIComponent(url)}`;
-        const response = await axios.get(scraperApiUrl, { timeout: 30000 }); // <-- TIMEOUT UPDATED
+        const response = await axios.get(scraperApiUrl, { timeout: 30000 });
         return response.data;
     }
     if (!SCRAPINGBEE_API_KEY) throw new Error('ScrapingBee key is not configured.');
     const scraperUrl = 'https://app.scrapingbee.com/api/v1/';
     const params = { api_key: SCRAPINGBEE_API_KEY, url: url };
-    const response = await axios.get(scraperUrl, { params: params, timeout: 30000 }); // <-- TIMEOUT UPDATED
+    const response = await axios.get(scraperUrl, { params: params, timeout: 30000 });
     return response.data;
 }
-
 function processResults(allPageResults) {
     const detailedReport = {};
     let totalPasses = 0, totalChecks = 0;
@@ -152,7 +150,6 @@ function processResults(allPageResults) {
     };
     return { summary, detailedReport, pagesCrawled: allPageResults.length };
 }
-
 const REPORT_DETAILS = {
     "Title Tag": { what: "The presence of a `&lt;title&gt;` tag in the page's HTML code.", why: "This is the primary title of your webpage shown in browser tabs and search results. It is the single most important signal to all search engines about the page's core topic." },
     "Meta Description": { what: "A `&lt;meta name=\"description\"&gt;` tag in the page's code.", why: "This provides the short summary that appears under your title in search results. A compelling description encourages clicks and gives generative AI a quick, clear summary of the page's purpose." },
