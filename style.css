@@ -2,13 +2,29 @@
 body {
     font-family: 'Open Sans', sans-serif;
     margin: 0;
-    background-color: #0c0a1a;
-    background-image: url('animated-background.gif');
-    background-size: cover;
-    background-position: center;
-    background-attachment: fixed;
+    background-color: #0c0a1a; /* Fallback color */
     color: #333;
     padding: 40px 20px;
+}
+.video-background {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    overflow: hidden;
+}
+.video-background video {
+    min-width: 100%;
+    min-height: 100%;
+    width: auto;
+    height: auto;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    object-fit: cover;
 }
 body.modal-open { overflow: hidden; }
 .container {
@@ -119,6 +135,7 @@ footer { margin-top: 30px; text-align: center; font-size: 0.9rem; color: #fff; t
         margin: 10px auto;
         /* This is a key fix to prevent the container from being too wide */
         width: auto;
+        box-sizing: border-box; /* Ensures padding is included in the width calculation */
     }
     header .title {
         font-size: 2.2rem;
