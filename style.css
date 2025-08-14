@@ -1,16 +1,8 @@
-/* Universal Settings, Box Sizing, and IMAGE FIX */
+/* FINAL CORRECTED CODE - Use this version */
 * {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
-}
-
-/* REPAIR: This new rule ensures no image can break out of its container.
-  This is the fix for the broken desktop layout.
-*/
-img {
-  max-width: 100%;
-  height: auto;
 }
 
 body {
@@ -33,6 +25,14 @@ body {
   text-align: center;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
   border: 4px solid #e0e0e0;
+  position: relative; /* Added for stacking context */
+
+  /* == THE CRUCIAL FIX IS HERE == */
+  /* These rules will control any background image that might be */
+  /* present, preventing it from breaking the layout. */
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
 }
 
 /* Title Styles */
@@ -66,7 +66,7 @@ body {
   height: 40px;
 }
 
-/* Form Section Styles */
+/* Form Section Wrapper */
 .form-section {
   max-width: 500px;
   margin: 0 auto;
@@ -146,6 +146,7 @@ body {
     padding: 20px 15px;
   }
   .title {
+    /* Re-applying the mobile size reduction */
     font-size: 1.9rem;
     text-shadow: 2px 2px 0 #c2b6f0;
   }
@@ -168,6 +169,7 @@ body {
   .website-admission-form .input-wrapper {
     text-align: center;
   }
+  /* Styles for the new form elements on mobile */
   .url-input {
     padding: 12px;
     font-size: 0.9rem;
