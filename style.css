@@ -1,5 +1,5 @@
 /* =================================================================== */
-/* == DEFINITIVE AND COMPLETE STYLESHEET ============================= */
+/* == DEFINITIVE AND COMPLETE STYLESHEET (V2 - Polished Formatting) == */
 /* =================================================================== */
 
 /* Universal Settings */
@@ -58,14 +58,14 @@ body {
 
 /* Title Styles */
 .title {
-    /* The correct, bold, blocky font */
     font-family: 'Anton', sans-serif;
     font-size: 3.5rem;
-    font-weight: 400; /* Anton font doesn't need a heavy font-weight */
+    font-weight: 400; 
     color: #5d3ad4;
-    text-shadow: 3px 3px 0 #c2b6f0, -3px -3px 0 #c2b6f0;
+    /* FORMATTING UPDATE: Changed to a single, sharper shadow to match original design. */
+    text-shadow: 4px 4px 0px #d8d2f5;
     line-height: 1.2;
-    margin-bottom: 20px;
+    margin-bottom: 25px; /* FORMATTING UPDATE: Adjusted spacing. */
     text-transform: uppercase;
 }
 
@@ -73,7 +73,7 @@ body {
 .subtitle {
     font-size: 1.5rem;
     color: #007bff;
-    margin-bottom: 30px;
+    margin-bottom: 40px; /* FORMATTING UPDATE: Adjusted spacing. */
     font-weight: 700;
 }
 
@@ -82,19 +82,21 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    gap: 20px;
+    gap: 15px; /* FORMATTING UPDATE: Reduced gap for a tighter layout. */
     margin-bottom: 40px;
     color: #555;
     text-align: left;
+    font-size: 0.95rem; /* FORMATTING UPDATE: Adjusted base font size. */
 }
 
 .built-by img {
-    height: 60px;
+    height: 50px; /* FORMATTING UPDATE: Adjusted logo size. */
     flex-shrink: 0;
 }
 .built-by .small-text {
-    font-size: 0.9rem;
-    color: #666;
+    /* FORMATTING UPDATE: Made this text smaller and lighter to de-emphasize it. */
+    font-size: 0.8rem;
+    color: #777;
 }
 
 /* Form Section Wrapper */
@@ -121,7 +123,8 @@ body {
 
 .website-admission-form .input-wrapper {
     flex-grow: 1;
-    padding: 10px 15px;
+    /* FORMATTING UPDATE: Adjusted padding for a tighter look. */
+    padding: 8px 15px;
     text-align: left;
 }
 
@@ -138,7 +141,8 @@ body {
     outline: none;
     width: 100%;
     font-size: 1.1rem;
-    color: #888;
+    /* FORMATTING UPDATE: Made placeholder text lighter to match original. */
+    color: #aaa;
     background-color: transparent;
 }
 
@@ -207,7 +211,7 @@ body {
     
     .title {
         font-size: 2rem;
-        text-shadow: 2px 2px 0 #c2b6f0, -2px -2px 0 #c2b6f0;
+        text-shadow: 2px 2px 0 #d8d2f5;
     }
     
     .subtitle {
