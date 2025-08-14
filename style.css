@@ -1,5 +1,5 @@
 /* =================================================================== */
-/* == DEFINITIVE AND COMPLETE STYLESHEET (V2 - Polished Formatting) == */
+/* == FINAL VERSION - Merging Functionality with Original Formatting == */
 /* =================================================================== */
 
 /* Universal Settings */
@@ -11,29 +11,29 @@
 
 /* Base Body Styles */
 body {
-    /* Sets the default font for paragraphs and regular text */
+    /* RESTORED STYLE: Using Anton for titles, but a basic sans-serif for the body. */
     font-family: 'Roboto', sans-serif;
     color: #333;
 }
 
-/* Background Video Styles */
+/* Background Video Styles - from our functional version */
 .video-background {
     position: fixed;
     top: 0;
     left: 0;
     width: 100vw;
     height: 100vh;
-    z-index: -1; /* Pushes the video behind everything else */
+    z-index: -1;
     overflow: hidden;
 }
 
 .video-background video {
     width: 100%;
     height: 100%;
-    object-fit: cover; /* Ensures video covers the entire screen without distortion */
+    object-fit: cover;
 }
 
-/* Content Overlay Styles */
+/* Content Overlay Styles - from our functional version */
 .content-overlay {
     width: 100%;
     min-height: 100vh;
@@ -41,10 +41,10 @@ body {
     justify-content: center;
     align-items: center;
     padding: 20px;
-    background-color: rgba(20, 20, 50, 0.4); /* Optional: Dark overlay for better text readability */
+    background-color: rgba(20, 20, 50, 0.4); 
 }
 
-/* Main Container Styles */
+/* Main Container Styles - from your preferred version */
 .thrill-o-meter-container {
     background-color: white;
     border-radius: 20px;
@@ -52,54 +52,46 @@ body {
     max-width: 800px;
     width: 100%;
     text-align: center;
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
     border: 4px solid #e0e0e0;
 }
 
-/* Title Styles */
+/* Title Styles - Merged */
 .title {
-    font-family: 'Anton', sans-serif;
+    font-family: 'Anton', sans-serif; /* Using the correct font */
     font-size: 3.5rem;
-    font-weight: 400; 
+    font-weight: 900;
     color: #5d3ad4;
-    /* FORMATTING UPDATE: Changed to a single, sharper shadow to match original design. */
-    text-shadow: 4px 4px 0px #d8d2f5;
+    /* RESTORED STYLE: Using the exact text-shadow from your file. */
+    text-shadow: 3px 3px 0 #c2b6f0, -3px -3px 0 #c2b6f0;
     line-height: 1.2;
-    margin-bottom: 25px; /* FORMATTING UPDATE: Adjusted spacing. */
+    /* RESTORED STYLE: Using the original margin. */
+    margin-bottom: 20px;
     text-transform: uppercase;
 }
 
-/* Subtitle Styles */
+/* Subtitle Styles - from your preferred version */
 .subtitle {
     font-size: 1.5rem;
     color: #007bff;
-    margin-bottom: 40px; /* FORMATTING UPDATE: Adjusted spacing. */
-    font-weight: 700;
+    margin-bottom: 30px;
 }
 
-/* "Built By" Section */
+/* "Built By" Section - from your preferred version */
 .built-by {
     display: flex;
     justify-content: center;
     align-items: center;
-    gap: 15px; /* FORMATTING UPDATE: Reduced gap for a tighter layout. */
+    gap: 15px;
     margin-bottom: 40px;
     color: #555;
-    text-align: left;
-    font-size: 0.95rem; /* FORMATTING UPDATE: Adjusted base font size. */
 }
 
 .built-by img {
-    height: 50px; /* FORMATTING UPDATE: Adjusted logo size. */
-    flex-shrink: 0;
-}
-.built-by .small-text {
-    /* FORMATTING UPDATE: Made this text smaller and lighter to de-emphasize it. */
-    font-size: 0.8rem;
-    color: #777;
+    height: 40px;
 }
 
-/* Form Section Wrapper */
+/* Form Section Styles - from your preferred version */
 .form-section {
     max-width: 500px;
     margin: 0 auto;
@@ -112,7 +104,7 @@ body {
     border: 2px solid #ccc;
     border-radius: 10px;
     overflow: hidden;
-    margin-bottom: 20px;
+    margin-bottom: 20px; /* Added margin for spacing with new elements */
 }
 
 .website-admission-form img {
@@ -123,8 +115,7 @@ body {
 
 .website-admission-form .input-wrapper {
     flex-grow: 1;
-    /* FORMATTING UPDATE: Adjusted padding for a tighter look. */
-    padding: 8px 15px;
+    padding: 10px 15px;
     text-align: left;
 }
 
@@ -133,7 +124,6 @@ body {
     color: #d9534f;
     font-size: 0.8rem;
     display: block;
-    text-transform: uppercase;
 }
 
 .website-admission-form input {
@@ -141,12 +131,12 @@ body {
     outline: none;
     width: 100%;
     font-size: 1.1rem;
-    /* FORMATTING UPDATE: Made placeholder text lighter to match original. */
-    color: #aaa;
+    /* RESTORED STYLE: Using the original subdued color. */
+    color: #888;
     background-color: transparent;
 }
 
-/* URL Input Field */
+/* Styles for NEW elements, consistent with the overall design */
 .url-input {
     width: 100%;
     padding: 15px;
@@ -157,7 +147,6 @@ body {
     margin-bottom: 20px;
 }
 
-/* Main Submit Button */
 .submit-btn {
     width: 100%;
     padding: 18px;
@@ -177,7 +166,6 @@ body {
     background-color: #c9302c;
 }
 
-/* "Why is GEO Important?" Button */
 .info-btn {
     width: 100%;
     padding: 12px;
@@ -198,30 +186,25 @@ body {
 
 
 /* ========================================= */
-/* MOBILE RESPONSIVE STYLES (MEDIA QUERY)    */
+/* MOBILE RESPONSIVE STYLES (from your file) */
 /* ========================================= */
 @media (max-width: 768px) {
-    .content-overlay {
-        padding: 10px;
-    }
-
     .thrill-o-meter-container {
-        padding: 20px;
+        padding: 25px 20px;
     }
     
     .title {
-        font-size: 2rem;
-        text-shadow: 2px 2px 0 #d8d2f5;
+        font-size: 2.2rem;
+        text-shadow: 2px 2px 0 #c2b6f0, -2px -2px 0 #c2b6f0;
     }
     
     .subtitle {
-        font-size: 1.1rem;
+        font-size: 1.2rem;
     }
     
     .built-by {
         flex-direction: column;
-        gap: 15px;
-        text-align: center;
+        gap: 10px;
         margin-bottom: 30px;
     }
     
@@ -237,5 +220,10 @@ body {
     
     .website-admission-form .input-wrapper {
         text-align: center;
+    }
+
+    /* Styles for the new elements on mobile to ensure they look good too */
+    .url-input, .submit-btn, .info-btn {
+        width: 100%;
     }
 }
