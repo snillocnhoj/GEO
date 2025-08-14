@@ -3,112 +3,39 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The GEO Thrill-O-Meter</title>
-    <link rel="stylesheet" href="style.css?v=3">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Open+Sans:wght@400;700&display=swap" rel="stylesheet">
+    <title>GEO Thrill-O-Meter</title>
+    <link rel="stylesheet" href="style.css?v=4">
 </head>
 <body>
-    <div class="video-background">
-        <video autoplay muted loop playsinline>
-            <source src="animated-background.mp4" type="video/mp4">
-        </video>
-    </div>
 
-    <div class="container">
-        <header>
-            <h1 class="title">Generative Engine Optimization (GEO) Thrill-O-Meter</h1>
-            <p class="subtitle">Is your website a headline attraction or a sideshow?<br>Test your GEO Strength for FREE!</p>
-            <div class="brand-line">
-                <a href="https://www.johncollins.biz/" target="_blank" rel="noopener">
-                    <img src="logo.png" alt="John Collins Consulting Logo">
-                </a>
-                <span>Built by <strong>John Collins Consulting</strong></span>
-            </div>
-            <p class="expertise-line">The leading GEO strategist for the Themed Attractions Industry.</p>
-        </header>
+    <header class="banner">
+        <img src="path/to/your/theme-park-image.jpg" alt="Theme Park Banner">
+    </header>
 
-        <main>
-            <div class="ticket-booth">
-                <div class="thrill-ticket" id="thrill-ticket">
-                    <div class="ticket-top-section">
-                        <div class="ticket-logo-area">
-                            <a href="https://www.johncollins.biz/" target="_blank" rel="noopener">
-                                <img src="logo.png" alt="Logo">
-                            </a>
-                            <p>GEO Thrill-O-Meter</p>
-                        </div>
-                        <div class="ticket-details-area">
-                            <h3>Website Admission</h3>
-                            <div class="ticket-website-name" id="ticket-website-name">your-website.com</div>
-                        </div>
-                    </div>
-                    <div class="ticket-input-section">
-                         <input type="text" id="urlInput" placeholder="Enter URL to personalize your ticket">
-                    </div>
-                    <div class="ticket-rip-section">
-                        <button id="analyzeButton"><span class="admit-one">ADMIT ONE</span> - Start Full Site Inspection!</button>
-                    </div>
-                </div>
-            </div>
-            
-            <button id="why-geo-button" class="why-button">Why is GEO so important?</button>
+    <div class="thrill-o-meter-container">
 
-            <div id="progress-container" class="hidden">
-                <h3 id="progress-status">Preparing the inspection...</h3>
-                <div class="progress-bar-outline">
-                    <div id="progress-bar" style="width: 0%;"></div>
-                </div>
-            </div>
-
-            <div id="results" class="hidden">
-                <h2>Full Site Inspection Report</h2>
-                <div class="score-card">
-                    <div id="score-wrapper" class="hidden">
-                        <h3>Overall Thrill Score</h3>
-                        <div class="score-display">
-                            <div class="static-legend">
-                                <div class="legend-item"><div class="legend-swatch excellent"></div> 90-100: Excellent</div>
-                                <div class="legend-item"><div class="legend-swatch good"></div> 80-89: Good</div>
-                                <div class="legend-item"><div class="legend-swatch improve"></div> 70-79: Room to Improve</div>
-                                <div class="legend-item"><div class="legend-swatch needs-help"></div> 60-69: Needs Help</div>
-                                <div class="legend-item"><div class="legend-swatch urgent"></div> 0-59: Needs Urgent Help</div>
-                            </div>
-                            <div id="score-circle" class="score-circle"></div>
-                        </div>
-                        <p id="score-interpretation"></p>
-
-                        <div class="cta-humanizer">
-                            <img src="john-photo.png" alt="John Collins">
-                            <p id="cta-text"><strong>Hi, I'm John.</strong></p>
-                        </div>
-                        
-                        <div class="email-capture-wrapper" id="email-capture-wrapper">
-                            <input type="email" id="user-email-input" placeholder="Enter your email to receive the report">
-                        </div>
-
-                        <div class="pointing-hand">👇</div>
-                        <button id="cta-button" class="cta-button hidden">SEND MY REPORT!</button>
-                    </div>
-                </div>
-                <div id="checklist-container"></div>
-            </div>
-        </main>
-
-        <footer>
-            <p>A GEO Compliance Tool for the Themed Attractions Industry</p>
-        </footer>
-    </div>
-    
-    <div id="info-modal" class="modal-overlay hidden">
-        <div class="modal-content">
-            <button id="modal-close-button" class="modal-close">&times;</button>
-            <h2 id="modal-title" class="modal-title"></h2>
-            <p id="modal-text" class="modal-text"></p>
+        <h1 class="title">GENERATIVE ENGINE OPTIMIZATION (GEO) THRILL-O-METER</h1>
+        <p class="subtitle">Is your website a headline attraction or a sideshow? Test your GEO Strength for FREE!</p>
+        
+        <div class="built-by">
+            <img src="path/to/your/jc-logo.png" alt="JC Logo">
+            <p>Built by John Collins Consulting<br>The leading GEO strategist for the Themed Attraction Industry.</p>
         </div>
+        
+        <div class="form-section">
+            <div class="website-admission-form">
+                <img src="path/to/your/jc-logo.png" alt="GEO Thrill-O-Meter">
+                <div class="input-wrapper">
+                    <label>WEBSITE ADMISSION</label>
+                    <input type="text" value="your-website.com" readonly>
+                </div>
+            </div>
+
+            <input type="text" class="url-input" placeholder="Enter URL to personalize your ticket">
+            <button class="submit-btn">ADMIT ONE - Start Full Site Inspection!</button>
+        </div>
+
     </div>
 
-    <script defer src="script.js"></script>
 </body>
 </html>
