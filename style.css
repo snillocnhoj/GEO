@@ -1,5 +1,6 @@
 /* =================================================================== */
-/* == BULLETPROOF CSS - Please use this version and hard refresh ===== */
+/* == STABLE DESKTOP-ONLY VERSION ==================================== */
+/* == All mobile responsive code has been removed. =================== */
 /* =================================================================== */
 
 * {
@@ -28,13 +29,6 @@ body {
   text-align: center;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
   border: 4px solid #e0e0e0;
-  position: relative; 
-  
-  /* == THE DEFINITIVE FIX IS HERE == */
-  /* This rule acts like a pair of scissors, clipping any element */
-  /* that tries to overflow the container's boundaries. This will */
-  /* contain the giant logo and fix the layout. */
-  overflow: hidden;
 }
 
 /* Title Styles */
@@ -65,7 +59,7 @@ body {
 }
 
 .built-by img {
-  max-width: 100%; /* General safety rule */
+  max-width: 100%; 
   height: 40px;
 }
 
@@ -139,44 +133,4 @@ body {
 
 .submit-btn:hover {
   background-color: #c9302c;
-}
-
-/* ========================================= */
-/* MOBILE RESPONSIVE STYLES (MEDIA QUERY)    */
-/* ========================================= */
-@media (max-width: 768px) {
-  .thrill-o-meter-container {
-    padding: 20px 15px;
-  }
-  .title {
-    font-size: 1.9rem;
-    text-shadow: 2px 2px 0 #c2b6f0;
-  }
-  .subtitle {
-    font-size: 1.1rem;
-  }
-  .built-by {
-    flex-direction: column;
-    gap: 10px;
-    margin-bottom: 30px;
-  }
-  .website-admission-form {
-    flex-direction: column;
-  }
-  .website-admission-form img {
-    border-right: none;
-    border-bottom: 2px dashed #ccc;
-    margin: 0 auto;
-  }
-  .website-admission-form .input-wrapper {
-    text-align: center;
-  }
-  .url-input {
-    padding: 12px;
-    font-size: 0.9rem;
-  }
-  .submit-btn {
-    padding: 15px;
-    font-size: 1rem;
-  }
 }
