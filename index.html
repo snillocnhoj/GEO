@@ -3,37 +3,47 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GEO Thrill-O-Meter</title>
-    <link rel="stylesheet" href="style.css?v=4">
+    <title>GEO Thrill-O-Matic</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Anton&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="style.css?v=5-final">
 </head>
 <body>
 
-    <header class="banner">
-        <img src="path/to/your/theme-park-image.jpg" alt="Theme Park Banner">
-    </header>
+    <div class="video-background">
+        <video src="animated-background.mp4" autoplay loop muted playsinline></video>
+    </div>
 
-    <div class="thrill-o-meter-container">
+    <div class="content-overlay">
 
-        <h1 class="title">GENERATIVE ENGINE OPTIMIZATION (GEO) THRILL-O-METER</h1>
-        <p class="subtitle">Is your website a headline attraction or a sideshow? Test your GEO Strength for FREE!</p>
-        
-        <div class="built-by">
-            <img src="path/to/your/jc-logo.png" alt="JC Logo">
-            <p>Built by John Collins Consulting<br>The leading GEO strategist for the Themed Attraction Industry.</p>
-        </div>
-        
-        <div class="form-section">
-            <div class="website-admission-form">
-                <img src="path/to/your/jc-logo.png" alt="GEO Thrill-O-Meter">
-                <div class="input-wrapper">
-                    <label>WEBSITE ADMISSION</label>
-                    <input type="text" value="your-website.com" readonly>
+        <main class="thrill-o-meter-container">
+
+            <h1 class="title">GENERATIVE ENGINE OPTIMIZATION (GEO) THRILL-O-METER</h1>
+            <p class="subtitle">Is your website a headline attraction or a sideshow? Test your GEO Strength for FREE!</p>
+            
+            <section class="built-by">
+                <img src="logo.png" alt="JC Logo">
+                <p>Built by John Collins Consulting<br><span class="small-text">The leading GEO strategist for the Themed Attraction Industry.</span></p>
+            </section>
+            
+            <section class="form-section">
+                <div class="website-admission-form">
+                    <img src="logo.png" alt="GEO Thrill-O-Meter Logo">
+                    <div class="input-wrapper">
+                        <label>WEBSITE ADMISSION</label>
+                        <input type="text" value="your-website.com" readonly>
+                    </div>
                 </div>
-            </div>
 
-            <input type="text" class="url-input" placeholder="Enter URL to personalize your ticket">
-            <button class="submit-btn">ADMIT ONE - Start Full Site Inspection!</button>
-        </div>
+                <input type="url" class="url-input" placeholder="Enter URL to personalize your ticket">
+                <button type="submit" class="submit-btn">ADMIT ONE - Start Full Site Inspection!</button>
+                <button type="button" class="info-btn">Why is GEO Important?</button>
+            </section>
+
+        </main>
 
     </div>
 

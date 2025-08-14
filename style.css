@@ -1,148 +1,237 @@
 /* =================================================================== */
-/* == STABLE DESKTOP-ONLY VERSION (FOR FRESH START) ================== */
+/* == DEFINITIVE AND COMPLETE STYLESHEET ============================= */
 /* =================================================================== */
 
+/* Universal Settings */
 * {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
 }
 
+/* Base Body Styles */
 body {
-  font-family: Arial, sans-serif;
-  background-color: #2a226b; /* A solid background color for stability */
-  display: flex;
-  flex-direction: column; /* Allow header and container to stack */
-  align-items: center;
-  padding: 20px;
+    /* Sets the default font for paragraphs and regular text */
+    font-family: 'Roboto', sans-serif;
+    color: #333;
 }
 
-/* Banner Image Styles */
-.banner {
-  width: 100%;
-  max-width: 1200px; /* Limit banner width */
-  margin-bottom: 20px;
+/* Background Video Styles */
+.video-background {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: -1; /* Pushes the video behind everything else */
+    overflow: hidden;
 }
 
-.banner img {
-  width: 100%;
-  height: auto;
+.video-background video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* Ensures video covers the entire screen without distortion */
+}
+
+/* Content Overlay Styles */
+.content-overlay {
+    width: 100%;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    background-color: rgba(20, 20, 50, 0.4); /* Optional: Dark overlay for better text readability */
 }
 
 /* Main Container Styles */
 .thrill-o-meter-container {
-  background-color: white;
-  border-radius: 20px;
-  padding: 40px 50px;
-  max-width: 800px;
-  width: 100%;
-  text-align: center;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-  border: 4px solid #e0e0e0;
+    background-color: white;
+    border-radius: 20px;
+    padding: 40px 50px;
+    max-width: 800px;
+    width: 100%;
+    text-align: center;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+    border: 4px solid #e0e0e0;
 }
 
 /* Title Styles */
 .title {
-  font-size: 3.5rem;
-  font-weight: 900;
-  color: #5d3ad4;
-  text-shadow: 3px 3px 0 #c2b6f0, -3px -3px 0 #c2b6f0;
-  line-height: 1.2;
-  margin-bottom: 20px;
+    /* The correct, bold, blocky font */
+    font-family: 'Anton', sans-serif;
+    font-size: 3.5rem;
+    font-weight: 400; /* Anton font doesn't need a heavy font-weight */
+    color: #5d3ad4;
+    text-shadow: 3px 3px 0 #c2b6f0, -3px -3px 0 #c2b6f0;
+    line-height: 1.2;
+    margin-bottom: 20px;
+    text-transform: uppercase;
 }
 
 /* Subtitle Styles */
 .subtitle {
-  font-size: 1.5rem;
-  color: #007bff;
-  margin-bottom: 30px;
+    font-size: 1.5rem;
+    color: #007bff;
+    margin-bottom: 30px;
+    font-weight: 700;
 }
 
 /* "Built By" Section */
 .built-by {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 15px;
-  margin-bottom: 40px;
-  color: #555;
-  text-align: left;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+    margin-bottom: 40px;
+    color: #555;
+    text-align: left;
 }
 
 .built-by img {
-  height: 60px; /* Slightly larger for clarity */
-  flex-shrink: 0; /* Prevent logo from shrinking */
+    height: 60px;
+    flex-shrink: 0;
+}
+.built-by .small-text {
+    font-size: 0.9rem;
+    color: #666;
 }
 
 /* Form Section Wrapper */
 .form-section {
-  max-width: 500px;
-  margin: 0 auto;
+    max-width: 500px;
+    margin: 0 auto;
 }
 
 .website-admission-form {
-  display: flex;
-  justify-content: center;
-  align-items: stretch;
-  border: 2px solid #ccc;
-  border-radius: 10px;
-  overflow: hidden;
-  margin-bottom: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: stretch;
+    border: 2px solid #ccc;
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 20px;
 }
 
 .website-admission-form img {
-  padding: 10px;
-  height: 60px;
-  border-right: 2px dashed #ccc;
+    padding: 10px;
+    height: 60px;
+    border-right: 2px dashed #ccc;
 }
 
 .website-admission-form .input-wrapper {
-  flex-grow: 1;
-  padding: 10px 15px;
-  text-align: left;
+    flex-grow: 1;
+    padding: 10px 15px;
+    text-align: left;
 }
 
 .website-admission-form label {
-  font-weight: bold;
-  color: #d9534f;
-  font-size: 0.8rem;
-  display: block;
+    font-weight: bold;
+    color: #d9534f;
+    font-size: 0.8rem;
+    display: block;
+    text-transform: uppercase;
 }
 
 .website-admission-form input {
-  border: none;
-  outline: none;
-  width: 100%;
-  font-size: 1.1rem;
-  color: #888;
-  background-color: transparent;
+    border: none;
+    outline: none;
+    width: 100%;
+    font-size: 1.1rem;
+    color: #888;
+    background-color: transparent;
 }
 
 /* URL Input Field */
 .url-input {
-  width: 100%;
-  padding: 15px;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  font-size: 1rem;
-  text-align: center;
-  margin-bottom: 20px;
+    width: 100%;
+    padding: 15px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 1rem;
+    text-align: center;
+    margin-bottom: 20px;
 }
 
-/* Submit Button */
+/* Main Submit Button */
 .submit-btn {
-  width: 100%;
-  padding: 18px;
-  background-color: #d9534f;
-  color: white;
-  font-size: 1.2rem;
-  font-weight: bold;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
+    width: 100%;
+    padding: 18px;
+    background-color: #d9534f;
+    color: white;
+    font-size: 1.2rem;
+    font-weight: bold;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    text-transform: uppercase;
+    margin-bottom: 15px;
 }
 
 .submit-btn:hover {
-  background-color: #c9302c;
+    background-color: #c9302c;
+}
+
+/* "Why is GEO Important?" Button */
+.info-btn {
+    width: 100%;
+    padding: 12px;
+    background-color: transparent;
+    color: #007bff;
+    font-size: 1rem;
+    font-weight: bold;
+    border: 2px solid #007bff;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.info-btn:hover {
+    background-color: #007bff;
+    color: white;
+}
+
+
+/* ========================================= */
+/* MOBILE RESPONSIVE STYLES (MEDIA QUERY)    */
+/* ========================================= */
+@media (max-width: 768px) {
+    .content-overlay {
+        padding: 10px;
+    }
+
+    .thrill-o-meter-container {
+        padding: 20px;
+    }
+    
+    .title {
+        font-size: 2rem;
+        text-shadow: 2px 2px 0 #c2b6f0, -2px -2px 0 #c2b6f0;
+    }
+    
+    .subtitle {
+        font-size: 1.1rem;
+    }
+    
+    .built-by {
+        flex-direction: column;
+        gap: 15px;
+        text-align: center;
+        margin-bottom: 30px;
+    }
+    
+    .website-admission-form {
+        flex-direction: column;
+    }
+    
+    .website-admission-form img {
+        border-right: none;
+        border-bottom: 2px dashed #ccc;
+        margin: 0 auto;
+    }
+    
+    .website-admission-form .input-wrapper {
+        text-align: center;
+    }
 }
