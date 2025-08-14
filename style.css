@@ -127,22 +127,20 @@ footer { margin-top: 30px; text-align: center; font-size: 0.9rem; color: #fff; t
 @media (max-width: 768px) {
     body {
         padding: 10px;
-        /* Ensures the body itself doesn't create overflow */
         overflow-x: hidden;
     }
     .container {
         padding: 15px;
         margin: 10px auto;
-        /* This is a key fix to prevent the container from being too wide */
         width: auto;
-        box-sizing: border-box; /* Ensures padding is included in the width calculation */
+        box-sizing: border-box;
     }
     header .title {
         font-size: 2.2rem;
         line-height: 1.1;
     }
     .score-display {
-        flex-direction: column; /* Stack the legend and circle on small screens */
+        flex-direction: column;
         gap: 25px;
     }
     .cta-humanizer {
