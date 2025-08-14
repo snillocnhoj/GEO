@@ -1,4 +1,7 @@
-/* Universal Settings & Body Background */
+/* =================================================================== */
+/* == BULLETPROOF CSS - Please use this version and hard refresh ===== */
+/* =================================================================== */
+
 * {
   box-sizing: border-box;
   margin: 0;
@@ -7,7 +10,6 @@
 
 body {
   font-family: Arial, sans-serif;
-  /* Approximated background from screenshot */
   background: linear-gradient(to right, #1e1a53, #3c2c8c);
   display: flex;
   justify-content: center;
@@ -26,13 +28,20 @@ body {
   text-align: center;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
   border: 4px solid #e0e0e0;
+  position: relative; 
+  
+  /* == THE DEFINITIVE FIX IS HERE == */
+  /* This rule acts like a pair of scissors, clipping any element */
+  /* that tries to overflow the container's boundaries. This will */
+  /* contain the giant logo and fix the layout. */
+  overflow: hidden;
 }
 
 /* Title Styles */
 .title {
-  font-size: 3.5rem; /* Large font size for desktop */
+  font-size: 3.5rem;
   font-weight: 900;
-  color: #5d3ad4; /* Purple color from screenshot */
+  color: #5d3ad4;
   text-shadow: 3px 3px 0 #c2b6f0, -3px -3px 0 #c2b6f0;
   line-height: 1.2;
   margin-bottom: 20px;
@@ -56,10 +65,16 @@ body {
 }
 
 .built-by img {
+  max-width: 100%; /* General safety rule */
   height: 40px;
 }
 
-/* Website Input Form Styles */
+/* Form Section Wrapper */
+.form-section {
+  max-width: 500px;
+  margin: 0 auto;
+}
+
 .website-admission-form {
   display: flex;
   justify-content: center;
@@ -67,13 +82,12 @@ body {
   border: 2px solid #ccc;
   border-radius: 10px;
   overflow: hidden;
-  max-width: 500px;
-  margin: 0 auto;
+  margin-bottom: 20px;
 }
 
 .website-admission-form img {
   padding: 10px;
-  height: 60px; /* Set a fixed height */
+  height: 60px;
   border-right: 2px dashed #ccc;
 }
 
@@ -85,7 +99,7 @@ body {
 
 .website-admission-form label {
   font-weight: bold;
-  color: #d9534f; /* Red color from screenshot */
+  color: #d9534f;
   font-size: 0.8rem;
   display: block;
 }
@@ -98,44 +112,71 @@ body {
   color: #888;
 }
 
+/* URL Input Field */
+.url-input {
+  width: 100%;
+  padding: 15px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 1rem;
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+/* Submit Button */
+.submit-btn {
+  width: 100%;
+  padding: 18px;
+  background-color: #d9534f;
+  color: white;
+  font-size: 1.2rem;
+  font-weight: bold;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.submit-btn:hover {
+  background-color: #c9302c;
+}
+
 /* ========================================= */
-/* MOBILE RESPONSIVE STYLES (MEDIA QUERY)   */
+/* MOBILE RESPONSIVE STYLES (MEDIA QUERY)    */
 /* ========================================= */
-/* This rule applies to any screen 768px wide or smaller */
 @media (max-width: 768px) {
-
   .thrill-o-meter-container {
-    /* Reduce padding for smaller screens */
-    padding: 25px 20px;
+    padding: 20px 15px;
   }
-
   .title {
-    /* Decrease font size to fit smaller screens */
-    font-size: 2.2rem;
-    text-shadow: 2px 2px 0 #c2b6f0, -2px -2px 0 #c2b6f0;
+    font-size: 1.9rem;
+    text-shadow: 2px 2px 0 #c2b6f0;
   }
-
   .subtitle {
-    font-size: 1.2rem;
+    font-size: 1.1rem;
   }
-
   .built-by {
-    flex-direction: column; /* Stack logo and text vertically */
+    flex-direction: column;
     gap: 10px;
     margin-bottom: 30px;
   }
-  
   .website-admission-form {
     flex-direction: column;
   }
-
   .website-admission-form img {
-    border-right: none; /* Remove border */
-    border-bottom: 2px dashed #ccc; /* Add border to the bottom */
-    margin: 0 auto; /* Center the logo */
+    border-right: none;
+    border-bottom: 2px dashed #ccc;
+    margin: 0 auto;
   }
-
   .website-admission-form .input-wrapper {
-    text-align: center; /* Center the label and input text */
+    text-align: center;
+  }
+  .url-input {
+    padding: 12px;
+    font-size: 0.9rem;
+  }
+  .submit-btn {
+    padding: 15px;
+    font-size: 1rem;
   }
 }
