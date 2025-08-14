@@ -1,4 +1,4 @@
-/* STABLE REVERTED CODE - From before the breaking change */
+/* Universal Settings & Body Background */
 * {
   box-sizing: border-box;
   margin: 0;
@@ -7,6 +7,7 @@
 
 body {
   font-family: Arial, sans-serif;
+  /* Approximated background from screenshot */
   background: linear-gradient(to right, #1e1a53, #3c2c8c);
   display: flex;
   justify-content: center;
@@ -15,6 +16,7 @@ body {
   padding: 20px;
 }
 
+/* Main Container Styles */
 .thrill-o-meter-container {
   background-color: white;
   border-radius: 20px;
@@ -26,21 +28,24 @@ body {
   border: 4px solid #e0e0e0;
 }
 
+/* Title Styles */
 .title {
-  font-size: 3.5rem;
+  font-size: 3.5rem; /* Large font size for desktop */
   font-weight: 900;
-  color: #5d3ad4;
+  color: #5d3ad4; /* Purple color from screenshot */
   text-shadow: 3px 3px 0 #c2b6f0, -3px -3px 0 #c2b6f0;
   line-height: 1.2;
   margin-bottom: 20px;
 }
 
+/* Subtitle Styles */
 .subtitle {
   font-size: 1.5rem;
   color: #007bff;
   margin-bottom: 30px;
 }
 
+/* "Built By" Section */
 .built-by {
   display: flex;
   justify-content: center;
@@ -54,6 +59,7 @@ body {
   height: 40px;
 }
 
+/* Website Input Form Styles */
 .website-admission-form {
   display: flex;
   justify-content: center;
@@ -67,7 +73,7 @@ body {
 
 .website-admission-form img {
   padding: 10px;
-  height: 60px;
+  height: 60px; /* Set a fixed height */
   border-right: 2px dashed #ccc;
 }
 
@@ -79,7 +85,7 @@ body {
 
 .website-admission-form label {
   font-weight: bold;
-  color: #d9534f;
+  color: #d9534f; /* Red color from screenshot */
   font-size: 0.8rem;
   display: block;
 }
@@ -92,31 +98,44 @@ body {
   color: #888;
 }
 
+/* ========================================= */
+/* MOBILE RESPONSIVE STYLES (MEDIA QUERY)   */
+/* ========================================= */
+/* This rule applies to any screen 768px wide or smaller */
 @media (max-width: 768px) {
+
   .thrill-o-meter-container {
+    /* Reduce padding for smaller screens */
     padding: 25px 20px;
   }
+
   .title {
+    /* Decrease font size to fit smaller screens */
     font-size: 2.2rem;
     text-shadow: 2px 2px 0 #c2b6f0, -2px -2px 0 #c2b6f0;
   }
+
   .subtitle {
     font-size: 1.2rem;
   }
+
   .built-by {
-    flex-direction: column;
+    flex-direction: column; /* Stack logo and text vertically */
     gap: 10px;
     margin-bottom: 30px;
   }
+  
   .website-admission-form {
     flex-direction: column;
   }
+
   .website-admission-form img {
-    border-right: none;
-    border-bottom: 2px dashed #ccc;
-    margin: 0 auto;
+    border-right: none; /* Remove border */
+    border-bottom: 2px dashed #ccc; /* Add border to the bottom */
+    margin: 0 auto; /* Center the logo */
   }
+
   .website-admission-form .input-wrapper {
-    text-align: center;
+    text-align: center; /* Center the label and input text */
   }
 }
