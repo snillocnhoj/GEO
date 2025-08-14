@@ -201,7 +201,44 @@ async function sendEmailReport(url, results, userEmail, origin) {
         console.error('Error sending email report:', error.toString());
     }
 }
-function findMenuLinks(doc, startUrl, crawledUrls) { const navLinkSelectors = 'nav a, [id*="nav"] a, [id*="menu"] a, [class*="nav"] a, [class*="menu"] a'; const links = new Set(); const siteOrigin = new URL(startUrl).origin; doc.querySelectorAll(navLinkSelectors).forEach(link => { try { const href = link.getAttribute('href'); if (!href || href.startsWith('#')) return; const urlObject = new URL(href, startUrl); urlObject.hash = ''; const cleanUrl = urlObject.href; if (cleanUrl.startsWith(siteOrigin) && !crawledUrls.has(cleanUrl)) { links.add(cleanUrl); } } catch (e) { /* Ignore invalid hrefs */ } }); return Array.from(links); }
+
+// --- UPDATED: Smarter findMenuLinks function ---
+function findMenuLinks(doc, startUrl, crawledUrls) {
+    const selectors = [
+        'nav[id*="main"] a', 'nav[id*="primary"] a', 'nav[id*="menu"] a',
+        'header nav a', 'header a',
+        'nav a'
+    ];
+    let links = new Set();
+    const siteOrigin = new URL(startUrl).origin;
+
+    const extractLinks = (selector) => {
+        const foundLinks = new Set();
+        doc.querySelectorAll(selector).forEach(link => {
+            try {
+                const href = link.getAttribute('href');
+                if (!href || href.startsWith('#')) return;
+                const urlObject = new URL(href, startUrl);
+                urlObject.hash = '';
+                const cleanUrl = urlObject.href;
+                if (cleanUrl.startsWith(siteOrigin) && !crawledUrls.has(cleanUrl)) {
+                    foundLinks.add(cleanUrl);
+                }
+            } catch (e) { /* Ignore invalid hrefs */ }
+        });
+        return foundLinks;
+    };
+
+    for (const selector of selectors) {
+        links = extractLinks(selector);
+        if (links.size > 0) {
+            console.log(`Found ${links.size} links using selector: ${selector}`);
+            break;
+        }
+    }
+    return Array.from(links);
+}
+
 function runAllChecks(doc, url) { const textContent = doc.body.textContent || ""; const schemaTypes = getSchemaTypes(doc); return [ { name: 'Title Tag', ...checkTitleTag(doc) }, { name: 'Meta Description', ...checkMetaDescription(doc) }, { name: 'H1 Heading', ...checkH1Heading(doc) }, { name: 'Mobile-Friendly Viewport', ...checkViewport(doc) }, { name: 'Internal Linking', ...checkInternalLinks(doc, url) }, { name: 'Image Alt Text', ...checkAltText(doc) }, { name: 'Conversational Tone', ...checkConversationalTone(doc, textContent) }, { name: 'Clear Structure (Lists)', ...checkLists(doc) }, { name: 'Readability', ...checkReadability(textContent) }, { name: 'Unique Data/Insights', ...checkUniqueData(doc, textContent) }, { name: 'Author Byline/Bio', ...checkAuthor(doc) }, { name: 'First-Hand Experience', ...checkExperience(textContent) }, { name: 'Content Freshness', ...checkFreshness(doc, textContent) }, { name: 'Contact Information', ...checkContact(doc) }, { name: 'Outbound Links', ...checkOutboundLinks(doc, url) }, { name: 'Cited Sources', ...checkCitations(doc, textContent) }, { name: 'Schema Found', ...checkSchemaFound(schemaTypes) }, { name: 'Article or Org Schema', ...checkArticleOrgSchema(schemaTypes) }, { name: 'FAQ or How-To Schema', ...checkFaqHowToSchema(schemaTypes) }, ]; }
 function checkTitleTag(doc) { const passed = !!doc.querySelector('title')?.textContent; return { passed, details: passed ? 'OK' : 'No &lt;title&gt; tag found.' }; }
 function checkMetaDescription(doc) { const passed = !!doc.querySelector('meta[name="description"]')?.content; return { passed, details: passed ? 'OK' : 'No &lt;meta name="description"&gt; tag found.' }; }
