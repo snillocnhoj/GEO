@@ -12,7 +12,7 @@ const MODAL_CONTENT = {
             <ol>
                 <li><strong>Enter Your URL:</strong> You provide the homepage URL of the website you want to analyze.</li>
                 <li><strong>Smart Crawl:</strong> Our tool intelligently finds the main navigation menu on your homepage and identifies up to 10 of your most important pages to inspect.</li>
-                <li><strong>19-Point GEO Analysis:</strong> The server analyzes each page against 19 critical criteria for Generative Engine Optimization, checking everything from technical setup to content quality and trustworthiness.</li>
+                <li><strong>19-Point GEO Analysis:</strong> The server analyzes each page against 19 critical criteria for Generative Engine Optimization, checking everything from technical setup to content quality and trustworthiness. This analysis can take up to two (2) minutes.</li>
                 <li><strong>Instant Results:</strong> You receive a site-wide GEO Score, a detailed checklist showing how your site performed on each check, and an interpretation of your score.</li>
                 <li><strong>Detailed Report:</strong> You have the option to receive a comprehensive, page-by-page report via email, outlining specific failures and providing educational context to help you or your team make the necessary improvements.</li>
             </ol>
