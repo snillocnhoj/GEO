@@ -100,9 +100,9 @@ async function crawlSite(startUrl, reportId) {
     try {
         console.log(`Starting background analysis for report ${reportId}, URL: ${startUrl}`);
         const allPageResults = [];
-        const siteOrigin = new URL(startUrl).origin;
-
-        const homePageHtml = await fetchHtml(startUrl);
+        
+        // We only need to fetch the homepage once.
+        const homePageHtml = await fetchHtml(startUrl, true); // Pass true for homepage
         const homePageDom = new JSDOM(homePageHtml, { url: startUrl });
         const homePageDoc = homePageDom.window.document;
         allPageResults.push({ url: startUrl, checks: runAllChecks(homePageDoc, startUrl) });
@@ -119,7 +119,8 @@ async function crawlSite(startUrl, reportId) {
                 if (crawledUrls.has(url)) return null;
                 crawledUrls.add(url);
                 try {
-                    const pageHtml = await fetchHtml(url);
+                    // For subpages, we can assume a simple fetch is enough.
+                    const pageHtml = await fetchHtml(url, false); // Pass false for subpages
                     const pageDom = new JSDOM(pageHtml, { url: url });
                     const pageDoc = pageDom.window.document;
                     return { url: url, checks: runAllChecks(pageDoc, url) };
@@ -145,31 +146,58 @@ async function crawlSite(startUrl, reportId) {
 }
 
 // THIS IS THE UPDATED FUNCTION
-async function fetchHtml(url) {
-    console.log(`Using scraper service: ${SCRAPER_SERVICE}`);
+async function fetchHtml(url, isHomepage = false) {
+    console.log(`Fetching HTML for ${url}. Is homepage: ${isHomepage}`);
+    
+    // --- Step 1: Try a quick, simple fetch first ---
+    try {
+        const simpleHtml = await fetchWithScraper(url, false); // 'false' for no JS rendering
+        // After simple fetch, check if a menu exists. If so, we are done.
+        const tempDom = new JSDOM(simpleHtml, { url: url });
+        const links = findMenuLinks(tempDom.window.document, url, new Set());
+        if (links.length > 0 || !isHomepage) {
+            console.log(`Success with simple fetch for ${url}.`);
+            return simpleHtml;
+        }
+    } catch (error) {
+        console.log(`Simple fetch failed for ${url}, but that's okay. Retrying with JS rendering.`);
+    }
+
+    // --- Step 2: If simple fetch fails to find links on homepage, retry with full JS rendering ---
+    console.log(`Simple fetch for ${url} did not find links. Retrying with advanced JS rendering...`);
+    return fetchWithScraper(url, true); // 'true' for JS rendering
+}
+
+async function fetchWithScraper(url, useJsRendering) {
+    console.log(`Using scraper service: ${SCRAPER_SERVICE}. JS Rendering: ${useJsRendering}`);
     try {
         if (SCRAPER_SERVICE === 'scraperapi') {
             if (!SCRAPER_API_KEY) throw new Error('ScraperAPI key is not configured.');
-            // UPDATED: Changed from a time-based wait to waiting for a specific selector.
-            const selector = encodeURIComponent('#main-nav');
-            const scraperApiUrl = `http://api.scraperapi.com?api_key=${SCRAPER_API_KEY}&url=${encodeURIComponent(url)}&render=true&wait_for_selector=${selector}`;
-            const response = await axios.get(scraperApiUrl, { timeout: 60000 });
+            let scraperApiUrl = `http://api.scraperapi.com?api_key=${SCRAPER_API_KEY}&url=${encodeURIComponent(url)}`;
+            if (useJsRendering) {
+                const selector = encodeURIComponent('#main-nav');
+                scraperApiUrl += `&render=true&wait_for_selector=${selector}`;
+            }
+            const response = await axios.get(scraperApiUrl, { timeout: 90000 });
             return response.data;
         }
+        
         // Default to scrapingbee
         if (!SCRAPINGBEE_API_KEY) throw new Error('ScrapingBee key is not configured.');
         const scraperUrl = 'https://app.scrapingbee.com/api/v1/';
         const params = {
             api_key: SCRAPINGBEE_API_KEY,
             url: url,
-            render_js: true,
-            // UPDATED: Added the correct wait_for parameter to wait for the nav menu to appear.
-            wait_for: '#main-nav'
         };
-        const response = await axios.get(scraperUrl, { params: params, timeout: 60000 });
+        if (useJsRendering) {
+            params.render_js = true;
+            params.wait_for = '#main-nav';
+        }
+        const response = await axios.get(scraperUrl, { params: params, timeout: 90000 });
         return response.data;
+
     } catch (error) {
-        console.error(`Failed to fetch HTML for ${url}:`, error.response ? error.response.data : error.message);
+        console.error(`Failed to fetch HTML for ${url} (JS rendering: ${useJsRendering}):`, error.response ? error.response.data : error.message);
         throw new Error(`Could not fetch HTML from ${url}. The site may be blocking scrapers or returning an error.`);
     }
 }
