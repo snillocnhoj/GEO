@@ -171,6 +171,7 @@ async function fetchWithScraper(url, useJsRendering) {
             let scraperApiUrl = `http://api.scraperapi.com?api_key=${SCRAPER_API_KEY}&url=${encodeURIComponent(url)}`;
             if (useJsRendering) {
                 const selector = encodeURIComponent('#main-nav');
+                // ScraperAPI does not have an explicit block_resources parameter, this is the most we can do.
                 scraperApiUrl += `&render=true&wait_for_selector=${selector}`;
             }
             const response = await axios.get(scraperApiUrl, { timeout: 90000 });
