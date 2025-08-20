@@ -116,7 +116,6 @@ async function crawlSite(startUrl) {
     return processResults(finalResults);
 }
 
-// THIS IS THE UPDATED FUNCTION
 async function fetchHtml(url) {
     console.log(`Using scraper service: ${SCRAPER_SERVICE}`);
     try {
