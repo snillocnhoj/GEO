@@ -112,6 +112,25 @@ header .subtitle { font-size: 1.2rem; color: #4361ee; font-weight: bold; margin-
 .legend-swatch.needs-help { background-color: #fca5a5; }
 .legend-swatch.urgent { background-color: #dc2626; }
 .score-circle { width: 150px; height: 150px; margin: 0; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-family: 'Bangers', cursive; font-size: 4rem; color: #fff; background-color: #264653; border: 8px solid #00509d; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+
+/* --- NEW QUOTABILITY SCORE STYLES --- */
+.quotability-score-container {
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 2px dashed #ccc;
+}
+.quotability-score {
+    background-color: #4361ee; /* Blue color */
+    border-color: #3a0ca3;
+}
+.quotability-score-container p {
+    font-size: 1rem;
+    color: #555;
+    margin-top: -5px;
+    font-style: italic;
+}
+/* --- END OF NEW STYLES --- */
+
 #score-interpretation { font-size: 1.2rem; font-weight: bold; color: #f72585; margin: 0 auto 25px; max-width: 80%; }
 .cta-humanizer { display: flex; align-items: center; justify-content: center; gap: 15px; background-color: rgba(248, 249, 250, 0.8); padding: 15px; border-radius: 10px; margin: 0 auto 10px; max-width: 80%; }
 .cta-humanizer img { width: 80px; height: 80px; border-radius: 50%; border: 3px solid #4361ee; }
@@ -135,38 +154,13 @@ header .subtitle { font-size: 1.2rem; color: #4361ee; font-weight: bold; margin-
 footer { margin-top: 30px; text-align: center; font-size: 0.9rem; color: #fff; text-shadow: 1px 1px 2px #000; }
 .hidden { display: none; }
 
-/* --- FINAL, CORRECTED Mobile & Responsive Styles --- */
 @media (max-width: 768px) {
-    body {
-        padding: 10px;
-        overflow-x: hidden;
-    }
-    .container {
-        padding: 15px;
-        margin: 10px auto;
-        width: auto;
-        box-sizing: border-box;
-    }
-    header .title {
-        font-size: 2.2rem;
-        line-height: 1.1;
-    }
-    .score-display {
-        flex-direction: column;
-        gap: 25px;
-    }
-    .cta-humanizer {
-        flex-direction: column;
-        max-width: 100%;
-    }
-    .cta-humanizer p {
-        text-align: center;
-        margin-top: 10px;
-    }
-    #score-interpretation {
-        max-width: 100%;
-    }
-    .email-capture-wrapper {
-        max-width: 100%;
-    }
+    body { padding: 10px; overflow-x: hidden; }
+    .container { padding: 15px; margin: 10px auto; width: auto; box-sizing: border-box; }
+    header .title { font-size: 2.2rem; line-height: 1.1; }
+    .score-display { flex-direction: column; gap: 25px; }
+    .cta-humanizer { flex-direction: column; max-width: 100%; }
+    .cta-humanizer p { text-align: center; margin-top: 10px; }
+    #score-interpretation { max-width: 100%; }
+    .email-capture-wrapper { max-width: 100%; }
 }
