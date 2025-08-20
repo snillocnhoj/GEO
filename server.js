@@ -46,7 +46,6 @@ app.post('/api/analyze', apiLimiter, async (req, res) => {
         const results = await crawlSite(startUrl);
         const reportId = uuidv4();
         reportCache.set(reportId, { report: results, url: startUrl });
-        // Report is now cached for 24 hours (86,400,000 milliseconds)
         setTimeout(() => reportCache.delete(reportId), 86400000);
         res.status(200).json({ summary: results.summary, reportId: reportId });
     } catch (error) {
@@ -74,7 +73,7 @@ app.post('/api/send-report', async (req, res) => {
 });
 
 // --- Frontend File Serving ---
-app.use(express.static(__dirname)); // Serve static files like CSS, JS, images
+app.use(express.static(__dirname));
 app.get('/', (req, res) => { res.sendFile(path.join(__dirname, 'index.html')); });
 
 app.listen(PORT, () => {
@@ -83,15 +82,10 @@ app.listen(PORT, () => {
 
 // --- Core Application Logic ---
 
-/**
- * Corrected crawlSite function with robust error handling for concurrent requests.
- * This prevents the server from crashing due to unhandled promise rejections.
- */
 async function crawlSite(startUrl) {
     const allPageResults = [];
     const siteOrigin = new URL(startUrl).origin;
 
-    // Fetch and analyze the homepage first
     const homePageHtml = await fetchHtml(startUrl);
     const homePageDom = new JSDOM(homePageHtml, { url: startUrl });
     const homePageDoc = homePageDom.window.document;
@@ -100,10 +94,7 @@ async function crawlSite(startUrl) {
     const crawledUrls = new Set([startUrl]);
     const menuUrlsToCrawl = findMenuLinks(homePageDoc, startUrl, crawledUrls).slice(0, 9);
 
-    // Create an array of promises for fetching and parsing all secondary pages
     const pagePromises = menuUrlsToCrawl.map(url => {
-        // Wrap the entire operation for a single URL in an async IIFE
-        // This ensures each promise has its own comprehensive try/catch block.
         return (async () => {
             if (crawledUrls.has(url)) return null;
             crawledUrls.add(url);
@@ -114,16 +105,12 @@ async function crawlSite(startUrl) {
                 return { url: url, checks: runAllChecks(pageDoc, url) };
             } catch (error) {
                 console.error(`Failed to crawl or process page ${url}:`, error.message);
-                // Explicitly return null on any failure to ensure Promise.all() does not reject.
                 return null;
             }
         })();
     });
 
-    // Await all promises to resolve concurrently. This will now never reject.
     const additionalResults = await Promise.all(pagePromises);
-
-    // Filter out any null results from failed crawls and combine with homepage results
     const finalResults = allPageResults.concat(additionalResults.filter(result => result !== null));
 
     return processResults(finalResults);
@@ -138,7 +125,6 @@ async function fetchHtml(url) {
             const response = await axios.get(scraperApiUrl, { timeout: 30000 });
             return response.data;
         }
-        // Default to scrapingbee
         if (!SCRAPINGBEE_API_KEY) throw new Error('ScrapingBee key is not configured.');
         const scraperUrl = 'https://app.scrapingbee.com/api/v1/';
         const params = { api_key: SCRAPINGBEE_API_KEY, url: url };
@@ -235,14 +221,20 @@ async function sendEmailReport(url, results, userEmail, origin) {
 /**
  * Finds links in the main navigation menu to crawl.
  * This function uses a series of CSS selectors as a heuristic to identify the primary navigation.
- * It starts with the most specific selectors (e.g., navs with 'main' or 'primary' in the ID)
- * and falls back to more generic ones if no links are found.
+ * It starts with the most specific selectors and falls back to more generic ones.
  */
 function findMenuLinks(doc, startUrl, crawledUrls) {
+    // Added more flexible selectors to find navs in divs and other elements
     const selectors = [
-        'nav[id*="main"] a', 'nav[id*="primary"] a', 'nav[id*="menu"] a',
-        'header nav a',
-        'nav a'
+        'nav[id*="main"] a',           // Standard navs with "main" in ID
+        'nav[id*="primary"] a',        // Standard navs with "primary" in ID
+        '[id*="main-nav"] a',          // NEW: Catches elements like <div id="main-nav">
+        '[id*="primary-nav"] a',       // NEW: Catches elements like <div id="primary-nav">
+        '[class*="main-nav"] a',       // NEW: Catches elements like <div class="main-nav">
+        '[class*="primary-nav"] a',    // NEW: Catches elements like <div class="primary-nav">
+        'header nav a',                // Navs within a header
+        '[role="navigation"] a',       // NEW: Accessibility-focused selector
+        'nav a'                        // Any remaining navs
     ];
     let links = new Set();
     const siteOrigin = new URL(startUrl).origin;
@@ -254,12 +246,10 @@ function findMenuLinks(doc, startUrl, crawledUrls) {
                 const href = link.getAttribute('href');
                 if (!href || href.startsWith('#')) return;
 
-                // Resolve the URL relative to the start URL
                 const urlObject = new URL(href, startUrl);
                 urlObject.hash = ''; // Remove fragments
                 const cleanUrl = urlObject.href;
 
-                // Add the link if it's on the same domain and not already crawled
                 if (cleanUrl.startsWith(siteOrigin) && !crawledUrls.has(cleanUrl)) {
                     foundLinks.add(cleanUrl);
                 }
@@ -270,7 +260,6 @@ function findMenuLinks(doc, startUrl, crawledUrls) {
 
     for (const selector of selectors) {
         links = extractLinks(selector);
-        // If we find links with a specific selector, we assume it's the main nav and stop.
         if (links.size > 0) {
             console.log(`Found ${links.size} links using selector: ${selector}`);
             break;
