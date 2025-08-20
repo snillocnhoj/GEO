@@ -116,14 +116,15 @@ async function crawlSite(startUrl) {
     return processResults(finalResults);
 }
 
+// THIS IS THE UPDATED FUNCTION
 async function fetchHtml(url) {
     console.log(`Using scraper service: ${SCRAPER_SERVICE}`);
     try {
         if (SCRAPER_SERVICE === 'scraperapi') {
             if (!SCRAPER_API_KEY) throw new Error('ScraperAPI key is not configured.');
-            // ADDED '&render=true' to enable JavaScript rendering
-            const scraperApiUrl = `http://api.scraperapi.com?api_key=${SCRAPER_API_KEY}&url=${encodeURIComponent(url)}&render=true`;
-            const response = await axios.get(scraperApiUrl, { timeout: 60000 }); // Increased timeout for JS rendering
+            // ADDED '&wait=2000' to wait 2 seconds for animations to finish
+            const scraperApiUrl = `http://api.scraperapi.com?api_key=${SCRAPER_API_KEY}&url=${encodeURIComponent(url)}&render=true&wait=2000`;
+            const response = await axios.get(scraperApiUrl, { timeout: 60000 });
             return response.data;
         }
         // Default to scrapingbee
@@ -132,9 +133,11 @@ async function fetchHtml(url) {
         const params = {
             api_key: SCRAPINGBEE_API_KEY,
             url: url,
-            render_js: true // ADDED THIS PARAMETER to enable JavaScript rendering
+            render_js: true,
+            // ADDED THIS PARAMETER to wait 2 seconds for animations to finish
+            wait_for: 2000
         };
-        const response = await axios.get(scraperUrl, { params: params, timeout: 60000 }); // Increased timeout for JS rendering
+        const response = await axios.get(scraperUrl, { params: params, timeout: 60000 });
         return response.data;
     } catch (error) {
         console.error(`Failed to fetch HTML for ${url}:`, error.response ? error.response.data : error.message);
