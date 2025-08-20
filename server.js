@@ -146,22 +146,25 @@ async function crawlSite(startUrl, reportId) {
     }
 }
 
+// THIS IS THE UPDATED FUNCTION
 async function fetchHtml(url) {
     console.log(`Using scraper service: ${SCRAPER_SERVICE}`);
     try {
         if (SCRAPER_SERVICE === 'scraperapi') {
             if (!SCRAPER_API_KEY) throw new Error('ScraperAPI key is not configured.');
+            // This is correct for ScraperAPI, so we leave it.
             const scraperApiUrl = `http://api.scraperapi.com?api_key=${SCRAPER_API_KEY}&url=${encodeURIComponent(url)}&render=true&wait=2000`;
             const response = await axios.get(scraperApiUrl, { timeout: 60000 });
             return response.data;
         }
+        // Default to scrapingbee
         if (!SCRAPINGBEE_API_KEY) throw new Error('ScrapingBee key is not configured.');
         const scraperUrl = 'https://app.scrapingbee.com/api/v1/';
         const params = {
             api_key: SCRAPINGBEE_API_KEY,
             url: url,
-            render_js: true,
-            wait_for: 2000
+            render_js: true
+            // REMOVED 'wait_for: 2000' as it was causing a validation error
         };
         const response = await axios.get(scraperUrl, { params: params, timeout: 60000 });
         return response.data;
@@ -170,6 +173,7 @@ async function fetchHtml(url) {
         throw new Error(`Could not fetch HTML from ${url}. The site may be blocking scrapers or returning an error.`);
     }
 }
+
 
 function processResults(allPageResults) {
     const detailedReport = {};
