@@ -90,7 +90,7 @@ async function crawlSite(startUrl) {
     const homePageHtml = await fetchHtml(startUrl);
     const homePageDom = new JSDOM(homePageHtml);
     const homePageDoc = homePageDom.window.document;
-    allPageResults.push({ url: startUrl, doc: homePageDoc });
+    allPageResults.push({ url: startUrl, checks: runAllChecks(homePageDoc, startUrl) });
     const crawledUrls = new Set([startUrl]);
     const menuUrlsToCrawl = findMenuLinks(homePageDoc, startUrl, crawledUrls);
     for (const url of menuUrlsToCrawl) {
@@ -101,7 +101,7 @@ async function crawlSite(startUrl) {
             const pageHtml = await fetchHtml(url);
             const pageDom = new JSDOM(pageHtml);
             const pageDoc = pageDom.window.document;
-            allPageResults.push({ url: url, doc: pageDoc });
+            allPageResults.push({ url: url, checks: runAllChecks(pageDoc, url) });
         } catch (error) {
             console.error(`Failed to crawl menu page ${url}:`, error.message);
         }
@@ -122,42 +122,11 @@ async function fetchHtml(url) {
     const response = await axios.get(scraperUrl, { params: params, timeout: 30000 });
     return response.data;
 }
-
-// --- NEW "QUOTABILITY" SCORING FUNCTION ---
-function calculateQuotabilityScore(allPageDocs) {
-    let totalSentences = 0;
-    let quotableSentences = 0;
-
-    allPageDocs.forEach(doc => {
-        doc.querySelectorAll('p').forEach(p => {
-            const sentences = p.textContent.match(/[^.!?]+[.!?]+/g) || [];
-            totalSentences += sentences.length;
-            sentences.forEach(sentence => {
-                const words = sentence.trim().split(/\s+/).length;
-                // Criteria for a "quotable" sentence:
-                // 1. Between 10 and 30 words long.
-                // 2. Starts with a capital letter (a sign of a complete sentence).
-                // 3. Doesn't start with a conversational filler word.
-                if (words >= 10 && words <= 30 && /^[A-Z]/.test(sentence.trim()) && !/^(But|And|So|Well),/i.test(sentence.trim())) {
-                    quotableSentences++;
-                }
-            });
-        });
-    });
-
-    return totalSentences > 0 ? Math.round((quotableSentences / totalSentences) * 100) : 0;
-}
-
 function processResults(allPageResults) {
     const detailedReport = {};
     let totalPasses = 0, totalChecks = 0;
-
-    const allDocs = allPageResults.map(p => p.doc);
-    const quotabilityScore = calculateQuotabilityScore(allDocs);
-
     allPageResults.forEach(pageResult => {
-        const checks = runAllChecks(pageResult.doc, pageResult.url);
-        checks.forEach(checkResult => {
+        pageResult.checks.forEach(checkResult => {
             const { name, passed, details } = checkResult;
             if (!detailedReport[name]) {
                 detailedReport[name] = { passedCount: 0, totalCount: 0, failures: [] };
@@ -175,14 +144,12 @@ function processResults(allPageResults) {
     const averageScore = totalChecks > 0 ? Math.round((totalPasses / totalChecks) * 100) : 0;
     const summary = {
         averageScore,
-        quotabilityScore, // Add the new score here
         checkStats: Object.fromEntries(
             Object.entries(detailedReport).map(([name, data]) => [name, { passed: data.passedCount, total: data.totalCount }])
         )
     };
     return { summary, detailedReport, pagesCrawled: allPageResults.length };
 }
-// ... (The rest of the file is unchanged and correct)
 const REPORT_DETAILS = {
     "Title Tag": { what: "The presence of a `&lt;title&gt;` tag in the page's HTML code.", why: "This is the primary title of your webpage shown in browser tabs and search results. It is the single most important signal to all search engines about the page's core topic." },
     "Meta Description": { what: "A `&lt;meta name=\"description\"&gt;` tag in the page's code.", why: "This provides the short summary that appears under your title in search results. A compelling description encourages clicks and gives generative AI a quick, clear summary of the page's purpose." },
@@ -204,51 +171,94 @@ const REPORT_DETAILS = {
     "Article or Org Schema": { what: "Checks if the schema defines the page as an 'Article' or provides information about the 'Organization.'", why: "'Article' schema provides context like author and dates (E-E-A-T signals), while 'Organization' schema helps establish the entity behind the website (a Trust signal)." },
     "FAQ or How-To Schema": { what: "Specifically checks for 'FAQPage' or 'HowTo' schema.", why: "This is one of the most powerful schema types, as it structures your content in a Q&A or step-by-step format that generative AI can lift directly into its answers." }
 };
-async function sendEmailReport(url,results,userEmail,origin){const{summary:summary,detailedReport:detailedReport,pagesCrawled:pagesCrawled}=results,{averageScore:averageScore}=summary;let reportHtml=`
-        <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
-            <div style="max-width: 800px; margin: 20px auto; padding: 20px; border: 1px solid #ddd; border-radius: 5px;">
-                <table style="width: 100%; border-bottom: 1px solid #ddd; padding-bottom: 20px; margin-bottom: 20px;">
-                    <tr>
-                        <td style="width: 100px; vertical-align: top;">
-                            <img src="${origin}/john-photo.png" alt="John Collins" style="width: 80px; height: 80px; border-radius: 50%;">
-                        </td>
-                        <td style="padding-left: 20px;">
-                            <p>Thanks for requesting your detailed GEO Compliance Report. I hope it's helpful.</p>
-                            <p>I can help you with much of this if you're not able to manage, but if you forward this to your web folks (assuming you have them) they should be able to sort a lot of it out for you.</p>
-                            <p>Take care, and I hope to see you at one of our industry events soon!</p>
-                            <p style="margin-top: 20px;">
-                                <strong>John</strong><br>
-                                <a href="https://www.johncollins.biz/" target="_blank" style="text-decoration: none; color: #333;">John Collins Consulting</a><br>
-                                <a href="https://www.johncollins.biz/" target="_blank">
-                                    <img src="${origin}/logo.png" alt="John Collins Consulting Logo" style="max-height: 30px; margin-top: 5px;">
-                                </a>
-                            </p>
-                            <p style="font-size: 0.9em; color: #555; margin-top: 15px;">
-                                <em>P.S. If you need any assistance with your strategic marketing messaging or promotions or any other marketing needs, just reach out. I'm happy to help.</em>
-                            </p>
-                        </td>
-                    </tr>
-                </table>
-                <h1 style="color: #3a0ca3;">Detailed GEO Report for ${url}</h1>
-                <h2 style="color: #4361ee;">Overall Score: ${averageScore}/100</h2>
-                <p><strong>Analyzed ${pagesCrawled} pages.</strong> Below is a detailed breakdown of each check.</p>
-                <hr>
-    `;for(const name in detailedReport){const stats=detailedReport[name],details=REPORT_DETAILS[name]||{what:"N/A",why:"N/A"},passPercent=Math.round(stats.passedCount/stats.totalCount*100),icon=passPercent>=75?"✔️":"❌",color=passPercent>=75?"#2a9d8f":"#e76f51";reportHtml+=`
-            <div style="margin-bottom: 30px; padding-bottom: 20px; border-bottom: 1px solid #eee;">
-                <h3 style="color: ${color}; margin-bottom: 15px;">${icon} ${name} - <span style="font-weight: normal;">Passed on ${stats.passedCount} of ${stats.totalCount} pages (${passPercent}%)</span></h3>
-                <div style="padding-left: 20px; border-left: 3px solid #ddd;">
-                    <p><strong>What It's Looking For:</strong> ${details.what}</p>
-                    <p><strong>Why It Matters for GEO:</strong> ${details.why}</p>
-                </div>
-        `,stats.failures.length>0&&(reportHtml+='<div style="margin-top: 15px; padding-left: 20px;"><strong>Pages with Omissions/Errors:</strong><ul style="list-style-type: none; padding-left: 0; margin-top: 5px;">',stats.failures.forEach(failure=>{reportHtml+=`<li style="margin-bottom: 10px; padding: 10px; background-color: #f8f9fa; border-radius: 4px;">
-                    <a href="${failure.url}" target="_blank" style="color: #4361ee;">${failure.url}</a><br>
-                    <small style="color: #666;"><strong>Issue:</strong> ${failure.details.replace(/</g,"&lt;").replace(/>/g,"&gt;")}</small>
-                </li>`}),reportHtml+="</ul></div>"),reportHtml+="</div>"}reportHtml+='</div></body>';const userReportMsg={to:userEmail,from:FROM_EMAIL,replyTo:TO_EMAIL,subject:`Your Detailed GEO Inspection Report for ${url}`,html:reportHtml},leadNotificationMsg={to:TO_EMAIL,from:FROM_EMAIL,subject:`GEO Report Request: ${userEmail} for ${url}`,html:`
-            <p>A new GEO report was requested for the website: <strong>${url}</strong></p>
-            <p>The user's email is: <strong>${userEmail}</strong></p>
-            <hr>
-            <h3>Full Report:</h3>
-            ${reportHtml}
-        `};try{await sgMail.send([userReportMsg,leadNotificationMsg]),console.log(`Email report sent to ${userEmail} and notification sent to ${TO_EMAIL}.`)}catch(error){console.error("Error sending email report:",error.toString())}}
-function findMenuLinks(doc,startUrl,crawledUrls){const navLinkSelectors="nav a, [id*=\"nav\"] a, [id*=\"menu\"] a, [class*=\"nav\"] a, [class*=\"menu\"] a",links=new Set,siteOrigin=(new URL(startUrl)).origin;return doc.querySelectorAll(navLinkSelectors).forEach(link=>{try{const href=link.getAttribute("href");if(!href||href.startsWith("#"))return;const urlObject=new URL(href,startUrl);urlObject.hash="";const cleanUrl=urlObject.href;cleanUrl.startsWith(siteOrigin)&&!crawledUrls.has(cleanUrl)&&links.add(cleanUrl)}catch(e){}}),Array.from(links)}function runAllChecks(doc,url){const textContent=doc.body.textContent||"",schemaTypes=getSchemaTypes(doc);return[{name:"Title Tag",...checkTitleTag(doc)},{name:"Meta Description",...checkMetaDescription(doc)},{name:"H1 Heading",...checkH1Heading(doc)},{name:"Mobile-Friendly Viewport",...checkViewport(doc)},{name:"Internal Linking",...checkInternalLinks(doc,url)},{name:"Image Alt Text",...checkAltText(doc)},{name:"Conversational Tone",...checkConversationalTone(doc,textContent)},{name:"Clear Structure (Lists)",...checkLists(doc)},{name:"Readability",...checkReadability(textContent)},{name:"Unique Data/Insights",...checkUniqueData(doc,textContent)},{name:"Author Byline/Bio",...checkAuthor(doc)},{name:"First-Hand Experience",...checkExperience(textContent)},{name:"Content Freshness",...checkFreshness(doc,textContent)},{name:"Contact Information",...checkContact(doc)},{name:"Outbound Links",...checkOutboundLinks(doc,url)},{name:"Cited Sources",...checkCitations(doc,textContent)},{name:"Schema Found",...checkSchemaFound(schemaTypes)},{name:"Article or Org Schema",...checkArticleOrgSchema(schemaTypes)},{name:"FAQ or How-To Schema",...checkFaqHowToSchema(schemaTypes)}]}
-function checkTitleTag(doc){const passed=!!doc.querySelector("title")?.textContent;return{passed:passed,details:passed?"OK":"No &lt;title&gt; tag found."}}function checkMetaDescription(doc){const passed=!!doc.querySelector('meta[name="description"]')?.content;return{passed:passed,details:passed?"OK":'No &lt;meta name="description"&gt; tag found.'}}function checkH1Heading(doc){const h1s=doc.querySelectorAll("h1").length,passed=1===h1s;return{passed:passed,details:passed?"OK":`Found ${h1s} &lt;h1&gt; tags (expected 1).`}}function checkViewport(doc){const passed=!!doc.querySelector('meta[name="viewport"]');return{passed:passed,details:passed?"OK":'Missing &lt;meta name="viewport"&gt; tag.'}}function checkInternalLinks(doc,url){const count=countInternalLinks(doc,url),passed=count>2;return{passed:passed,details:passed?"OK":`Found only ${count} internal links (recommend > 2).`}}function checkAltText(doc){const images=Array.from(doc.querySelectorAll("img")),missingAlt=images.filter(img=>!img.alt||!img.alt.trim()),passed=0===missingAlt.length;return{passed:passed,details:passed?"OK":`Found ${missingAlt.length} images missing alt text. e.g., ${missingAlt.map(i=>i.src).slice(0,2).join(", ")}`}}function checkLists(doc){const passed=doc.querySelectorAll("ul, ol").length>0;return{passed:passed,details:passed?"OK":"No bulleted or numbered lists found."}}function checkReadability(text){const sentences=text.match(/[^.!?]+[.!?]+/g)||[],words=text.match(/\b\w+\b/g)||[],score=0===sentences.length||0===words.length?0:words.length/sentences.length,passed=score<25&&score>0;return{passed:passed,details:passed?`Good (Avg. ${score.toFixed(1)} words/sentence).`:`High (Avg. ${score.toFixed(1)} words/sentence). Recommend < 25.`}}function checkAuthor(doc){const passed=!!doc.querySelector('a[href*="author/"], a[rel="author"]');return{passed:passed,details:passed?"OK":"No link to an author bio page found."}}function checkExperience(text){const passed=/in our test|hands-on|my experience|we visited|I found that|our team reviewed|we tested|firsthand|I personally|from my experience/i.test(text);return{passed:passed,details:passed?"OK":"No phrases indicating first-hand experience found."}}function checkFreshness(doc,text){const passed=/updated|published/i.test(text)||!!doc.querySelector('meta[property*="time"]');return{passed:passed,details:passed?"OK":'No "published" or "last updated" date found.'}}function checkContact(doc){const passed=!!doc.querySelector('a[href*="contact"], a[href*="about"]');return{passed:passed,details:passed?"OK":"No link to a Contact or About page found."}}function checkOutboundLinks(doc,url){const passed=hasOutboundLinks(doc,url);return{passed:passed,details:passed?"OK":"No links to external websites found."}}function checkSchemaFound(types){const passed=types.length>0;return{passed:passed,details:passed?`Found: ${types.join(", ")}`:"No Schema.org data found."}}function checkArticleOrgSchema(types){const passed=types.includes("Article")||types.includes("Organization");return{passed:passed,details:passed?"OK":"Missing essential Article or Organization schema."}}function checkFaqHowToSchema(types){const passed=types.includes("FAQPage")||types.includes("HowTo");return{passed:passed,details:passed?"OK":"Missing high-value FAQ or How-To schema."}}function checkConversationalTone(doc,text){const headings=doc.querySelectorAll("h2, h3"),questionWords="what how why when where is can do are which who does should".split(" "),hasQuestionHeadings=Array.from(headings).some(h=>{const headingText=h.textContent.trim().toLowerCase();return questionWords.some(word=>headingText.startsWith(word))});if(hasQuestionHeadings)return{passed:!0,details:"OK (Found question-based subheadings)."};const pronounCount=(text.match(/\byou\b|\byour\b/gi)||[]).length;return pronounCount>5?{passed:!0,details:`OK (Found ${pronounCount} second-person pronouns).`}:{passed:!1,details:"No question-based subheadings or significant use of second-person pronouns (you/your) found."}}function checkUniqueData(doc,text){const hasKeywords=/our data|our research|we surveyed|according to our study|we analyzed|our findings show|in our analysis/i.test(text);if(hasKeywords)return{passed:!0,details:"OK (Found keywords indicating original research)."};const hasTable=doc.querySelector("table");if(hasTable)return{passed:!0,details:"OK (Found an HTML &lt;table&gt; element)."};const vizPlatforms="tableau datawrapper sheets.google.com fusiontables.google.com".split(" "),hasEmbeddedViz=Array.from(doc.querySelectorAll("iframe")).some(iframe=>{const src=iframe.getAttribute("src")||"";return vizPlatforms.some(platform=>src.includes(platform))});return hasEmbeddedViz?{passed:!0,details:"OK (Found an embedded data visualization)."}:{passed:!1,details:"No signals of original data, research, or visualizations found."}}function checkCitations(doc,text){const hasKeywords=/source:|according to:|citation:/i.test(text);if(hasKeywords)return{passed:!0,details:"OK (Found citation keywords)."};const hasParagraphLinks=Array.from(doc.querySelectorAll("p a")).some(link=>{try{const pageHost=(new URL(doc.baseURI)).hostname,linkHost=(new URL(link.href)).hostname;return linkHost&&linkHost!==pageHost}catch(e){return!1}});return hasParagraphLinks?{passed:!0,details:"OK (Found outbound links within paragraph text)."}:{passed:!1,details:"No cited sources or contextual outbound links found in paragraphs."}}function hasOutboundLinks(doc,url){try{const pageHost=(new URL(url)).hostname;return Array.from(doc.querySelectorAll("a[href]")).some(link=>{try{const linkHost=(new URL(link.href)).hostname;return linkHost&&linkHost!==pageHost}catch(e){return!1}})}catch(e){return!1}}function countInternalLinks(doc,url){try{const pageHost=(new URL(url)).hostname;return Array.from(doc.querySelectorAll("a[href]")).filter(link=>{try{const linkHost=(new URL(link.href)).hostname;return linkHost===pageHost}catch(e){return!1}}).length}catch(e){return 0}}function getSchemaTypes(doc){const schemas=[];return doc.querySelectorAll('script[type="application/ld+json"]').forEach(script=>{try{const json=JSON.parse(script.textContent),graph=json["@graph"]||[json];graph.forEach(item=>{item["@type"]&&schemas.push(item["@type"])})}catch(e){console.error("Error parsing JSON-LD:",e)}}),schemas.flat()}
+async function sendEmailReport(url, results, userEmail, origin) {
+    const { summary, detailedReport, pagesCrawled } = results;
+    const { averageScore } = summary;
+    let reportHtml = `<body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;"><div style="max-width: 800px; margin: 20px auto; padding: 20px; border: 1px solid #ddd; border-radius: 5px;"><table style="width: 100%; border-bottom: 1px solid #ddd; padding-bottom: 20px; margin-bottom: 20px;"><tr><td style="width: 100px; vertical-align: top;"><img src="${origin}/john-photo.png" alt="John Collins" style="width: 80px; height: 80px; border-radius: 50%;"></td><td style="padding-left: 20px;"><p>Thanks for requesting your detailed GEO Compliance Report. I hope it's helpful.</p><p>I can help you with much of this if you're not able to manage, but if you forward this to your web folks (assuming you have them) they should be able to sort a lot of it out for you.</p><p>Take care, and I hope to see you at one of our industry events soon!</p><p style="margin-top: 20px;"><strong>John</strong><br><a href="https://www.johncollins.biz/" target="_blank" style="text-decoration: none; color: #333;">John Collins Consulting</a><br><a href="https://www.johncollins.biz/" target="_blank"><img src="${origin}/logo.png" alt="John Collins Consulting Logo" style="max-height: 30px; margin-top: 5px;"></a></p><p style="font-size: 0.9em; color: #555; margin-top: 15px;"><em>P.S. If you need any assistance with your strategic marketing messaging or promotions or any other marketing needs, just reach out. I'm happy to help.</em></p></td></tr></table><h1 style="color: #3a0ca3;">Detailed GEO Report for ${url}</h1><h2 style="color: #4361ee;">Overall Score: ${averageScore}/100</h2><p><strong>Analyzed ${pagesCrawled} pages.</strong> Below is a detailed breakdown of each check.</p><hr>`;
+    for (const name in detailedReport) {
+        const stats = detailedReport[name];
+        const details = REPORT_DETAILS[name] || { what: 'N/A', why: 'N/A' };
+        const passPercent = Math.round((stats.passedCount / stats.totalCount) * 100);
+        const icon = passPercent >= 75 ? '✔️' : '❌';
+        const color = passPercent >= 75 ? '#2a9d8f' : '#e76f51';
+        reportHtml += `<div style="margin-bottom: 30px; padding-bottom: 20px; border-bottom: 1px solid #eee;"><h3 style="color: ${color}; margin-bottom: 15px;">${icon} ${name} - <span style="font-weight: normal;">Passed on ${stats.passedCount} of ${stats.totalCount} pages (${passPercent}%)</span></h3><div style="padding-left: 20px; border-left: 3px solid #ddd;"><p><strong>What It's Looking For:</strong> ${details.what}</p><p><strong>Why It Matters for GEO:</strong> ${details.why}</p></div>`;
+        if (stats.failures.length > 0) {
+            reportHtml += `<div style="margin-top: 15px; padding-left: 20px;"><strong>Pages with Omissions/Errors:</strong><ul style="list-style-type: none; padding-left: 0; margin-top: 5px;">`;
+            stats.failures.forEach(failure => {
+                reportHtml += `<li style="margin-bottom: 10px; padding: 10px; background-color: #f8f9fa; border-radius: 4px;"><a href="${failure.url}" target="_blank" style="color: #4361ee;">${failure.url}</a><br><small style="color: #666;"><strong>Issue:</strong> ${failure.details.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</small></li>`;
+            });
+            reportHtml += `</ul></div>`;
+        }
+        reportHtml += `</div>`;
+    }
+    reportHtml += `</div></body>`;
+    const userReportMsg = { to: userEmail, from: FROM_EMAIL, replyTo: TO_EMAIL, subject: `Your Detailed GEO Inspection Report for ${url}`, html: reportHtml };
+    const leadNotificationMsg = { to: TO_EMAIL, from: FROM_EMAIL, subject: `GEO Report Request: ${userEmail} for ${url}`, html: `<p>A new GEO report was requested for the website: <strong>${url}</strong></p><p>The user's email is: <strong>${userEmail}</strong></p><hr><h3>Full Report:</h3>${reportHtml}` };
+    try {
+        await sgMail.send([userReportMsg, leadNotificationMsg]);
+        console.log(`Email report sent to ${userEmail} and notification sent to ${TO_EMAIL}.`);
+    } catch (error) {
+        console.error('Error sending email report:', error.toString());
+    }
+}
+
+// --- UPDATED: Smarter findMenuLinks function ---
+function findMenuLinks(doc, startUrl, crawledUrls) {
+    const selectors = [
+        'nav[id*="main"] a', 'nav[id*="primary"] a', 'nav[id*="menu"] a',
+        'header nav a', 'header a',
+        'nav a'
+    ];
+    let links = new Set();
+    const siteOrigin = new URL(startUrl).origin;
+
+    const extractLinks = (selector) => {
+        const foundLinks = new Set();
+        doc.querySelectorAll(selector).forEach(link => {
+            try {
+                const href = link.getAttribute('href');
+                if (!href || href.startsWith('#')) return;
+                const urlObject = new URL(href, startUrl);
+                urlObject.hash = '';
+                const cleanUrl = urlObject.href;
+                if (cleanUrl.startsWith(siteOrigin) && !crawledUrls.has(cleanUrl)) {
+                    foundLinks.add(cleanUrl);
+                }
+            } catch (e) { /* Ignore invalid hrefs */ }
+        });
+        return foundLinks;
+    };
+
+    for (const selector of selectors) {
+        links = extractLinks(selector);
+        if (links.size > 0) {
+            console.log(`Found ${links.size} links using selector: ${selector}`);
+            break;
+        }
+    }
+    return Array.from(links);
+}
+
+function runAllChecks(doc, url) { const textContent = doc.body.textContent || ""; const schemaTypes = getSchemaTypes(doc); return [ { name: 'Title Tag', ...checkTitleTag(doc) }, { name: 'Meta Description', ...checkMetaDescription(doc) }, { name: 'H1 Heading', ...checkH1Heading(doc) }, { name: 'Mobile-Friendly Viewport', ...checkViewport(doc) }, { name: 'Internal Linking', ...checkInternalLinks(doc, url) }, { name: 'Image Alt Text', ...checkAltText(doc) }, { name: 'Conversational Tone', ...checkConversationalTone(doc, textContent) }, { name: 'Clear Structure (Lists)', ...checkLists(doc) }, { name: 'Readability', ...checkReadability(textContent) }, { name: 'Unique Data/Insights', ...checkUniqueData(doc, textContent) }, { name: 'Author Byline/Bio', ...checkAuthor(doc) }, { name: 'First-Hand Experience', ...checkExperience(textContent) }, { name: 'Content Freshness', ...checkFreshness(doc, textContent) }, { name: 'Contact Information', ...checkContact(doc) }, { name: 'Outbound Links', ...checkOutboundLinks(doc, url) }, { name: 'Cited Sources', ...checkCitations(doc, textContent) }, { name: 'Schema Found', ...checkSchemaFound(schemaTypes) }, { name: 'Article or Org Schema', ...checkArticleOrgSchema(schemaTypes) }, { name: 'FAQ or How-To Schema', ...checkFaqHowToSchema(schemaTypes) }, ]; }
+function checkTitleTag(doc) { const passed = !!doc.querySelector('title')?.textContent; return { passed, details: passed ? 'OK' : 'No &lt;title&gt; tag found.' }; }
+function checkMetaDescription(doc) { const passed = !!doc.querySelector('meta[name="description"]')?.content; return { passed, details: passed ? 'OK' : 'No &lt;meta name="description"&gt; tag found.' }; }
+function checkH1Heading(doc) { const h1s = doc.querySelectorAll('h1').length; const passed = h1s === 1; return { passed, details: passed ? 'OK' : `Found ${h1s} &lt;h1&gt; tags (expected 1).` }; }
+function checkViewport(doc) { const passed = !!doc.querySelector('meta[name="viewport"]'); return { passed, details: passed ? 'OK' : 'Missing &lt;meta name="viewport"&gt; tag.' }; }
+function checkInternalLinks(doc, url) { const count = countInternalLinks(doc, url); const passed = count > 2; return { passed, details: passed ? 'OK' : `Found only ${count} internal links (recommend > 2).` }; }
+function checkAltText(doc) { const images = Array.from(doc.querySelectorAll('img')); const missingAlt = images.filter(img => !img.alt || !img.alt.trim()); const passed = missingAlt.length === 0; return { passed, details: passed ? 'OK' : `Found ${missingAlt.length} images missing alt text. e.g., ${missingAlt.map(i => i.src).slice(0, 2).join(', ')}` }; }
+function checkLists(doc) { const passed = doc.querySelectorAll('ul, ol').length > 0; return { passed, details: passed ? 'OK' : 'No bulleted or numbered lists found.' }; }
+function checkReadability(text) { const sentences = text.match(/[^.!?]+[.!?]+/g) || []; const words = text.match(/\b\w+\b/g) || []; const score = (sentences.length === 0 || words.length === 0) ? 0 : words.length / sentences.length; const passed = score < 25 && score > 0; return { passed, details: passed ? `Good (Avg. ${score.toFixed(1)} words/sentence).` : `High (Avg. ${score.toFixed(1)} words/sentence). Recommend < 25.` }; }
+function checkAuthor(doc) { const passed = !!doc.querySelector('a[href*="author/"], a[rel="author"]'); return { passed, details: passed ? 'OK' : 'No link to an author bio page found.' }; }
+function checkExperience(text) { const passed = /in our test|hands-on|my experience|we visited|I found that|our team reviewed|we tested|firsthand|I personally|from my experience/i.test(text); return { passed, details: passed ? 'OK' : 'No phrases indicating first-hand experience found.' }; }
+function checkFreshness(doc, text) { const passed = /updated|published/i.test(text) || !!doc.querySelector('meta[property*="time"]'); return { passed, details: passed ? 'OK' : 'No "published" or "last updated" date found.' }; }
+function checkContact(doc) { const passed = !!doc.querySelector('a[href*="contact"], a[href*="about"]'); return { passed, details: passed ? 'OK' : 'No link to a Contact or About page found.' }; }
+function checkOutboundLinks(doc, url) { const passed = hasOutboundLinks(doc, url); return { passed, details: passed ? 'OK' : 'No links to external websites found.' }; }
+function checkSchemaFound(types) { const passed = types.length > 0; return { passed, details: passed ? `Found: ${types.join(', ')}` : 'No Schema.org data found.' }; }
+function checkArticleOrgSchema(types) { const passed = types.includes('Article') || types.includes('Organization'); return { passed, details: passed ? 'OK' : 'Missing essential Article or Organization schema.' }; }
+function checkFaqHowToSchema(types) { const passed = types.includes('FAQPage') || types.includes('HowTo'); return { passed, details: passed ? 'OK' : 'Missing high-value FAQ or How-To schema.' }; }
+function checkConversationalTone(doc, text) { const headings = doc.querySelectorAll('h2, h3'); const questionWords = ['what', 'how', 'why', 'when', 'where', 'is', 'can', 'do', 'are', 'which', 'who', 'does', 'should']; const hasQuestionHeadings = Array.from(headings).some(h => { const headingText = h.textContent.trim().toLowerCase(); return questionWords.some(word => headingText.startsWith(word)); }); if (hasQuestionHeadings) return { passed: true, details: 'OK (Found question-based subheadings).' }; const pronounCount = (text.match(/\byou\b|\byour\b/gi) || []).length; if (pronounCount > 5) { return { passed: true, details: `OK (Found ${pronounCount} second-person pronouns).` }; } return { passed: false, details: 'No question-based subheadings or significant use of second-person pronouns (you/your) found.' }; }
+function checkUniqueData(doc, text) { const hasKeywords = /our data|our research|we surveyed|according to our study|we analyzed|our findings show|in our analysis/i.test(text); if (hasKeywords) return { passed: true, details: 'OK (Found keywords indicating original research).' }; const hasTable = doc.querySelector('table'); if (hasTable) return { passed: true, details: 'OK (Found an HTML &lt;table&gt; element).' }; const vizPlatforms = ['tableau', 'datawrapper', 'sheets.google.com', 'fusiontables.google.com']; const hasEmbeddedViz = Array.from(doc.querySelectorAll('iframe')).some(iframe => { const src = iframe.getAttribute('src') || ''; return vizPlatforms.some(platform => src.includes(platform)); }); if (hasEmbeddedViz) return { passed: true, details: 'OK (Found an embedded data visualization).' }; return { passed: false, details: 'No signals of original data, research, or visualizations found.' }; }
+function checkCitations(doc, text) { const hasKeywords = /source:|according to:|citation:/i.test(text); if (hasKeywords) return { passed: true, details: 'OK (Found citation keywords).' }; const hasParagraphLinks = Array.from(doc.querySelectorAll('p a')).some(link => { try { const pageHost = new URL(doc.baseURI).hostname; const linkHost = new URL(link.href).hostname; return linkHost && linkHost !== pageHost; } catch (e) { return false; } }); if (hasParagraphLinks) return { passed: true, details: 'OK (Found outbound links within paragraph text).' }; return { passed: false, details: 'No cited sources or contextual outbound links found in paragraphs.' }; }
+function hasOutboundLinks(doc, url) { try { const pageHost = new URL(url).hostname; return Array.from(doc.querySelectorAll('a[href]')).some(link => { try { const linkHost = new URL(link.href).hostname; return linkHost && linkHost !== pageHost; } catch (e) { return false; } }); } catch (e) { return false; } }
+function countInternalLinks(doc, url) { try { const pageHost = new URL(url).hostname; return Array.from(doc.querySelectorAll('a[href]')).filter(link => { try { const linkHost = new URL(link.href).hostname; return linkHost === pageHost; } catch (e) { return false; } }).length; } catch (e) { return 0; } }
+function getSchemaTypes(doc) { const schemas = []; doc.querySelectorAll('script[type="application/ld+json"]').forEach(script => { try { const json = JSON.parse(script.textContent); const graph = json['@graph'] || [json]; graph.forEach(item => { if (item['@type']) { schemas.push(item['@type']); } }); } catch (e) { console.error("Error parsing JSON-LD:", e); } }); return schemas.flat(); }
