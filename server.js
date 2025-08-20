@@ -34,7 +34,6 @@ const apiLimiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 10, standardHeader
 
 // --- API Routes ---
 
-// NEW: Endpoint to start the analysis and immediately return a reportId
 app.post('/api/start-analysis', apiLimiter, (req, res) => {
     const scraperKeyMissing = (SCRAPER_SERVICE === 'scraperapi' && !SCRAPER_API_KEY) || (SCRAPER_SERVICE === 'scrapingbee' && !SCRAPINGBEE_API_KEY);
     if (scraperKeyMissing || !SENDGRID_API_KEY || !FROM_EMAIL || !TO_EMAIL) {
@@ -46,17 +45,14 @@ app.post('/api/start-analysis', apiLimiter, (req, res) => {
     const reportId = uuidv4();
     reportCache.set(reportId, { status: 'pending', message: 'Analysis has been queued.' });
     
-    // Immediately respond to the client so it doesn't time out
     res.status(202).json({ reportId: reportId });
 
-    // Start the long-running crawl process in the background
     crawlSite(startUrl, reportId).catch(error => {
         console.error(`Unhandled error during crawl for report ${reportId}:`, error);
         reportCache.set(reportId, { status: 'error', message: 'A critical error occurred during analysis.' });
     });
 });
 
-// NEW: Endpoint to poll for the analysis status and results
 app.get('/api/analysis-status/:reportId', (req, res) => {
     const { reportId } = req.params;
     const result = reportCache.get(reportId);
@@ -100,7 +96,6 @@ app.listen(PORT, () => {
 
 // --- Core Application Logic ---
 
-// MODIFIED: crawlSite now accepts a reportId and saves the result to the cache instead of returning it.
 async function crawlSite(startUrl, reportId) {
     try {
         console.log(`Starting background analysis for report ${reportId}, URL: ${startUrl}`);
@@ -114,6 +109,10 @@ async function crawlSite(startUrl, reportId) {
 
         const crawledUrls = new Set([startUrl]);
         const menuUrlsToCrawl = findMenuLinks(homePageDoc, startUrl, crawledUrls).slice(0, 9);
+        
+        if (menuUrlsToCrawl.length === 0) {
+             console.log(`No new internal links found on ${startUrl}. Ending crawl.`);
+        }
 
         const pagePromises = menuUrlsToCrawl.map(url => {
             return (async () => {
@@ -137,7 +136,6 @@ async function crawlSite(startUrl, reportId) {
         
         console.log(`Analysis complete for report ${reportId}. Saving to cache.`);
         reportCache.set(reportId, { status: 'complete', data: processedReport, url: startUrl });
-        // Set a timeout to delete the cache entry after 24 hours
         setTimeout(() => reportCache.delete(reportId), 86400000);
 
     } catch (error) {
@@ -152,8 +150,9 @@ async function fetchHtml(url) {
     try {
         if (SCRAPER_SERVICE === 'scraperapi') {
             if (!SCRAPER_API_KEY) throw new Error('ScraperAPI key is not configured.');
-            // This is correct for ScraperAPI, so we leave it.
-            const scraperApiUrl = `http://api.scraperapi.com?api_key=${SCRAPER_API_KEY}&url=${encodeURIComponent(url)}&render=true&wait=2000`;
+            // UPDATED: Changed from a time-based wait to waiting for a specific selector.
+            const selector = encodeURIComponent('#main-nav');
+            const scraperApiUrl = `http://api.scraperapi.com?api_key=${SCRAPER_API_KEY}&url=${encodeURIComponent(url)}&render=true&wait_for_selector=${selector}`;
             const response = await axios.get(scraperApiUrl, { timeout: 60000 });
             return response.data;
         }
@@ -163,8 +162,9 @@ async function fetchHtml(url) {
         const params = {
             api_key: SCRAPINGBEE_API_KEY,
             url: url,
-            render_js: true
-            // REMOVED 'wait_for: 2000' as it was causing a validation error
+            render_js: true,
+            // UPDATED: Added the correct wait_for parameter to wait for the nav menu to appear.
+            wait_for: '#main-nav'
         };
         const response = await axios.get(scraperUrl, { params: params, timeout: 60000 });
         return response.data;
