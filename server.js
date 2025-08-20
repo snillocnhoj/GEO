@@ -101,8 +101,7 @@ async function crawlSite(startUrl, reportId) {
         console.log(`Starting background analysis for report ${reportId}, URL: ${startUrl}`);
         const allPageResults = [];
         
-        // We only need to fetch the homepage once.
-        const homePageHtml = await fetchHtml(startUrl, true); // Pass true for homepage
+        const homePageHtml = await fetchHtml(startUrl, true);
         const homePageDom = new JSDOM(homePageHtml, { url: startUrl });
         const homePageDoc = homePageDom.window.document;
         allPageResults.push({ url: startUrl, checks: runAllChecks(homePageDoc, startUrl) });
@@ -119,8 +118,7 @@ async function crawlSite(startUrl, reportId) {
                 if (crawledUrls.has(url)) return null;
                 crawledUrls.add(url);
                 try {
-                    // For subpages, we can assume a simple fetch is enough.
-                    const pageHtml = await fetchHtml(url, false); // Pass false for subpages
+                    const pageHtml = await fetchHtml(url, false);
                     const pageDom = new JSDOM(pageHtml, { url: url });
                     const pageDoc = pageDom.window.document;
                     return { url: url, checks: runAllChecks(pageDoc, url) };
@@ -145,14 +143,11 @@ async function crawlSite(startUrl, reportId) {
     }
 }
 
-// THIS IS THE UPDATED FUNCTION
 async function fetchHtml(url, isHomepage = false) {
     console.log(`Fetching HTML for ${url}. Is homepage: ${isHomepage}`);
     
-    // --- Step 1: Try a quick, simple fetch first ---
     try {
-        const simpleHtml = await fetchWithScraper(url, false); // 'false' for no JS rendering
-        // After simple fetch, check if a menu exists. If so, we are done.
+        const simpleHtml = await fetchWithScraper(url, false);
         const tempDom = new JSDOM(simpleHtml, { url: url });
         const links = findMenuLinks(tempDom.window.document, url, new Set());
         if (links.length > 0 || !isHomepage) {
@@ -163,11 +158,11 @@ async function fetchHtml(url, isHomepage = false) {
         console.log(`Simple fetch failed for ${url}, but that's okay. Retrying with JS rendering.`);
     }
 
-    // --- Step 2: If simple fetch fails to find links on homepage, retry with full JS rendering ---
     console.log(`Simple fetch for ${url} did not find links. Retrying with advanced JS rendering...`);
-    return fetchWithScraper(url, true); // 'true' for JS rendering
+    return fetchWithScraper(url, true);
 }
 
+// THIS IS THE UPDATED FUNCTION
 async function fetchWithScraper(url, useJsRendering) {
     console.log(`Using scraper service: ${SCRAPER_SERVICE}. JS Rendering: ${useJsRendering}`);
     try {
@@ -182,17 +177,20 @@ async function fetchWithScraper(url, useJsRendering) {
             return response.data;
         }
         
-        // Default to scrapingbee
         if (!SCRAPINGBEE_API_KEY) throw new Error('ScrapingBee key is not configured.');
         const scraperUrl = 'https://app.scrapingbee.com/api/v1/';
         const params = {
             api_key: SCRAPINGBEE_API_KEY,
             url: url,
         };
+
         if (useJsRendering) {
             params.render_js = true;
             params.wait_for = '#main-nav';
+            // FINAL OPTIMIZATION: Block images/css/fonts to speed up rendering
+            params.block_resources = true; 
         }
+
         const response = await axios.get(scraperUrl, { params: params, timeout: 90000 });
         return response.data;
 
