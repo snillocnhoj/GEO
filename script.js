@@ -1,5 +1,4 @@
 // --- Constants & Data ---
-const TICKET_COLORS = ['#fdd835', '#4cc9f0', '#f72585', '#7209b7'];
 let currentReportId = null;
 const MAX_PAGES_TO_CRAWL = 10;
 const INITIAL_PROGRESS_MESSAGES = ["Warming up the engines...","Scanning for E-E-A-T signals to build trust with AI...","Did you know? AI prioritizes sites that answer customer questions.","Checking if your content is 'quotable' for search results...","Analyzing your site's structure for readability..."];
@@ -7,9 +6,21 @@ const FINAL_MARKETING_MESSAGES = ["Brought to you by John Collins Consulting","A
 let progressInterval;
 
 const MODAL_CONTENT = {
+    "how-it-works": {
+        title: "How The Thrill-O-Meter Works",
+        text: `
+            <ol>
+                <li><strong>Enter Your URL:</strong> You provide the homepage URL of the website you want to analyze.</li>
+                <li><strong>Smart Crawl:</strong> Our tool intelligently finds the main navigation menu on your homepage and identifies up to 10 of your most important pages to inspect.</li>
+                <li><strong>19-Point GEO Analysis:</strong> The server analyzes each page against 19 critical criteria for Generative Engine Optimization, checking everything from technical setup to content quality and trustworthiness.</li>
+                <li><strong>Instant Results:</strong> You receive a site-wide GEO Score, a detailed checklist showing how your site performed on each check, and an interpretation of your score.</li>
+                <li><strong>Detailed Report:</strong> You have the option to receive a comprehensive, page-by-page report via email, outlining specific failures and providing educational context to help you or your team make the necessary improvements.</li>
+            </ol>
+        `
+    },
     "why-geo": {
         title: "The New Frontier: Why GEO is Crucial",
-        text: `The world of search is undergoing its most significant change in a decade. Users are shifting from Browse lists of blue links to asking conversational questions and receiving direct, synthesized answers from AI like Google's AI Overviews and ChatGPT.<br><br>This is where Generative Engine Optimization (GEO) becomes essential. Traditional SEO was about ranking your website to get a click. The goal of GEO is to make your website's content so clear, authoritative, and trustworthy that the AI chooses to use it as a primary source, citing your brand and expertise directly within its generated answers. It's about moving from being an option in a list to becoming part of the definitive answer.<br><br>This requires a deeper focus on the signals of E-E-A-T (Experience, Expertise, Authoritativeness, and Trust). Because AI is putting its own reputation on the line with every response it generates, it has a strong incentive to pull from sources it deems the most credible.<br><br>Optimizing for GEO means structuring your content to be easily understood and parsed by AI, demonstrating your first-hand experience, and building undeniable brand authority. Failing to adapt to this new landscape risks your brand becoming invisible to a growing segment of users who now get their answers without ever clicking a link.`
+        text: `The world of search is undergoing its most significant change in a decade. Users are shifting from browsing lists of blue links to asking conversational questions and receiving direct, synthesized answers from AI like Google's AI Overviews and ChatGPT.<br><br>This is where Generative Engine Optimization (GEO) becomes essential. Traditional SEO was about ranking your website to get a click. The goal of GEO is to make your website's content so clear, authoritative, and trustworthy that the AI chooses to use it as a primary source, citing your brand and expertise directly within its generated answers. It's about moving from being an option in a list to becoming part of the definitive answer.<br><br>This requires a deeper focus on the signals of E-E-A-T (Experience, Expertise, Authoritativeness, and Trust). Because AI is putting its own reputation on the line with every response it generates, it has a strong incentive to pull from sources it deems the most credible.<br><br>Optimizing for GEO means structuring your content to be easily understood and parsed by AI, demonstrating your first-hand experience, and building undeniable brand authority. Failing to adapt to this new landscape risks your brand becoming invisible to a growing segment of users who now get their answers without ever clicking a link.`
     },
     "Title Tag": { title: "Title Tag", text: "The &lt;title&gt; tag is the primary title of your webpage shown in browser tabs and search results. It is the single most important signal to all search engines about the page's core topic." },
     "Meta Description": { title: "Meta Description", text: "This provides the short summary that appears under your title in search results. A compelling description encourages clicks and gives generative AI a quick, clear summary of the page's purpose." },
@@ -32,228 +43,5 @@ const MODAL_CONTENT = {
     "FAQ or How-To Schema": { title: "FAQ or How-To Schema", text: "This is one of the most powerful schema types, as it structures your content in a Q&A or step-by-step format that generative AI can lift directly into its answers." }
 };
 
-// --- DOM Elements ---
-const urlInput = document.getElementById('urlInput');
-const analyzeButton = document.getElementById('analyzeButton');
-const progressContainer = document.getElementById('progress-container');
-const progressStatus = document.getElementById('progress-status');
-const progressBar = document.getElementById('progress-bar');
-const resultsSection = document.getElementById('results');
-const scoreWrapper = document.getElementById('score-wrapper');
-const scoreCircle = document.getElementById('score-circle');
-const scoreInterpretation = document.getElementById('score-interpretation');
-const ctaButton = document.getElementById('cta-button');
-const checklistContainer = document.getElementById('checklist-container');
-const ticketWebsiteName = document.getElementById('ticket-website-name');
-const whyGeoButton = document.getElementById('why-geo-button');
-const infoModal = document.getElementById('info-modal');
-const modalTitle = document.getElementById('modal-title');
-const modalText = document.getElementById('modal-text');
-const modalCloseButton = document.getElementById('modal-close-button');
-const thrillTicket = document.getElementById('thrill-ticket');
-const ctaText = document.getElementById('cta-text');
-const userEmailInput = document.getElementById('user-email-input');
-
-// --- Event Listeners ---
-urlInput.addEventListener('input', () => {
-    if (ticketWebsiteName) {
-        ticketWebsiteName.textContent = urlInput.value.replace(/^https?:\/\//, '') || "your-website.com";
-    }
-});
-
-analyzeButton.addEventListener('click', async () => {
-    const rawUrl = urlInput.value.trim();
-    if (!rawUrl) {
-        alert('Please enter a website URL.');
-        return;
-    }
-    uiReset();
-    try {
-        const startUrl = rawUrl.startsWith('http') ? rawUrl : `https://${rawUrl}`;
-        analyzeButton.disabled = true;
-        animateProgressBar();
-        const response = await fetch('/api/analyze', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ startUrl: startUrl })
-        });
-        if (!response.ok) { throw new Error('Analysis failed on the server.'); }
-        const results = await response.json();
-        displayFinalReport(results);
-    } catch (error) {
-        console.error("A critical error occurred:", error);
-        progressContainer.classList.add('hidden');
-        resultsSection.classList.remove('hidden');
-        checklistContainer.innerHTML = '<h3>Site-Wide Compliance Checklist</h3><p>The analysis could not be completed.</p>';
-    } finally {
-        analyzeButton.disabled = false;
-        clearInterval(progressInterval);
-    }
-});
-
-ctaButton.addEventListener('click', async () => {
-    if (!currentReportId) {
-        alert('Could not find the report to send. Please run the analysis again.');
-        return;
-    }
-    const userEmail = userEmailInput.value.trim();
-    if (!userEmail || !userEmail.includes('@') || !userEmail.includes('.')) {
-        alert('Please enter a valid email address to receive your report.');
-        return;
-    }
-    ctaButton.textContent = 'SENDING...';
-    ctaButton.disabled = true;
-    try {
-        const response = await fetch('/api/send-report', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ reportId: currentReportId, userEmail: userEmail })
-        });
-        if (response.ok) {
-            ctaButton.textContent = 'REPORT SENT! ✅';
-        } else {
-            throw new Error('Server failed to send the report.');
-        }
-    } catch (error) {
-        alert('There was an error sending your report. Please try again.');
-        ctaButton.textContent = 'SEND MY REPORT!';
-        ctaButton.disabled = false;
-    }
-});
-
-whyGeoButton.addEventListener('click', () => openModal('why-geo'));
-modalCloseButton.addEventListener('click', closeModal);
-infoModal.addEventListener('click', (event) => {
-    if (event.target === infoModal) { closeModal(); }
-});
-
-// --- Modal Functions ---
-function openModal(checkName) {
-    const content = MODAL_CONTENT[checkName];
-    if (content) {
-        modalTitle.innerHTML = content.title;
-        modalText.innerHTML = content.text;
-        infoModal.classList.remove('hidden');
-        document.body.classList.add('modal-open');
-    }
-}
-function closeModal() {
-    infoModal.classList.add('hidden');
-    document.body.classList.remove('modal-open');
-}
-
-// --- UI Update Functions ---
-function uiReset() {
-    resultsSection.classList.add('hidden');
-    progressContainer.classList.remove('hidden');
-    if (progressBar) {
-        progressBar.style.transition = 'none';
-        progressBar.style.width = '0%';
-    }
-    checklistContainer.innerHTML = '';
-    scoreWrapper.classList.add('hidden');
-    clearInterval(progressInterval);
-    if (thrillTicket) {
-        thrillTicket.style.backgroundColor = '#fdd835';
-    }
-}
-
-function animateProgressBar() {
-    let initialMessageIndex = 0;
-    let finalMessageIndex = 0;
-    let finalAlternatingCounter = 0;
-    progressStatus.textContent = INITIAL_PROGRESS_MESSAGES[initialMessageIndex];
-    setTimeout(() => {
-        if (progressBar) {
-            progressBar.style.transition = 'width 25s ease-in-out';
-            progressBar.style.width = '90%';
-        }
-    }, 100);
-    const initialInterval = setInterval(() => {
-        initialMessageIndex++;
-        if (thrillTicket) {
-            thrillTicket.style.backgroundColor = TICKET_COLORS[initialMessageIndex % TICKET_COLORS.length];
-        }
-        if (initialMessageIndex >= INITIAL_PROGRESS_MESSAGES.length) {
-            clearInterval(initialInterval);
-            progressStatus.textContent = "Compiling final report...";
-            progressInterval = setInterval(() => {
-                finalAlternatingCounter++;
-                if (thrillTicket) {
-                     thrillTicket.style.backgroundColor = TICKET_COLORS[finalAlternatingCounter % TICKET_COLORS.length];
-                }
-                if (finalAlternatingCounter % 2 === 0) {
-                    progressStatus.textContent = "Compiling final report...";
-                } else {
-                    progressStatus.textContent = FINAL_MARKETING_MESSAGES[finalMessageIndex];
-                    finalMessageIndex = (finalMessageIndex + 1) % FINAL_MARKETING_MESSAGES.length;
-                }
-            }, 3000);
-        } else {
-            progressStatus.textContent = INITIAL_PROGRESS_MESSAGES[initialMessageIndex];
-        }
-    }, 4000);
-}
-
-function getScoreInterpretation(score) {
-    if (score >= 90) return "Your site is a prime candidate for AI features! You have a powerful advantage over competitors.";
-    if (score >= 80) return "Your site has a strong foundation. Let's discuss how to leverage this advantage.";
-    if (score <= 73) return "Your site has potential, but there are a few unexpected drops ahead.";
-    return "";
-}
-
-function displayFinalReport(results) {
-    clearInterval(progressInterval);
-    if (thrillTicket) {
-        thrillTicket.style.backgroundColor = '#fdd835';
-    }
-    progressStatus.textContent = "Analysis complete!";
-    if (progressBar) {
-        progressBar.style.transition = 'width 0.5s ease-in-out';
-        progressBar.style.width = '100%';
-    }
-    setTimeout(() => {
-        progressContainer.classList.add('hidden');
-        resultsSection.classList.remove('hidden');
-    }, 500);
-    const { summary, reportId } = results;
-    currentReportId = reportId;
-    const { averageScore, checkStats } = summary;
-    checklistContainer.innerHTML = '<h3>Site-Wide Compliance Checklist</h3>';
-    if (!checkStats || Object.keys(checkStats).length === 0) {
-        checklistContainer.innerHTML += '<p>Could not retrieve any pages to analyze.</p>';
-        return;
-    }
-    scoreCircle.textContent = `${averageScore}`;
-    scoreInterpretation.textContent = getScoreInterpretation(averageScore);
-
-    if (ctaText) {
-        if (averageScore >= 74) {
-            ctaText.innerHTML = "<strong>Hi, I'm John.</strong> You're doing quite well! Let me know if you want me to email a detailed report that shows you how to address the remaining issues. Don't worry, it's free, and I won't bug you, I promise. It's a Karma thing. 😊";
-        } else {
-            ctaText.innerHTML = "<strong>Hi, I'm John.</strong> Let me know if you want me to email a detailed report that shows you how to address these issues. Don't worry, it's free, and I won't bug you, I promise. It's a Karma thing. 😊";
-        }
-    }
-
-    ctaButton.classList.remove('hidden');
-    ctaButton.textContent = 'SEND MY REPORT!';
-    ctaButton.disabled = false;
-    
-    scoreWrapper.classList.remove('hidden');
-
-    for (const name in checkStats) {
-        const stats = checkStats[name];
-        const passPercent = stats.total > 0 ? Math.round((stats.passed / stats.total) * 100) : 0;
-        const icon = passPercent >= 75 ? '✔️' : '❌';
-        const checkItem = document.createElement('div');
-        checkItem.className = `check-item ${passPercent >= 75 ? 'passed' : 'failed'}`;
-        checkItem.innerHTML = `<div class="check-item-icon">${icon}</div><div class="check-item-text"><div><strong>${name}</strong><span>Passed on ${stats.passed} of ${stats.total} pages (${passPercent}%)</span></div><button class="check-item-info-button" data-check-name="${name}">?</button></div>`;
-        checklistContainer.appendChild(checkItem);
-    }
-    document.querySelectorAll('.check-item-info-button').forEach(button => {
-        button.addEventListener('click', (event) => {
-            const checkName = event.target.getAttribute('data-check-name');
-            openModal(checkName);
-        });
-    });
-}
+const urlInput=document.getElementById("urlInput"),analyzeButton=document.getElementById("analyzeButton"),progressContainer=document.getElementById("progress-container"),progressStatus=document.getElementById("progress-status"),progressBar=document.getElementById("progress-bar"),resultsSection=document.getElementById("results"),scoreWrapper=document.getElementById("score-wrapper"),scoreCircle=document.getElementById("score-circle"),scoreInterpretation=document.getElementById("score-interpretation"),ctaButton=document.getElementById("cta-button"),checklistContainer=document.getElementById("checklist-container"),ticketWebsiteName=document.getElementById("ticket-website-name"),whyGeoButton=document.getElementById("why-geo-button"),infoModal=document.getElementById("info-modal"),modalTitle=document.getElementById("modal-title"),modalText=document.getElementById("modal-text"),modalCloseButton=document.getElementById("modal-close-button"),thrillTicket=document.getElementById("thrill-ticket"),ctaText=document.getElementById("cta-text"),userEmailInput=document.getElementById("user-email-input"),howItWorksButton=document.getElementById("how-it-works-button");urlInput.addEventListener("input",()=>{ticketWebsiteName&&(ticketWebsiteName.textContent=urlInput.value.replace(/^https?:\/\//,"")||"your-website.com")}),analyzeButton.addEventListener("click",async()=>{const e=urlInput.value.trim();if(!e)return void alert("Please enter a website URL.");uiReset();try{const t=e.startsWith("http")?e:`https://${e}`;analyzeButton.disabled=!0,animateProgressBar();const n=await fetch("/api/analyze",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({startUrl:t})});if(!n.ok)throw new Error("Analysis failed on the server.");const o=await n.json();displayFinalReport(o)}catch(t){console.error("A critical error occurred:",t),progressContainer.classList.add("hidden"),resultsSection.classList.remove("hidden"),checklistContainer.innerHTML="<h3>Site-Wide Compliance Checklist</h3><p>The analysis could not be completed.</p>"}finally{analyzeButton.disabled=!1,clearInterval(progressInterval)}}),ctaButton.addEventListener("click",async()=>{if(!currentReportId)return void alert("Could not find the report to send. Please run the analysis again.");const e=userEmailInput.value.trim();if(!e||!e.includes("@")||!e.includes("."))return void alert("Please enter a valid email address to receive your report.");ctaButton.textContent="SENDING...",ctaButton.disabled=!0;try{const t=await fetch("/api/send-report",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({reportId:currentReportId,userEmail:e})});if(!t.ok)throw new Error("Server failed to send the report.");ctaButton.textContent="REPORT SENT! ✅"}catch(t){alert("There was an error sending your report. Please try again."),ctaButton.textContent="SEND MY REPORT!",ctaButton.disabled=!1}}),whyGeoButton.addEventListener("click",()=>openModal("why-geo")),howItWorksButton.addEventListener("click",()=>openModal("how-it-works")),modalCloseButton.addEventListener("click",closeModal),infoModal.addEventListener("click",e=>{e.target===infoModal&&closeModal()});function openModal(e){const t=MODAL_CONTENT[e];t&&(modalTitle.innerHTML=t.title,modalText.innerHTML=t.text,infoModal.classList.remove("hidden"),document.body.classList.add("modal-open"))}function closeModal(){infoModal.classList.add("hidden"),document.body.classList.remove("modal-open")}function uiReset(){resultsSection.classList.add("hidden"),progressContainer.classList.remove("hidden"),progressBar&&(progressBar.style.transition="none",progressBar.style.width="0%"),checklistContainer.innerHTML="",scoreWrapper.classList.add("hidden"),clearInterval(progressInterval)}
+function animateProgressBar(){let e=0,t=0,n=0;progressStatus.textContent=INITIAL_PROGRESS_MESSAGES[e],setTimeout(()=>{progressBar&&(progressBar.style.transition="width 25s ease-in-out",progressBar.style.width="90%")},100);const o=setInterval(()=>{e++,e>=INITIAL_PROGRESS_MESSAGES.length?(clearInterval(o),progressStatus.textContent="Compiling final report...",progressInterval=setInterval(()=>{n++,n%2==0?progressStatus.textContent="Compiling final report...":(progressStatus.textContent=FINAL_MARKETING_MESSAGES[t],t=(t+1)%FINAL_MARKETING_MESSAGES.length)},3e3)):progressStatus.textContent=INITIAL_PROGRESS_MESSAGES[e]},4e3)}function getScoreInterpretation(e){return e>=90?"Your site is a prime candidate for AI features! You have a powerful advantage over competitors.":e>=80?"Your site has a strong foundation. Let's discuss how to leverage this advantage.":e<=73?"Your site has potential, but there are a few unexpected drops ahead.":""}function displayFinalReport(e){clearInterval(progressInterval),progressStatus.textContent="Analysis complete!",progressBar&&(progressBar.style.transition="width 0.5s ease-in-out",progressBar.style.width="100%"),setTimeout(()=>{progressContainer.classList.add("hidden"),resultsSection.classList.remove("hidden")},500);const{summary:t,reportId:n}=e;currentReportId=n;const{averageScore:o,checkStats:r}=t;if(checklistContainer.innerHTML="<h3>Site-Wide Compliance Checklist</h3>",!r||0===Object.keys(r).length)return void(checklistContainer.innerHTML+="<p>Could not retrieve any pages to analyze.</p>");scoreCircle.textContent=`${o}`,scoreInterpretation.textContent=getScoreInterpretation(o),ctaText.innerHTML=o>=74?"<strong>Hi, I'm John.</strong> You're doing quite well! Let me know if you want me to email a detailed report that shows you how to address the remaining issues. Don't worry, it's free, and I won't bug you, I promise. It's a Karma thing. 😊":"<strong>Hi, I'm John.</strong> Let me know if you want me to email a detailed report that shows you how to address these issues. Don't worry, it's free, and I won't bug you, I promise. It's a Karma thing. 😊",ctaButton.classList.remove("hidden"),ctaButton.textContent="SEND MY REPORT!",ctaButton.disabled=!1,scoreWrapper.classList.remove("hidden");for(const s in r){const a=r[s],l=a.total>0?Math.round(a.passed/a.total*100):0,c=l>=75?"✔️":"❌",d=document.createElement("div");d.className=`check-item ${l>=75?"passed":"failed"}`,d.innerHTML=`<div class="check-item-icon">${c}</div><div class="check-item-text"><div><strong>${s}</strong><span>Passed on ${a.passed} of ${a.total} pages (${l}%)</span></div><button class="check-item-info-button" data-check-name="${s}">?</button></div>`,checklistContainer.appendChild(d)}document.querySelectorAll(".check-item-info-button").forEach(e=>{e.addEventListener("click",t=>{const n=t.target.getAttribute("data-check-name");openModal(n)})})}
