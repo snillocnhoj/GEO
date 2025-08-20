@@ -13,7 +13,7 @@ const PORT = process.env.PORT || 3000;
 
 app.set('trust proxy', 1);
 
-// --- In-memory cache for reports ---
+// --- In-memory cache for reports & job statuses ---
 const reportCache = new Map();
 
 // --- API KEYS & CONFIGURATION ---
@@ -33,39 +33,57 @@ app.use(express.json());
 const apiLimiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 10, standardHeaders: true, legacyHeaders: false, message: 'Too many requests, please try again after 15 minutes' });
 
 // --- API Routes ---
-app.post('/api/analyze', apiLimiter, async (req, res) => {
+
+// NEW: Endpoint to start the analysis and immediately return a reportId
+app.post('/api/start-analysis', apiLimiter, (req, res) => {
     const scraperKeyMissing = (SCRAPER_SERVICE === 'scraperapi' && !SCRAPER_API_KEY) || (SCRAPER_SERVICE === 'scrapingbee' && !SCRAPINGBEE_API_KEY);
     if (scraperKeyMissing || !SENDGRID_API_KEY || !FROM_EMAIL || !TO_EMAIL) {
-        console.error('One or more environment variables are not set on the server.');
         return res.status(500).json({ error: 'Server is not configured correctly.' });
     }
     const { startUrl } = req.body;
     if (!startUrl) { return res.status(400).json({ error: 'startUrl is required' }); }
-    console.log(`Starting analysis for: ${startUrl}`);
-    try {
-        const results = await crawlSite(startUrl);
-        const reportId = uuidv4();
-        reportCache.set(reportId, { report: results, url: startUrl });
-        setTimeout(() => reportCache.delete(reportId), 86400000);
-        res.status(200).json({ summary: results.summary, reportId: reportId });
-    } catch (error) {
-        console.error(`Analysis failed for ${startUrl}:`, error);
-        res.status(500).json({ error: 'Failed to complete analysis. The URL may be invalid or the site may be blocking automated tools.' });
-    }
+
+    const reportId = uuidv4();
+    reportCache.set(reportId, { status: 'pending', message: 'Analysis has been queued.' });
+    
+    // Immediately respond to the client so it doesn't time out
+    res.status(202).json({ reportId: reportId });
+
+    // Start the long-running crawl process in the background
+    crawlSite(startUrl, reportId).catch(error => {
+        console.error(`Unhandled error during crawl for report ${reportId}:`, error);
+        reportCache.set(reportId, { status: 'error', message: 'A critical error occurred during analysis.' });
+    });
 });
+
+// NEW: Endpoint to poll for the analysis status and results
+app.get('/api/analysis-status/:reportId', (req, res) => {
+    const { reportId } = req.params;
+    const result = reportCache.get(reportId);
+
+    if (!result) {
+        return res.status(404).json({ status: 'error', message: 'Report not found.' });
+    }
+
+    res.status(200).json(result);
+});
+
 
 app.post('/api/send-report', async (req, res) => {
     const { reportId, userEmail } = req.body;
-    if (!reportId || !reportCache.has(reportId)) {
-        return res.status(404).send('Report not found or expired.');
+    const cacheEntry = reportCache.get(reportId);
+
+    if (!cacheEntry || cacheEntry.status !== 'complete' || !cacheEntry.data) {
+        return res.status(404).send('Report not found, expired, or not yet complete.');
     }
     if (!userEmail) {
         return res.status(400).send('Email address is required.');
     }
-    const { report, url } = reportCache.get(reportId);
+    
+    const { data, url } = cacheEntry;
     try {
         const origin = `${req.protocol}://${req.get('host')}`;
-        await sendEmailReport(url, report, userEmail, origin);
+        await sendEmailReport(url, data, userEmail, origin);
         res.status(200).send('Report sent successfully.');
     } catch (error) {
         res.status(500).send('Failed to send email.');
@@ -82,59 +100,67 @@ app.listen(PORT, () => {
 
 // --- Core Application Logic ---
 
-async function crawlSite(startUrl) {
-    const allPageResults = [];
-    const siteOrigin = new URL(startUrl).origin;
+// MODIFIED: crawlSite now accepts a reportId and saves the result to the cache instead of returning it.
+async function crawlSite(startUrl, reportId) {
+    try {
+        console.log(`Starting background analysis for report ${reportId}, URL: ${startUrl}`);
+        const allPageResults = [];
+        const siteOrigin = new URL(startUrl).origin;
 
-    const homePageHtml = await fetchHtml(startUrl);
-    const homePageDom = new JSDOM(homePageHtml, { url: startUrl });
-    const homePageDoc = homePageDom.window.document;
-    allPageResults.push({ url: startUrl, checks: runAllChecks(homePageDoc, startUrl) });
+        const homePageHtml = await fetchHtml(startUrl);
+        const homePageDom = new JSDOM(homePageHtml, { url: startUrl });
+        const homePageDoc = homePageDom.window.document;
+        allPageResults.push({ url: startUrl, checks: runAllChecks(homePageDoc, startUrl) });
 
-    const crawledUrls = new Set([startUrl]);
-    const menuUrlsToCrawl = findMenuLinks(homePageDoc, startUrl, crawledUrls).slice(0, 9);
+        const crawledUrls = new Set([startUrl]);
+        const menuUrlsToCrawl = findMenuLinks(homePageDoc, startUrl, crawledUrls).slice(0, 9);
 
-    const pagePromises = menuUrlsToCrawl.map(url => {
-        return (async () => {
-            if (crawledUrls.has(url)) return null;
-            crawledUrls.add(url);
-            try {
-                const pageHtml = await fetchHtml(url);
-                const pageDom = new JSDOM(pageHtml, { url: url });
-                const pageDoc = pageDom.window.document;
-                return { url: url, checks: runAllChecks(pageDoc, url) };
-            } catch (error) {
-                console.error(`Failed to crawl or process page ${url}:`, error.message);
-                return null;
-            }
-        })();
-    });
+        const pagePromises = menuUrlsToCrawl.map(url => {
+            return (async () => {
+                if (crawledUrls.has(url)) return null;
+                crawledUrls.add(url);
+                try {
+                    const pageHtml = await fetchHtml(url);
+                    const pageDom = new JSDOM(pageHtml, { url: url });
+                    const pageDoc = pageDom.window.document;
+                    return { url: url, checks: runAllChecks(pageDoc, url) };
+                } catch (error) {
+                    console.error(`Failed to crawl or process page ${url}:`, error.message);
+                    return null;
+                }
+            })();
+        });
 
-    const additionalResults = await Promise.all(pagePromises);
-    const finalResults = allPageResults.concat(additionalResults.filter(result => result !== null));
+        const additionalResults = await Promise.all(pagePromises);
+        const finalResults = allPageResults.concat(additionalResults.filter(result => result !== null));
+        const processedReport = processResults(finalResults);
+        
+        console.log(`Analysis complete for report ${reportId}. Saving to cache.`);
+        reportCache.set(reportId, { status: 'complete', data: processedReport, url: startUrl });
+        // Set a timeout to delete the cache entry after 24 hours
+        setTimeout(() => reportCache.delete(reportId), 86400000);
 
-    return processResults(finalResults);
+    } catch (error) {
+        console.error(`Analysis failed for ${startUrl}:`, error);
+        reportCache.set(reportId, { status: 'error', message: 'Failed to complete analysis. The URL may be invalid or the site may be blocking automated tools.' });
+    }
 }
 
-// THIS IS THE UPDATED FUNCTION
 async function fetchHtml(url) {
     console.log(`Using scraper service: ${SCRAPER_SERVICE}`);
     try {
         if (SCRAPER_SERVICE === 'scraperapi') {
             if (!SCRAPER_API_KEY) throw new Error('ScraperAPI key is not configured.');
-            // ADDED '&wait=2000' to wait 2 seconds for animations to finish
             const scraperApiUrl = `http://api.scraperapi.com?api_key=${SCRAPER_API_KEY}&url=${encodeURIComponent(url)}&render=true&wait=2000`;
             const response = await axios.get(scraperApiUrl, { timeout: 60000 });
             return response.data;
         }
-        // Default to scrapingbee
         if (!SCRAPINGBEE_API_KEY) throw new Error('ScrapingBee key is not configured.');
         const scraperUrl = 'https://app.scrapingbee.com/api/v1/';
         const params = {
             api_key: SCRAPINGBEE_API_KEY,
             url: url,
             render_js: true,
-            // ADDED THIS PARAMETER to wait 2 seconds for animations to finish
             wait_for: 2000
         };
         const response = await axios.get(scraperUrl, { params: params, timeout: 60000 });
@@ -227,23 +253,17 @@ async function sendEmailReport(url, results, userEmail, origin) {
     }
 }
 
-/**
- * Finds links in the main navigation menu to crawl.
- * This function uses a series of CSS selectors as a heuristic to identify the primary navigation.
- * It starts with the most specific selectors and falls back to more generic ones.
- */
 function findMenuLinks(doc, startUrl, crawledUrls) {
-    // Added more flexible selectors to find navs in divs and other elements
     const selectors = [
-        'nav[id*="main"] a',           // Standard navs with "main" in ID
-        'nav[id*="primary"] a',        // Standard navs with "primary" in ID
-        '[id*="main-nav"] a',          // NEW: Catches elements like <div id="main-nav">
-        '[id*="primary-nav"] a',       // NEW: Catches elements like <div id="primary-nav">
-        '[class*="main-nav"] a',       // NEW: Catches elements like <div class="main-nav">
-        '[class*="primary-nav"] a',    // NEW: Catches elements like <div class="primary-nav">
-        'header nav a',                // Navs within a header
-        '[role="navigation"] a',       // NEW: Accessibility-focused selector
-        'nav a'                        // Any remaining navs
+        'nav[id*="main"] a',
+        'nav[id*="primary"] a',
+        '[id*="main-nav"] a',
+        '[id*="primary-nav"] a',
+        '[class*="main-nav"] a',
+        '[class*="primary-nav"] a',
+        'header nav a',
+        '[role="navigation"] a',
+        'nav a'
     ];
     let links = new Set();
     const siteOrigin = new URL(startUrl).origin;
@@ -256,7 +276,7 @@ function findMenuLinks(doc, startUrl, crawledUrls) {
                 if (!href || href.startsWith('#')) return;
 
                 const urlObject = new URL(href, startUrl);
-                urlObject.hash = ''; // Remove fragments
+                urlObject.hash = '';
                 const cleanUrl = urlObject.href;
 
                 if (cleanUrl.startsWith(siteOrigin) && !crawledUrls.has(cleanUrl)) {
