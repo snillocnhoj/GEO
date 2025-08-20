@@ -116,23 +116,30 @@ async function crawlSite(startUrl) {
     return processResults(finalResults);
 }
 
+// THIS IS THE UPDATED FUNCTION
 async function fetchHtml(url) {
     console.log(`Using scraper service: ${SCRAPER_SERVICE}`);
     try {
         if (SCRAPER_SERVICE === 'scraperapi') {
             if (!SCRAPER_API_KEY) throw new Error('ScraperAPI key is not configured.');
-            const scraperApiUrl = `http://api.scraperapi.com?api_key=${SCRAPER_API_KEY}&url=${encodeURIComponent(url)}`;
-            const response = await axios.get(scraperApiUrl, { timeout: 30000 });
+            // ADDED '&render=true' to enable JavaScript rendering
+            const scraperApiUrl = `http://api.scraperapi.com?api_key=${SCRAPER_API_KEY}&url=${encodeURIComponent(url)}&render=true`;
+            const response = await axios.get(scraperApiUrl, { timeout: 60000 }); // Increased timeout for JS rendering
             return response.data;
         }
+        // Default to scrapingbee
         if (!SCRAPINGBEE_API_KEY) throw new Error('ScrapingBee key is not configured.');
         const scraperUrl = 'https://app.scrapingbee.com/api/v1/';
-        const params = { api_key: SCRAPINGBEE_API_KEY, url: url };
-        const response = await axios.get(scraperUrl, { params: params, timeout: 30000 });
+        const params = {
+            api_key: SCRAPINGBEE_API_KEY,
+            url: url,
+            render_js: true // ADDED THIS PARAMETER to enable JavaScript rendering
+        };
+        const response = await axios.get(scraperUrl, { params: params, timeout: 60000 }); // Increased timeout for JS rendering
         return response.data;
     } catch (error) {
-        console.error(`Failed to fetch HTML for ${url}:`, error.message);
-        throw new Error(`Could not fetch HTML from ${url}.`);
+        console.error(`Failed to fetch HTML for ${url}:`, error.response ? error.response.data : error.message);
+        throw new Error(`Could not fetch HTML from ${url}. The site may be blocking scrapers or returning an error.`);
     }
 }
 
